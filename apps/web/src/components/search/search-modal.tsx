@@ -4,7 +4,7 @@ import React from "react";
 import { Search, X, Loader2, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui-components";
 import { motion, AnimatePresence } from "framer-motion";
-import { searchEntities, type SearchResult } from "@/actions/search";
+import { searchEntities, addToSearchHistory, type SearchResult } from "@/actions/search";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -31,7 +31,8 @@ export function SearchModal() {
     return () => clearTimeout(timer);
   }, [query]);
 
-  const handleSelect = (slug: string) => {
+  const handleSelect = (slug: string, name: string) => {
+    addToSearchHistory(name);
     setIsOpen(false);
     router.push(`/god/${slug}`);
   };
@@ -91,7 +92,7 @@ export function SearchModal() {
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             className="flex items-center gap-4 p-4 rounded-2xl hover:bg-neutral-black/5 cursor-pointer transition-colors group"
-                            onClick={() => handleSelect(result.slug)}
+                            onClick={() => handleSelect(result.slug, result.name)}
                         >
                             <div className="w-12 h-12 rounded-full bg-neutral-black/5 relative overflow-hidden shrink-0">
                                 {result.imageUrl ? (
