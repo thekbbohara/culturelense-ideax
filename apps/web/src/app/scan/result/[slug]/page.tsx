@@ -56,7 +56,7 @@ export default async function ResultPage({
       <nav className="fixed top-0 left-0 right-0 z-50 p-6 flex justify-between items-start ">
         <AnimatedButton href="/home" icon={<ArrowLeft />} direction="left" />
 
-        <AnimatedButton icon={<Share2 />} direction="right" />
+        {/* <AnimatedButton icon={<Share2 />} direction="right" /> */}
       </nav>
 
       <main className="lg:flex min-h-screen">
