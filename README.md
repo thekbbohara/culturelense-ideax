@@ -4,8 +4,7 @@ Welcome to CultureLense, a platform for discovering cultural entities.
 
 ## Project Structure
 
-- **apps/web**: Next.js 14 web application (PWA enabled).
-- **packages/db**: Shared database schema and configuration (PostgreSQL/Drizzle).
+- **apps/web**: Next.js 14 web application (PWA enabled) containing the Database Schema and logic.
 - **packages/shared**: Shared utilities and types.
 - **packages/ui**: Shared React UI component library.
 - **services/api**: FastAPI Python backend service.
@@ -46,10 +45,25 @@ To run the Next.js app in development mode:
 
 ```bash
 # From root
-npm run dev
+npm run web
 ```
 
 Access the web app at [http://localhost:3000](http://localhost:3000).
+
+### 4. Database Management
+
+You can run database commands directly from the root:
+
+```bash
+# Push schema changes to Supabase
+npm run db:push
+
+# Generate migration files
+npm run db:generate
+
+# Seed the database
+npm run db:seed
+```
 
 **Backend (API Service):**
 
