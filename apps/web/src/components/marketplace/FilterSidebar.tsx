@@ -1,75 +1,98 @@
 import React from 'react';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { SlidersHorizontal, ChevronDown } from 'lucide-react';
+import { SlidersHorizontal, X } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export const FilterSidebar = () => {
   return (
-    <div className="w-full lg:w-64 space-y-8">
-      <div className="flex items-center justify-between lg:hidden mb-4">
-        <h2 className="text-lg font-bold">Filters</h2>
-         <Button variant="outline" size="sm">
-            <SlidersHorizontal className="w-4 h-4 mr-2" />
-            Filter
-         </Button>
+    <div className="bg-white rounded-3xl border border-primary/10 p-6 shadow-lg">
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="font-bold text-lg flex items-center gap-2">
+          <SlidersHorizontal className="w-5 h-5 text-primary" />
+          Filters
+        </h3>
+        <Button variant="link" className="text-primary text-sm font-bold p-0 h-auto">
+          Clear All
+        </Button>
       </div>
 
-      <div className="hidden lg:block space-y-8">
+      <div className="space-y-6">
+        {/* Category */}
         <div>
-          <h3 className="text-sm font-bold uppercase tracking-wider text-gray-900 mb-4">Categories</h3>
-          <ul className="space-y-3">
-            {['All Sculptures', 'Modern', 'Classical', 'Abstract', 'Bronze', 'Marble'].map((category, i) => (
-              <li key={category}>
-                <button className={`text-sm ${i === 0 ? 'font-semibold text-black' : 'text-gray-600 hover:text-black'} transition-colors`}>
-                  {category}
-                </button>
-              </li>
+          <h4 className="font-bold text-sm text-neutral-black mb-3 uppercase tracking-wider">
+            Category
+          </h4>
+          <div className="space-y-2">
+            {['All', 'Traditional', 'Modern', 'Abstract', 'Religious'].map((cat) => (
+              <label key={cat} className="flex items-center gap-3 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  className="w-5 h-5 rounded border-2 border-primary/20 text-primary focus:ring-2 focus:ring-primary/20 cursor-pointer"
+                />
+                <span className="text-sm text-neutral-black/70 group-hover:text-primary transition-colors font-medium">
+                  {cat}
+                </span>
+              </label>
             ))}
-          </ul>
+          </div>
         </div>
-        
-        <Separator />
 
+        <Separator className="bg-primary/10" />
+
+        {/* Price Range */}
         <div>
-            <div className="flex items-center justify-between mb-4 group cursor-pointer">
-                <h3 className="text-sm font-bold uppercase tracking-wider text-gray-900">Price Range</h3>
-                <ChevronDown className="w-4 h-4 text-gray-400 group-hover:text-gray-900 transition-colors"/>
+          <h4 className="font-bold text-sm text-neutral-black mb-3 uppercase tracking-wider">
+            Price Range
+          </h4>
+          <div className="space-y-4">
+            <input
+              type="range"
+              min="0"
+              max="10000"
+              className="w-full h-2 bg-primary/10 rounded-full appearance-none cursor-pointer accent-primary"
+            />
+            <div className="flex items-center gap-3">
+              <input
+                type="number"
+                placeholder="Min"
+                className="flex-1 px-3 py-2 rounded-lg border border-primary/10 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10 text-sm"
+              />
+              <span className="text-neutral-black/30">-</span>
+              <input
+                type="number"
+                placeholder="Max"
+                className="flex-1 px-3 py-2 rounded-lg border border-primary/10 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10 text-sm"
+              />
             </div>
-            <div className="space-y-3">
-                 <label className="flex items-center space-x-3 text-sm text-gray-600 cursor-pointer hover:text-black">
-                    <input type="checkbox" className="rounded border-gray-300 text-black focus:ring-black" />
-                    <span>Under $100</span>
-                 </label>
-                 <label className="flex items-center space-x-3 text-sm text-gray-600 cursor-pointer hover:text-black">
-                    <input type="checkbox" className="rounded border-gray-300 text-black focus:ring-black" />
-                    <span>$100 - $500</span>
-                 </label>
-                 <label className="flex items-center space-x-3 text-sm text-gray-600 cursor-pointer hover:text-black">
-                    <input type="checkbox" className="rounded border-gray-300 text-black focus:ring-black" />
-                    <span>$500 - $1000</span>
-                 </label>
-                 <label className="flex items-center space-x-3 text-sm text-gray-600 cursor-pointer hover:text-black">
-                    <input type="checkbox" className="rounded border-gray-300 text-black focus:ring-black" />
-                    <span>Over $1000</span>
-                 </label>
-            </div>
+          </div>
         </div>
 
-        <Separator />
+        <Separator className="bg-primary/10" />
 
+        {/* Availability */}
         <div>
-            <h3 className="text-sm font-bold uppercase tracking-wider text-gray-900 mb-4">Availability</h3>
-             <div className="space-y-3">
-                 <label className="flex items-center space-x-3 text-sm text-gray-600 cursor-pointer hover:text-black">
-                    <input type="checkbox" className="rounded border-gray-300 text-black focus:ring-black" defaultChecked />
-                    <span>In Stock</span>
-                 </label>
-                 <label className="flex items-center space-x-3 text-sm text-gray-600 cursor-pointer hover:text-black">
-                    <input type="checkbox" className="rounded border-gray-300 text-black focus:ring-black" />
-                    <span>Pre-order</span>
-                 </label>
-            </div>
+          <h4 className="font-bold text-sm text-neutral-black mb-3 uppercase tracking-wider">
+            Availability
+          </h4>
+          <div className="space-y-2">
+            {['In Stock', 'Pre-Order', 'Coming Soon'].map((status) => (
+              <label key={status} className="flex items-center gap-3 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  className="w-5 h-5 rounded border-2 border-primary/20 text-primary focus:ring-2 focus:ring-primary/20 cursor-pointer"
+                />
+                <span className="text-sm text-neutral-black/70 group-hover:text-primary transition-colors font-medium">
+                  {status}
+                </span>
+              </label>
+            ))}
+          </div>
         </div>
+
+        <Button className="w-full bg-primary hover:bg-primary/90 text-white font-bold rounded-full h-12 shadow-lg shadow-primary/30">
+          Apply Filters
+        </Button>
       </div>
     </div>
   );
