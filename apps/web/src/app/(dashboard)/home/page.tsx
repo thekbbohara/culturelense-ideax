@@ -43,7 +43,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-neutral-white text-neutral-black font-sans">
-      <main className="pt-20 min-h-screen flex flex-col w-full overflow-x-hidden">
+      <main className="pt-20 pb-32 min-h-screen flex flex-col w-full overflow-x-hidden">
         {!hasHistory ? (
             // EMPTY STATE: Immersive Scan
             <div className="flex-1 flex flex-col items-center justify-center relative bg-neutral-white overflow-hidden">

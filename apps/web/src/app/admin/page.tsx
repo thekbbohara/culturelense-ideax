@@ -1,29 +1,47 @@
-import { Button } from '@culturelense/ui';
+import { getAdminStats, getPendingVendors, getAllTransactions } from "@/actions/admin";
+import { AdminStats } from "@/components/admin/admin-stats";
+import { VendorTable } from "@/components/admin/vendor-table";
+import { TransactionTable } from "@/components/admin/transaction-table";
+import { ThemeToggle } from "@/components/theme-toggle";
 
-export default function AdminDashboard() {
-  return (
-    <div className="p-8">
-        <h1 className="text-3xl font-bold mb-8">Admin Console</h1>
-        
-        <div className="grid grid-cols-3 gap-6 mb-8">
-            <div className="bg-white p-6 rounded-xl shadow">
-                <h3 className="text-gray-500 text-sm">Total Revenue</h3>
-                <p className="text-3xl font-bold mt-2">$0.00</p>
-            </div>
-            <div className="bg-white p-6 rounded-xl shadow">
-                <h3 className="text-gray-500 text-sm">Escrow Held</h3>
-                <p className="text-3xl font-bold mt-2">$0.00</p>
-            </div>
-            <div className="bg-white p-6 rounded-xl shadow">
-                <h3 className="text-gray-500 text-sm">Pending Vendors</h3>
-                <p className="text-3xl font-bold mt-2">0</p>
-            </div>
-        </div>
+export default async function AdminPage() {
+    const stats = await getAdminStats();
+    const pendingVendors = await getPendingVendors();
+    const transactions = await getAllTransactions();
 
-        <div className="bg-white rounded-xl shadow p-6">
-            <h2 className="text-xl font-bold mb-4">Pending Approvals</h2>
-            <p className="text-gray-400">No pending items.</p>
+    return (
+        <div className="min-h-screen bg-muted/10 pb-20">
+            <header className="bg-background border-b sticky top-0 z-30">
+                <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+                    <h1 className="text-xl font-bold font-serif tracking-tight">CultureLense Admin</h1>
+                    <div className="flex items-center gap-4">
+                        <span className="text-sm text-muted-foreground hidden sm:inline">Administrator</span>
+                        <ThemeToggle />
+                    </div>
+                </div>
+            </header>
+
+            <main className="container mx-auto px-4 py-8 space-y-8">
+                {/* Stats Section */}
+                <section>
+                    <h2 className="text-2xl font-bold mb-4">Overview</h2>
+                    <AdminStats stats={stats} />
+                </section>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* Pending Vendors Section */}
+                    <section>
+                        <h2 className="text-2xl font-bold mb-4">Vendor Requests</h2>
+                        <VendorTable vendors={pendingVendors} />
+                    </section>
+
+                    {/* Recent Transactions Section */}
+                    <section>
+                        <h2 className="text-2xl font-bold mb-4">Live Transactions</h2>
+                        <TransactionTable transactions={transactions} />
+                    </section>
+                </div>
+            </main>
         </div>
-    </div>
-  );
+    );
 }
