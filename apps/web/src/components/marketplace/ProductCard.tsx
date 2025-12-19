@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ShoppingCart, Heart, Eye } from 'lucide-react';
 import Link from 'next/link';
+import { cn } from '@/lib/utils';
 
 interface ProductCardProps {
   id: string;
@@ -13,6 +14,7 @@ interface ProductCardProps {
   price: number;
   imageUrl: string;
   isNew?: boolean;
+  className?: string;
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({
@@ -22,15 +24,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   price,
   imageUrl,
   isNew,
+  className,
 }) => {
   return (
     <motion.div
       whileHover={{ y: -12 }}
       transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-      className="group"
+      className={cn('group', className)}
     >
-      <Link href={`/marketplace/${id}`}>
-        <Card className="relative overflow-hidden border-none bg-card shadow-lg hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 rounded-3xl">
+      <Link href={`/marketplace/${id}`} className="inline-block h-full w-full">
+        <Card className="relative flex flex-col h-full overflow-hidden border-none bg-card shadow-lg hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 rounded-3xl">
           {/* Image Container */}
           <div className="relative aspect-[3/4] overflow-hidden bg-muted">
             {isNew && (
