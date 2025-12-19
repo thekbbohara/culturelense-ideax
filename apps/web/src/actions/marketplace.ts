@@ -31,3 +31,16 @@ export async function createListing(vendorId: string, data: any) {
         return { success: false, error: 'Failed to create listing' };
     }
 }
+
+export async function getListingsByEntityId(entityId: string) {
+    try {
+        const items = await db.select().from(listings)
+            .where(eq(listings.entityId, entityId))
+            .where(eq(listings.status, 'active'))
+            .orderBy(desc(listings.createdAt));
+        return { success: true, data: items };
+    } catch (error) {
+        console.error('Failed to fetch listings by entity:', error);
+        return { success: false, data: [] };
+    }
+}

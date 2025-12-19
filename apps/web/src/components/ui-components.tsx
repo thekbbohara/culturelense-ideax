@@ -46,4 +46,13 @@ const Separator = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivE
 ))
 Separator.displayName = "Separator"
 
-export { Button, Card, CardContent, Badge, Separator }
+const Skeleton = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => {
+  return (
+    <div
+      className={cn("animate-pulse rounded-md bg-neutral-black/10", className)}
+      {...props}
+    />
+  )
+}
+
+export { Button, Card, CardContent, Badge, Separator, Skeleton }
