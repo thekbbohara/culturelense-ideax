@@ -58,7 +58,7 @@ export default async function GodPage({ params }: { params: { slug: string } }) 
                         {entity.type}
                     </Badge>
                     {entity.religion && (
-                        <Badge variant="outline" className="bg-white/10 backdrop-blur-sm text-white border-white/20 uppercase tracking-widest text-[10px] py-1 px-3">
+                        <Badge className="bg-white/10 backdrop-blur-sm text-white border-white/20 uppercase tracking-widest text-[10px] py-1 px-3">
                             {entity.religion}
                         </Badge>
                     )}
