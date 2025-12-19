@@ -6,6 +6,7 @@ import { revalidatePath } from 'next/cache';
 import { notFound, redirect } from 'next/navigation';
 
 // Helper to ensure admin access
+// Helper to ensure admin access
 async function ensureAdmin() {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -14,12 +15,15 @@ async function ensureAdmin() {
         redirect('/');
     }
 
-    // In a real app with RBAC, check role here:
-    // const dbUser = await db.query.users.findFirst({ where: eq(users.id, user.id) });
-    // if (dbUser?.role !== 'admin') redirect('/');
+    // Verify role directly from DB (Server-side, using Drizzle)
+    const dbUser = await db.query.users.findFirst({
+        where: eq(users.id, user.id),
+        columns: { role: true }
+    });
 
-    // For MVP/Demo, we might allow any logged in user or specific email
-    // if (user.email !== 'admin@culturelense.com') redirect('/'); 
+    if (dbUser?.role !== 'admin') {
+        redirect('/home');
+    }
 
     return user;
 }

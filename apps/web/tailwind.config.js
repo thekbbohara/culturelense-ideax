@@ -31,6 +31,10 @@ module.exports = {
           DEFAULT: "rgb(var(--secondary) / <alpha-value>)",
           foreground: "rgb(var(--secondary-foreground) / <alpha-value>)",
         },
+        tertiary: {
+          DEFAULT: "rgb(var(--tertiary) / <alpha-value>)",
+          foreground: "rgb(var(--tertiary-foreground) / <alpha-value>)",
+        },
         destructive: {
           DEFAULT: "rgb(var(--destructive) / <alpha-value>)",
           foreground: "rgb(var(--destructive-foreground) / <alpha-value>)",
