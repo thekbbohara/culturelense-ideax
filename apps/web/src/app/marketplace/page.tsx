@@ -58,9 +58,9 @@ export default function MarketplacePage() {
         <MarketplaceHeader />
 
         <div className="flex flex-col lg:flex-row gap-8 mt-8">
-          {/* Sidebar */}
+          {/* Filter Sidebar - handles mobile/desktop internally */}
           <aside className="lg:w-64 flex-shrink-0">
-            <div className="sticky top-24">
+            <div className="lg:sticky lg:top-24">
               <FilterSidebar />
             </div>
           </aside>
