@@ -6,7 +6,9 @@ import { LogOut } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ThemeToggle } from '@/components/theme-toggle';
 
-export function ProfileHeader({ userEmail }: { userEmail?: string | null }) {
+import { cn } from '@/lib/utils';
+
+export function ProfileHeader({ userEmail, className }: { userEmail?: string | null, className?: string }) {
     const router = useRouter();
 
     const handleLogout = async () => {
@@ -17,7 +19,7 @@ export function ProfileHeader({ userEmail }: { userEmail?: string | null }) {
     };
 
     return (
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+        <div className={cn("flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8", className)}>
             <div className="flex items-center gap-4">
                 {/* Fake Avatar */}
                 <div className="h-16 w-16 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-2xl font-bold shadow-lg ring-4 ring-background">

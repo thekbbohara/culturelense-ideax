@@ -1,12 +1,12 @@
 "use client";
-
 import React, { useState } from "react";
-import { Card, CardContent, Button } from "./ui-components";
 import { Switch } from "./ui/switch";
 import { Label } from "./ui/label";
 import { Settings, Save, Bell, Globe, Moon } from "lucide-react";
+import { Button } from "./ui-components"; // Re-import Button if needed for inline save
 import { updateUserPreferences } from "@/actions/user";
 import { useRouter } from "next/navigation";
+import { ProfileRow } from "./profile-row";
 
 interface UserPreferencesProps {
   userId: string;
@@ -25,103 +25,77 @@ export function UserPreferences({ userId, preferences }: UserPreferencesProps) {
     language: preferences?.language ?? "en",
     theme: preferences?.theme ?? "system",
   });
+  const [hasChanges, setHasChanges] = useState(false);
+
+  const updateFormData = (key: string, value: any) => {
+      setFormData(prev => ({ ...prev, [key]: value }));
+      setHasChanges(true);
+  };
 
   const handleSave = async () => {
     setLoading(true);
     const res = await updateUserPreferences(userId, formData);
     if (res.success) {
       router.refresh();
-      // Ideally show toast here
+      setHasChanges(false);
     }
     setLoading(false);
   };
 
+  // Removed internal PreferenceRow in favor of shared ProfileRow
+
   return (
-    <Card>
-      <CardContent className="p-6 space-y-6">
-        <div className="flex items-center justify-between mb-4">
-           <h3 className="font-semibold flex items-center gap-2">
-              <Settings className="w-5 h-5 text-gray-500" /> Preferences
-           </h3>
-           <Button 
-             size="sm" 
-             onClick={handleSave} 
-             disabled={loading}
-             className="gap-2"
-            >
-              <Save className="w-4 h-4" />
-              {loading ? "Saving..." : "Save Changes"}
-           </Button>
-        </div>
+    <div className="space-y-2">
+       {/* Save Banner if changes exist */}
+       {hasChanges && (
+           <div className="flex items-center justify-between bg-primary/10 text-primary px-4 py-2 rounded-lg mb-4 text-sm animate-in fade-in slide-in-from-top-2">
+               <span>You have unsaved changes.</span>
+               <Button size="sm" onClick={handleSave} disabled={loading} className="h-7 text-xs">
+                   {loading ? "Saving..." : "Save Config"}
+               </Button>
+           </div>
+       )}
 
-        <div className="space-y-4">
-          {/* Notifications */}
-          <div className="flex items-center justify-between p-3 rounded-lg border bg-neutral-50/50">
-             <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-100 text-blue-600 rounded-full">
-                   <Bell className="w-4 h-4" />
-                </div>
-                <div className="space-y-0.5">
-                    <Label htmlFor="notifications" className="text-base font-medium">Notifications</Label>
-                    <p className="text-xs text-muted-foreground">Receive updates about your orders and listings.</p>
-                </div>
-             </div>
-             <Switch 
-                id="notifications" 
+       <ProfileRow 
+          icon={Bell}
+          label="Weekly Newsletter"
+        >
+            <Switch 
                 checked={formData.enableNotifications}
-                onCheckedChange={(checked) => setFormData(prev => ({ ...prev, enableNotifications: checked }))}
-             />
-          </div>
+                onCheckedChange={(checked) => updateFormData('enableNotifications', checked)}
+            />
+       </ProfileRow>
 
-          {/* Language */}
-          <div className="flex items-center justify-between p-3 rounded-lg border bg-neutral-50/50">
-             <div className="flex items-center gap-3">
-                <div className="p-2 bg-green-100 text-green-600 rounded-full">
-                   <Globe className="w-4 h-4" />
-                </div>
-                <div className="space-y-0.5">
-                    <Label htmlFor="language" className="text-base font-medium">Language</Label>
-                    <p className="text-xs text-muted-foreground">Select your preferred language.</p>
-                </div>
-             </div>
+       <ProfileRow 
+          icon={Globe}
+          label="Language"
+        >
              <select 
-                id="language"
                 value={formData.language}
-                onChange={(e) => setFormData(prev => ({ ...prev, language: e.target.value }))}
-                className="h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm ring-offset-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                onChange={(e) => updateFormData('language', e.target.value)}
+                className="bg-transparent text-sm text-foreground border border-input rounded-md px-2 py-1 focus:ring-1 focus:ring-ring focus:outline-none"
              >
-                <option value="en">English</option>
-                <option value="es">Spanish</option>
-                <option value="fr">French</option>
-                <option value="hi">Hindi</option>
+                <option value="en" className="bg-popover text-popover-foreground">English</option>
+                <option value="es" className="bg-popover text-popover-foreground">Spanish</option>
+                <option value="fr" className="bg-popover text-popover-foreground">French</option>
              </select>
-          </div>
-
-           {/* Theme */}
-           <div className="flex items-center justify-between p-3 rounded-lg border bg-neutral-50/50">
-             <div className="flex items-center gap-3">
-                <div className="p-2 bg-purple-100 text-purple-600 rounded-full">
-                   <Moon className="w-4 h-4" />
-                </div>
-                <div className="space-y-0.5">
-                    <Label htmlFor="theme" className="text-base font-medium">App Theme</Label>
-                    <p className="text-xs text-muted-foreground">Choose your visual preference.</p>
-                </div>
-             </div>
+       </ProfileRow>
+       
+       <ProfileRow 
+          icon={Moon}
+          label="Theme"
+        >
              <select 
-                id="theme"
                 value={formData.theme}
-                onChange={(e) => setFormData(prev => ({ ...prev, theme: e.target.value }))}
-                className="h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm ring-offset-background focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                onChange={(e) => updateFormData('theme', e.target.value)}
+                className="bg-transparent text-sm text-foreground border border-input rounded-md px-2 py-1 focus:ring-1 focus:ring-ring focus:outline-none"
              >
-                <option value="system">System</option>
-                <option value="light">Light</option>
-                <option value="dark">Dark</option>
+                <option value="system" className="bg-popover text-popover-foreground">System</option>
+                <option value="light" className="bg-popover text-popover-foreground">Light</option>
+                <option value="dark" className="bg-popover text-popover-foreground">Dark</option>
              </select>
-          </div>
-
-        </div>
-      </CardContent>
-    </Card>
+       </ProfileRow>
+       
+    </div>
   );
 }
