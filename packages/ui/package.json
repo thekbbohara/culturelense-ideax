@@ -1,0 +1,18 @@
+{
+  "name": "@culturelense/ui",
+  "version": "0.0.0",
+  "main": "./src/index.tsx",
+  "types": "./src/index.tsx",
+  "license": "MIT",
+  "devDependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "typescript": "^5.3.3",
+    "tailwindcss": "^3.4.1",
+    "config": "*"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  }
+}

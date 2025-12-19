@@ -1,0 +1,35 @@
+[tool.poetry]
+name = "culturelense-backend"
+version = "0.1.0"
+description = "Backend services for CultureLense"
+authors = ["CultureLense Team"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.109.2"
+uvicorn = {extras = ["standard"], version = "^0.27.1"}
+sqlalchemy = "^2.0.27"
+pydantic = {extras = ["email"], version = "^2.6.1"}
+alembic = "^1.13.1"
+psycopg2-binary = "^2.9.9"
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+python-multipart = "^0.0.9"
+
+[tool.poetry.dev-dependencies]
+pytest = "^8.0.1"
+black = "^24.2.0"
+isort = "^5.13.2"
+mypy = "^1.8.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 88
+target-version = ['py310']
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
