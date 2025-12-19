@@ -29,7 +29,7 @@ export default function AddProductPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="mx-auto space-y-6">
       {/* Back Button */}
       <Link href="/vendor/products">
         <Button variant="ghost" className="gap-2">
