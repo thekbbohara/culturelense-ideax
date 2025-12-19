@@ -1,5 +1,6 @@
 import React from 'react';
 import { VendorNav } from '@/components/vendor/vendor-nav';
+import { SidebarProvider } from '@/components/ui/sidebar';
 
 interface VenderLayoutProps {
   children: React.ReactNode;
@@ -7,10 +8,14 @@ interface VenderLayoutProps {
 
 const VendorLayout: React.FC<VenderLayoutProps> = ({ children }) => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-      <VendorNav />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">{children}</main>
-    </div>
+    <SidebarProvider className="flex w-full h-screen">
+      <div className="min-h-[calc(100vh-5rem)] w-full bg-gradient-to-br from-background via-background to-primary/5 flex">
+        <VendorNav />
+        <main className="flex-1 p-8 !pb-28 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
+          {children}
+        </main>
+      </div>
+    </SidebarProvider>
   );
 };
 
