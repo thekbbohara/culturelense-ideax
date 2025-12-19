@@ -156,7 +156,7 @@ export const scanHistory = pgTable('scan_history', {
   userId: uuid('user_id').references(() => users.id).notNull(),
   entityId: uuid('entity_id').references(() => culturalEntities.id), // Nullable if not identified
   imageUrl: text('image_url').notNull(),
-  timestamp: timestamp('timestamp').defaultNow().notNull(),
+  timestamp: timestamp('timestamp'                          ).defaultNow().notNull(),
 });
 
 export const visitedLocations = pgTable('visited_locations', {
