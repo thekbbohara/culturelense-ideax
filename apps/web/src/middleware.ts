@@ -68,7 +68,14 @@ export async function middleware(request: NextRequest) {
 
   // White-listed public routes
   // Allows landing page, auth callbacks, login page (if exists), and any Next.js internals handled by matcher
-  const isPublicRoute = path === '/' || path.startsWith('/auth') || path.startsWith('/login');
+  // White-listed public routes
+  // Allows landing page, auth callbacks, login page (if exists), and any Next.js internals handled by matcher
+  const isPublicRoute = 
+    path === '/' || 
+    path.startsWith('/auth') || 
+    path.startsWith('/login') ||
+    path === '/sw.js' ||
+    path.startsWith('/workbox-');
 
   // 1. Unauthenticated Users
   if (!user) {
