@@ -99,3 +99,41 @@ export async function getEntitiesBySlugs(slugs: string[]): Promise<{ success: bo
     return { success: false, data: [] };
   }
 }
+
+export async function getContentItems(entityId: string) {
+  try {
+    const items = await db.query.contentItems.findMany({
+      where: (contentItems, { eq }) => eq(contentItems.entityId, entityId),
+    });
+    return items;
+  } catch (error) {
+    console.error("Failed to fetch content items:", error);
+    return [];
+  }
+}
+
+export async function getRelatedEntities(entityId: string) {
+  try {
+    // Basic implementation: fetch entities of the same type, excluding current one
+    // In future, querying entityRelationships table would be better
+    const current = await db.query.culturalEntities.findFirst({
+      where: (culturalEntities, { eq }) => eq(culturalEntities.id, entityId),
+      columns: { type: true }
+    });
+
+    if (!current) return [];
+
+    const related = await db.query.culturalEntities.findMany({
+      where: (culturalEntities, { and, eq, ne }) => and(
+        eq(culturalEntities.type, current.type),
+        ne(culturalEntities.id, entityId)
+      ),
+      limit: 3,
+    });
+    
+    return related;
+  } catch (error) {
+    console.error("Failed to fetch related entities:", error);
+    return [];
+  }
+}
