@@ -75,7 +75,8 @@ export async function middleware(request: NextRequest) {
     path.startsWith('/auth') || 
     path.startsWith('/login') ||
     path === '/sw.js' ||
-    path.startsWith('/workbox-');
+    path.startsWith('/workbox-') ||
+    path === '/manifest.json';
 
   // 1. Unauthenticated Users
   if (!user) {
