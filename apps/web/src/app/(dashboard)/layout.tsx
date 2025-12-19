@@ -1,4 +1,5 @@
 import { Nav } from "@/components/nav";
+import { Dock } from "@/components/dock";
 
 export default function DashboardLayout({
   children,
@@ -25,6 +26,7 @@ export default function DashboardLayout({
         Let's just render Nav.
       */}
       {children}
+      <Dock />
     </>
   );
 }
