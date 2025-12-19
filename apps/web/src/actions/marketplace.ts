@@ -31,3 +31,18 @@ export async function createListing(vendorId: string, data: any) {
         return { success: false, error: 'Failed to create listing' };
     }
 }
+
+export async function getListingById(id: string) {
+    try {
+        const item = await db.select().from(listings)
+           .where(eq(listings.id, id))
+           .limit(1);
+        
+        if (item && item.length > 0) {
+            return { success: true, data: item[0] };
+        }
+        return { success: false, error: 'Listing not found' };
+    } catch (error) {
+        return { success: false, error: 'Failed to fetch listing' };
+    }
+}
