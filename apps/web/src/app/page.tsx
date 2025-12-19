@@ -19,10 +19,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/lib/supabase/client";
+import { usePWAInstall } from "@/components/pwa-provider";
 
 export default function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [isScanning, setIsScanning] = React.useState(false);
+  const { install } = usePWAInstall();
 
   const toggleScan = () => {
     setIsScanning(true);
@@ -339,7 +341,7 @@ export default function LandingPage() {
                   Join the world&apos;s most advanced sculpture community. Download the app to start scanning or browse the exhibition.
                 </p>
                 <div className="flex flex-wrap justify-center gap-6">
-                  <Button onClick={handleLogin} size="lg" className="rounded-full h-16 px-10 bg-white text-black hover:bg-zinc-200 text-base font-black uppercase tracking-widest">
+                  <Button onClick={install} size="lg" className="rounded-full h-16 px-10 bg-white text-black hover:bg-zinc-200 text-base font-black uppercase tracking-widest">
                     Get the App
                   </Button>
                   <Button size="lg"  className="rounded-full h-16 px-10 border-white/20 text-white hover:bg-white/10 text-base font-black uppercase tracking-widest">

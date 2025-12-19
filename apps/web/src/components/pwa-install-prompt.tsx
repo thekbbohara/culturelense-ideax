@@ -1,56 +1,19 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Download, X } from "lucide-react";
 import { Button } from "@/components/ui-components";
 import { motion, AnimatePresence } from "framer-motion";
+import { usePWAInstall } from "@/components/pwa-provider";
 
 export function PWAInstallPrompt() {
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const { isInstallable, install } = usePWAInstall();
+  const [isVisible, setIsVisible] = useState(true);
 
-  useEffect(() => {
-    const handler = (e: Event) => {
-      // Prevent the mini-infobar from appearing on mobile
-      e.preventDefault();
-      // Stash the event so it can be triggered later.
-      setDeferredPrompt(e);
-      // Update UI notify the user they can install the PWA
-      setIsVisible(true);
-    };
-
-    window.addEventListener("beforeinstallprompt", handler);
-
-    return () => window.removeEventListener("beforeinstallprompt", handler);
-  }, []);
-
-  const handleInstallClick = async () => {
-    if (!deferredPrompt) return;
-
-    // Show the install prompt
-    deferredPrompt.prompt();
-
-    // Wait for the user to respond to the prompt
-    const { outcome } = await deferredPrompt.userChoice;
-    
-    if (outcome === 'accepted') {
-      console.log('User accepted the install prompt');
-    } else {
-      console.log('User dismissed the install prompt');
-    }
-
-    // We've used the prompt, and can't use it again, discard it
-    setDeferredPrompt(null);
-    setIsVisible(false);
-  };
-
-  const handleDismiss = () => {
-    setIsVisible(false);
-  };
+  if (!isInstallable || !isVisible) return null;
 
   return (
     <AnimatePresence>
-      {isVisible && (
         <motion.div
           initial={{ opacity: 0, y: 50, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -65,21 +28,20 @@ export function PWAInstallPrompt() {
             <div className="flex items-center gap-2">
                 <Button 
                     size="sm" 
-                    onClick={handleInstallClick}
+                    onClick={install}
                     className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 h-8 px-4 text-xs font-bold"
                 >
                     <Download className="w-3.5 h-3.5 mr-2" />
                     Install
                 </Button>
                 <button 
-                    onClick={handleDismiss}
+                    onClick={() => setIsVisible(false)}
                     className="p-1.5 rounded-full hover:bg-accent text-muted-foreground transition-colors"
                 >
                     <X className="w-4 h-4" />
                 </button>
             </div>
         </motion.div>
-      )}
     </AnimatePresence>
   );
 }

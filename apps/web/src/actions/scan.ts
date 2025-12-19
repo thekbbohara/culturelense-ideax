@@ -46,7 +46,7 @@ export async function scanImage(formData: FormData) {
     const aiFormData = new FormData();
     aiFormData.append('file', file);
 
-    const aiResponse = await axios.post(`${process.env.NEXT_PUBLIC_SPATIAL_URL}/predictv2`, aiFormData);
+    const aiResponse = await axios.post(`${process.env.NEXT_PUBLIC_SPATIAL_URL}/predict`, aiFormData);
     if (!aiResponse.data) {
       console.error('AI Service Error:', aiResponse.data);
       throw new Error('Failed to analyze image');
