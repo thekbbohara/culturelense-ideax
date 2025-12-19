@@ -1,14 +1,13 @@
-'use client';
+"use client";
 
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui-components';
 import { LogOut } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { ThemeToggle } from '@/components/theme-toggle';
 
 import { cn } from '@/lib/utils';
 
-export function ProfileHeader({ userEmail, className }: { userEmail?: string | null, className?: string }) {
+export function ProfileHeader({ userEmail, memberSince, className }: { userEmail?: string | null, memberSince?: string | null, className?: string }) {
     const router = useRouter();
 
     const handleLogout = async () => {
@@ -26,20 +25,16 @@ export function ProfileHeader({ userEmail, className }: { userEmail?: string | n
                     {userEmail ? userEmail[0].toUpperCase() : 'G'}
                 </div>
                 <div>
-                    <h1 className="text-3xl font-extrabold tracking-tight text-primary">
+                    <h1 className="text-3xl font-extrabold tracking-tight text-foreground">
                         {userEmail ? userEmail.split('@')[0] : 'Guest User'}
                     </h1>
                     <p className="text-muted-foreground text-sm">
-                        Member since 2024 • Premium
+                        Member since {memberSince ? new Date(memberSince).getFullYear() : new Date().getFullYear()}
                     </p>
                 </div>
             </div>
 
-            <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2 bg-muted/50 px-3 py-1 rounded-full border">
-                    <span className="text-xs font-medium text-muted-foreground uppercase">Theme</span>
-                    <ThemeToggle />
-                </div>
+            <div className="flex items-center gap-3 md:ml-auto">
                 <Button
                     onClick={handleLogout}
                     variant="outline"

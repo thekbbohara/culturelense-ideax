@@ -5,6 +5,7 @@ import {  Card, Skeleton } from "@/components/ui-components";
 import { Scan, Sparkles } from "lucide-react";
 import { checkUserHistory } from "@/actions/home";
 import { getRecentSearchedEntities } from "@/actions/history";
+import { getRelatedEntities } from "@/actions/entities";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -12,6 +13,7 @@ import { useRouter } from "next/navigation";
 export default function HomePage() {
   const [hasHistory, setHasHistory] = React.useState<boolean | null>(null);
   const [recentEntities, setRecentEntities] = React.useState<any[]>([]);
+  const [recommendedEntities, setRecommendedEntities] = React.useState<any[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const router = useRouter();
 
@@ -25,6 +27,13 @@ export default function HomePage() {
          setIsLoading(true);
          const { data } = await getRecentSearchedEntities();
          setRecentEntities(data || []);
+         
+         // Fetch recommendations based on the most recent search
+         if (data && data.length > 0 && data[0]) {
+            const related = await getRelatedEntities(data[0].id);
+            setRecommendedEntities(related);
+         }
+         
          setIsLoading(false);
       } else {
         setIsLoading(false);
@@ -140,24 +149,29 @@ export default function HomePage() {
                        </div>
                    ) : (
                         <div className="flex gap-6 overflow-x-auto pb-4 sm:pb-0 scrollbar-hide sm:flex-wrap max-w-[calc(100vw-3rem)]">
-                             {[
-                                { title: "Modern Muse", img: "/sclupture/buddha.webp", tag: "Zen Collection" },
-                                { title: "Vedic Artifacts", img: "/sclupture/shiva.webp", tag: "New Arrival" },
-                                { title: "Temple Series", img: "/sclupture/hanuman.webp", tag: "Popular" }
-                             ].map((item, i) => (
+                             {recommendedEntities.length > 0 ? recommendedEntities.map((item, i) => (
                                  <Card 
                                     key={i}
-                                    className="min-w-[60vw] sm:min-w-0 shrink-0 sm:shrink sm:basis-[calc(50%-0.75rem)] lg:basis-[calc(25%-1.125rem)] p-4 rounded-[2rem] bg-white border border-neutral-black/5 hover:border-secondary/30 transition-all hover:shadow-lg cursor-pointer h-full"
+                                    onClick={() => router.push(`/god/${item.slug}`)}
+                                    className="min-w-[60vw] sm:min-w-0 shrink-0 sm:shrink sm:basis-[calc(50%-0.75rem)] lg:basis-[calc(25%-1.125rem)] p-4 rounded-[2rem] bg-white border border-neutral-black/5 hover:border-secondary/30 transition-all hover:shadow-lg cursor-pointer h-full group"
                                  >
                                     <div className="aspect-square relative rounded-2xl overflow-hidden mb-4 bg-neutral-white">
-                                        <Image src={item.img} alt={item.title} fill className="object-cover" />
+                                        {item.imageUrl ? (
+                                            <Image src={item.imageUrl} alt={item.name} fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
+                                        ) : (
+                                            <div className="w-full h-full bg-neutral-100 flex items-center justify-center text-xs text-neutral-400">No Image</div>
+                                        )}
                                     </div>
                                     <div className="px-2 pb-2">
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-secondary block mb-2">{item.tag}</span>
-                                        <h3 className="font-serif font-bold text-lg">{item.title}</h3>
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-secondary block mb-2">{item.type}</span>
+                                        <h3 className="font-serif font-bold text-lg">{item.name}</h3>
                                     </div>
                                  </Card>
-                             ))}
+                             )) : (
+                                <div className="w-full py-10 text-center text-neutral-400 italic">
+                                    Continue exploring to get better recommendations.
+                                </div>
+                             )}
                         </div>
                    )}
                 </div>

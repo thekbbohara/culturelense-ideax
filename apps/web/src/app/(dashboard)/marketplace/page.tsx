@@ -25,9 +25,9 @@ export default function MarketplacePage() {
   const regularItems = items.slice(2);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-white via-neutral-white to-primary/5">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Hero Section with Gradient */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-primary via-primary/90 to-secondary/80 text-white">
+      <div className="relative overflow-hidden bg-gradient-to-r from-primary via-primary/90 to-secondary/80 text-primary-foreground">
         <div className="absolute inset-0 bg-[url('/pattern.svg')] opacity-10" />
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-secondary/20 rounded-full blur-3xl" />
@@ -102,7 +102,7 @@ export default function MarketplacePage() {
             <section>
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-serif font-black italic">All Sculptures</h2>
-                <p className="text-sm text-neutral-black/50 font-medium">
+                <p className="text-sm text-muted-foreground font-medium">
                   {regularItems.length} items
                 </p>
               </div>

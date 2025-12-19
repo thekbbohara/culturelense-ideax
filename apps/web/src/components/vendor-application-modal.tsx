@@ -6,7 +6,13 @@ import { submitVendorApplication } from '@/actions/vendor';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 
-export function VendorApplicationModal({ triggerClassName }: { triggerClassName?: string }) {
+interface VendorApplicationModalProps {
+    triggerClassName?: string;
+    triggerText?: string;
+    variant?: 'default' | 'outline' | 'link' | 'ghost'; // Add variant support
+}
+
+export function VendorApplicationModal({ triggerClassName, triggerText = "Apply for Vendor", variant = 'default' }: VendorApplicationModalProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
     const [message, setMessage] = useState('');
@@ -37,7 +43,7 @@ export function VendorApplicationModal({ triggerClassName }: { triggerClassName?
 
     return (
         <>
-            <Button onClick={() => setIsOpen(true)} className={triggerClassName}>Apply for Vendor</Button>
+            <Button onClick={() => setIsOpen(true)} className={triggerClassName} variant={variant}>{triggerText}</Button>
 
             <AnimatePresence>
                 {isOpen && (

@@ -34,7 +34,7 @@ export const FilterSidebar = () => {
     <div className="space-y-6">
       {/* Category */}
       <div>
-        <h4 className="font-bold text-sm text-neutral-black mb-3 uppercase tracking-wider">
+        <h4 className="font-bold text-sm text-foreground mb-3 uppercase tracking-wider">
           Category
         </h4>
         <div className="space-y-2">
@@ -42,9 +42,9 @@ export const FilterSidebar = () => {
             <label key={cat} className="flex items-center gap-3 cursor-pointer group">
               <input
                 type="checkbox"
-                className="w-5 h-5 rounded border-2 border-primary/20 text-primary focus:ring-2 focus:ring-primary/20 cursor-pointer"
+                className="w-5 h-5 rounded border-2 border-primary/20 text-primary focus:ring-2 focus:ring-primary/20 cursor-pointer bg-background"
               />
-              <span className="text-sm text-neutral-black/70 group-hover:text-primary transition-colors font-medium">
+              <span className="text-sm text-muted-foreground group-hover:text-primary transition-colors font-medium">
                 {cat}
               </span>
             </label>
@@ -52,12 +52,12 @@ export const FilterSidebar = () => {
         </div>
       </div>
 
-      <Separator className="bg-primary/10" />
+      <Separator className="bg-border" />
 
       {/* Price Range with Shadcn Slider */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h4 className="font-bold text-sm text-neutral-black uppercase tracking-wider">
+          <h4 className="font-bold text-sm text-foreground uppercase tracking-wider">
             Price Range
           </h4>
           {/* <span className="text-xs font-bold text-primary">${priceRange[0].toLocaleString()}</span> */}
@@ -77,10 +77,10 @@ export const FilterSidebar = () => {
 
             {/* Min/Max Labels */}
             <div className="flex justify-between mt-3">
-              <span className="text-xs font-medium text-neutral-black/50">
+              <span className="text-xs font-medium text-muted-foreground">
                 ${priceRange[0].toLocaleString()}
               </span>
-              <span className="text-xs font-medium text-neutral-black/50">
+              <span className="text-xs font-medium text-muted-foreground">
                 ${priceRange[1].toLocaleString()}
               </span>
             </div>
@@ -88,11 +88,11 @@ export const FilterSidebar = () => {
         </div>
       </div>
 
-      <Separator className="bg-primary/10" />
+      <Separator className="bg-border" />
 
       {/* Availability */}
       <div>
-        <h4 className="font-bold text-sm text-neutral-black mb-3 uppercase tracking-wider">
+        <h4 className="font-bold text-sm text-foreground mb-3 uppercase tracking-wider">
           Availability
         </h4>
         <div className="space-y-2">
@@ -100,9 +100,9 @@ export const FilterSidebar = () => {
             <label key={status} className="flex items-center gap-3 cursor-pointer group">
               <input
                 type="checkbox"
-                className="w-5 h-5 rounded border-2 border-primary/20 text-primary focus:ring-2 focus:ring-primary/20 cursor-pointer"
+                className="w-5 h-5 rounded border-2 border-primary/20 text-primary focus:ring-2 focus:ring-primary/20 cursor-pointer bg-background"
               />
-              <span className="text-sm text-neutral-black/70 group-hover:text-primary transition-colors font-medium">
+              <span className="text-sm text-muted-foreground group-hover:text-primary transition-colors font-medium">
                 {status}
               </span>
             </label>
@@ -110,7 +110,7 @@ export const FilterSidebar = () => {
         </div>
       </div>
 
-      <Button className="w-full bg-primary hover:bg-primary/90 text-white font-bold rounded-full h-12 shadow-lg shadow-primary/30">
+      <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-full h-12 shadow-lg shadow-primary/30">
         Apply Filters
       </Button>
     </div>
@@ -128,7 +128,7 @@ export const FilterSidebar = () => {
         >
           <Button
             onClick={() => setIsMobileFilterOpen(true)}
-            className="w-full bg-white text-primary border-2 border-primary/20 hover:bg-primary/5 hover:border-primary font-bold h-12 rounded-full shadow-sm"
+            className="w-full bg-card text-foreground border-2 border-border hover:bg-muted font-bold h-12 rounded-full shadow-sm"
           >
             <SlidersHorizontal className="w-5 h-5 mr-2" />
             Filters & Sort
@@ -154,29 +154,29 @@ export const FilterSidebar = () => {
                 animate={{ y: 0 }}
                 exit={{ y: '100%' }}
                 transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-                className="fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-2xl z-50 max-h-[85vh] overflow-hidden"
+                className="fixed bottom-0 left-0 right-0 bg-card text-card-foreground rounded-t-3xl shadow-2xl z-50 max-h-[85vh] overflow-hidden"
               >
                 {/* Handle Bar */}
                 <div className="flex justify-center pt-3 pb-2">
-                  <div className="w-12 h-1.5 bg-neutral-black/20 rounded-full" />
+                  <div className="w-12 h-1.5 bg-muted-foreground/20 rounded-full" />
                 </div>
 
                 {/* Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-primary/10">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-border">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
                       <SlidersHorizontal className="w-5 h-5 text-primary" />
                     </div>
                     <div>
                       <h3 className="font-bold text-lg">Filters</h3>
-                      <p className="text-xs text-neutral-black/50">Refine your search</p>
+                      <p className="text-xs text-muted-foreground">Refine your search</p>
                     </div>
                   </div>
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     size="icon"
                     onClick={() => setIsMobileFilterOpen(false)}
-                    className="rounded-full border-primary/20 hover:bg-primary/10 hover:border-primary"
+                    className="rounded-full hover:bg-muted"
                   >
                     <X className="w-5 h-5" />
                   </Button>
@@ -199,7 +199,7 @@ export const FilterSidebar = () => {
 
   // Desktop Sidebar
   return (
-    <div className="bg-white rounded-3xl border border-primary/10 p-6 shadow-lg">
+    <div className="bg-card text-card-foreground rounded-3xl border border-border p-6 shadow-lg">
       <div className="flex items-center justify-between mb-6">
         <h3 className="font-bold text-lg flex items-center gap-2">
           <SlidersHorizontal className="w-5 h-5 text-primary" />
