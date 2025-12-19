@@ -1,6 +1,6 @@
 import * as React from "react"
 
-const cn = (...classes: (string | undefined | null | false)[]) => classes.filter(Boolean).join(' ');
+const cn = (...classes: (string | undefined | null | boolean)[]) => classes.filter(Boolean).join(' ');
 
 const Button = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'default' | 'outline' | 'link' | 'ghost'; size?: 'default' | 'sm' | 'lg' | 'icon' }>(
   ({ className, variant = 'default', size = 'default', ...props }, ref) => {
@@ -12,6 +12,7 @@ const Button = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes<HT
           variant === 'outline' && "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
           variant === 'ghost' && "hover:bg-accent hover:text-accent-foreground",
           variant === 'link' && "text-primary underline-offset-4 hover:underline",
+          variant === 'ghost' && "hover:bg-accent hover:text-accent-foreground",
           size === 'default' && "h-10 px-4 py-2",
           size === 'icon' && "h-10 w-10",
           size === 'lg' && "h-11 rounded-md px-8",
