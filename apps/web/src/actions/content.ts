@@ -1,7 +1,7 @@
 'use server';
 
 import { db } from '@/lib/db';
-import { contentItems, purchases, eq, and } from '@culturelense/db';
+import { contentItems, purchases, eq, and } from '@/db';
 
 
 export async function getContentForEntity(entityId: string) {

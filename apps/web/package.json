@@ -6,16 +6,22 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "generate": "drizzle-kit generate",
+    "push": "drizzle-kit push",
+    "seed": "tsx src/db/seed.ts"
   },
   "dependencies": {
-    "@culturelense/db": "*",
     "@culturelense/shared": "*",
     "@culturelense/ui": "*",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.89.0",
+    "drizzle-orm": "^0.45.1",
+    "framer-motion": "^12.23.26",
+    "lucide-react": "^0.562.0",
     "next": "14.1.0",
     "next-pwa": "^5.6.0",
+    "postgres": "^3.4.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-webcam": "^7.2.0",
@@ -26,10 +32,12 @@
     "@types/react": "^18.2.55",
     "@types/react-dom": "^18.2.19",
     "autoprefixer": "^10.4.17",
+    "drizzle-kit": "^0.31.8",
     "eslint": "8.57.0",
     "eslint-config-next": "14.1.0",
     "postcss": "^8.4.35",
     "tailwindcss": "^3.4.1",
+    "tsx": "^4.7.1",
     "typescript": "^5.3.3"
   }
 }

@@ -1,7 +1,7 @@
 'use server';
 
 import { db } from '@/lib/db';
-import { listings, vendors, eq, desc } from '@culturelense/db';
+import { listings, vendors, eq, desc } from '@/db';
 
 
 export async function getRecentListings() {

@@ -1,7 +1,7 @@
 'use server';
 
 import { db } from '@/lib/db';
-import { culturalEntities, eq } from '@culturelense/db';
+import { culturalEntities, eq } from '@/db';
 
 
 export interface Entity {
