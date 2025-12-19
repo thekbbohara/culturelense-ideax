@@ -23,6 +23,8 @@ module.exports = {
         ring: "rgb(var(--ring) / <alpha-value>)",
         background: "rgb(var(--background) / <alpha-value>)",
         foreground: "rgb(var(--foreground) / <alpha-value>)",
+        txt: "rgb(var(--txt) / <alpha-value>)",
+        stxt: "rgb(var(--stxt) / <alpha-value>)",
         primary: {
           DEFAULT: "rgb(var(--primary) / <alpha-value>)",
           foreground: "rgb(var(--primary-foreground) / <alpha-value>)",

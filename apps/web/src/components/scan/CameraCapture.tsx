@@ -3,7 +3,7 @@ import Webcam from "react-webcam";
 import { Button } from "@culturelense/ui";
 import { Upload, X, Camera, RefreshCw, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
-import { BackButton } from "../back-button";
+import { AnimatedButton } from "../animated-button";
 
 interface CameraCaptureProps {
   onCapture: (fileOrSrc: string | File) => void;
@@ -96,7 +96,7 @@ export const CameraCapture: React.FC<CameraCaptureProps> = ({
 
             {/* Camera Controls */}
             <div className="absolute bottom-8 left-0 right-0 flex items-center justify-center gap-8 px-4">
-              <BackButton href="/home" icon={<ArrowLeft />} direction="left" />
+              <AnimatedButton href="/home" icon={<ArrowLeft />} direction="left" />
               {/* Capture Button */}
               <button
                 onClick={capture}
@@ -111,8 +111,7 @@ export const CameraCapture: React.FC<CameraCaptureProps> = ({
                 onClick={triggerFileUpload}
                 aria-label="Upload image"
               >
-                {/* <Upload className="w-6 h-6" /> */}
-                <BackButton href="/home" text="Upload" icon={<Upload />} direction="right" />
+                <AnimatedButton icon={<Upload />} direction="right" />
 
                 <input
                   type="file"

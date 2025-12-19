@@ -1,9 +1,8 @@
 "use client";
 
 import React from "react";
-import { createClient } from "@/lib/supabase/client";
-import { Button, Card, Skeleton } from "@/components/ui-components";
-import { Scan, ArrowRight, Search, Sparkles } from "lucide-react";
+import {  Card, Skeleton } from "@/components/ui-components";
+import { Scan, Sparkles } from "lucide-react";
 import { checkUserHistory } from "@/actions/home";
 import { getRecentSearchedEntities } from "@/actions/history";
 import { motion } from "framer-motion";
@@ -61,6 +60,7 @@ export default function HomePage() {
                     animate={{ scale: 1, opacity: 1 }}
                     whileTap={{ scale: 0.95 }}
                     className="w-full h-full flex flex-col items-center justify-center z-10 cursor-pointer"
+                    onClick={() => router.push('/scan')}
                  >
                     <div className="w-24 h-24 bg-primary text-white rounded-full flex items-center justify-center mb-6 shadow-2xl shadow-primary/20 animate-pulse">
                         <Scan className="w-10 h-10" />

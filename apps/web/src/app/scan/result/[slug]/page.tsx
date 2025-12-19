@@ -2,7 +2,7 @@ import { getEntityBySlug, getEntitiesBySlugs } from '@/actions/entities';
 import { Button } from '@culturelense/ui';
 import Link from 'next/link';
 import { ArrowLeft, Share2 } from 'lucide-react';
-import { BackButton } from '@/components/back-button';
+import { AnimatedButton } from '@/components/animated-button';
 
 export default async function ResultPage({
   params,
@@ -54,7 +54,7 @@ export default async function ResultPage({
 
       {/* Floating Navigation (Mobile & Desktop) */}
       <nav className="fixed top-0 left-0 right-0 z-50 p-6 flex justify-between items-start pointer-events-none">
-        <BackButton href="/home" icon={<ArrowLeft />} direction="left" />
+        <AnimatedButton href="/home" icon={<ArrowLeft />} direction="left" />
 
         <button className="pointer-events-auto p-3 rounded-full bg-background/20 backdrop-blur-xl border border-white/10 transition-all hover:bg-foreground hover:text-background text-foreground">
           <Share2 className="w-5 h-5" />
@@ -103,11 +103,11 @@ export default async function ResultPage({
             <span className="inline-block px-3 py-1 mb-3 text-xs font-bold tracking-[0.2em] uppercase text-secondary border border-secondary/30 rounded-full">
               {entity.type}
             </span>
-            <h1 className="text-5xl xl:text-6xl font-serif font-medium leading-tight text-foreground mb-4">
+            <h1 className="text-5xl xl:text-6xl font-serif font-medium leading-tight text-txt mb-4">
               {normalizeSlug(entity.name)}
             </h1>
             {entity.nickName && (
-              <p className="text-xl text-muted-foreground font-serif italic">" {entity.nickName} "</p>
+              <p className="text-xl text-stxt font-serif italic">" {entity.nickName} "</p>
             )}
           </div>
 
@@ -116,22 +116,22 @@ export default async function ResultPage({
             {/* Quick Stats Grid */}
             <div className="grid grid-cols-2 gap-3 pb-6 border-b border-border">
               {entity.location && (
-                <div className="p-4 rounded-xl bg-muted/30 border border-border">
-                  <span className="block text-xs uppercase tracking-wider text-muted-foreground mb-1">Location</span>
-                  <span className="text-lg font-medium text-foreground">{entity.location}</span>
+                <div className="p-4 rounded-xl bg-primary/30 border border-border">
+                  <span className="block text-xs uppercase tracking-wider text-white/80 mb-1">Location</span>
+                  <span className="text-lg font-medium text-white">{entity.location}</span>
                 </div>
               )}
               {entity.religion && (
-                <div className="p-4 rounded-xl bg-muted/30 border border-border">
-                  <span className="block text-xs uppercase tracking-wider text-muted-foreground mb-1">Origin</span>
-                  <span className="text-lg font-medium text-foreground">{entity.religion}</span>
+                <div className="p-4 rounded-xl bg-primary/30 border border-border">
+                  <span className="block text-xs uppercase tracking-wider text-white/80 mb-1">Origin</span>
+                  <span className="text-lg font-medium text-white">{entity.religion}</span>
                 </div>
               )}
             </div>
 
             {/* Overview - "The Curator's Note" Style */}
             <div className="relative">
-              <p className="text-lg lg:text-xl leading-relaxed text-foreground/90 font-light">
+              <p className="text-lg lg:text-xl leading-relaxed text-txt font-light">
                 {entity.intro || entity.description}
               </p>
             </div>
@@ -158,20 +158,20 @@ export default async function ResultPage({
             <div className="space-y-12">
               {entity.journey && (
                 <section>
-                  <h3 className="text-2xl font-serif text-foreground mb-4">The Journey</h3>
+                  <h3 className="text-2xl font-serif text-txt mb-4">The Journey</h3>
                   <div className="pl-6 border-l-2 border-primary/50">
-                    <p className="text-muted-foreground leading-relaxed">{entity.journey}</p>
+                    <p className="text-stxt leading-relaxed">{entity.journey}</p>
                   </div>
                 </section>
               )}
 
               {(entity.myth || entity.history) && (
                 <section>
-                  <h3 className="text-2xl font-serif text-foreground mb-4">Mythology & History</h3>
-                  <div className="p-6 rounded-2xl bg-muted/50 border border-border">
-                    {entity.myth && <p className="text-muted-foreground leading-relaxed mb-6">{entity.myth}</p>}
+                  <h3 className="text-2xl font-serif text-txt mb-4">Mythology & History</h3>
+                  <div className="p-6 rounded-2xl bg-background/20 border border-border">
+                    {entity.myth && <p className="text-stxt leading-relaxed mb-6">{entity.myth}</p>}
                     {entity.history && (
-                      <p className="text-sm text-muted-foreground/50 pt-6 border-t border-border font-mono">
+                      <p className="text-sm text-stxt/20 pt-6 border-t border-border font-mono">
                         HISTORICAL CONTEXT: {entity.history}
                       </p>
                     )}
