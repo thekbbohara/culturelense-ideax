@@ -45,25 +45,20 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFCFB] text-[#1A1A1A] font-sans selection:bg-[#E2D1C3] selection:text-[#4A3E3E]">
+    <div className="min-h-screen bg-neutral-white text-neutral-black font-sans selection:bg-tertiary selection:text-white">
       {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 bg-white/70 backdrop-blur-xl border-b border-[#E2D1C3]/30">
+      <nav className="fixed top-0 w-full z-50 bg-neutral-white/90 backdrop-blur-xl border-b border-primary/10">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-black rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
               <span className="text-white font-serif text-xl font-bold italic">C</span>
             </div>
             <span className="font-serif text-2xl font-black tracking-tighter uppercase">CultureLense</span>
           </div>
 
-          <div className="hidden md:flex items-center gap-10 font-medium text-sm tracking-wide">
-            <a href="#scan" className="hover:text-[#8C7A6B] transition-colors uppercase">Scan</a>
-            <a href="#exhibition" className="hover:text-[#8C7A6B] transition-colors uppercase">Exhibition</a>
-            <a href="#creators" className="hover:text-[#8C7A6B] transition-colors uppercase">For Creators</a>
-            <Button onClick={handleLogin} variant="outline" className="rounded-full border-[#1A1A1A] font-bold uppercase tracking-widest text-[10px] px-6">
-              Connect Wallet
+            <Button onClick={handleLogin} variant="outline" className="rounded-full border-neutral-black font-bold uppercase tracking-widest text-[10px] px-6 hover:bg-neutral-black hover:text-white transition-colors">
+              Login
             </Button>
-          </div>
 
           <button className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
             {isMenuOpen ? <X /> : <Menu />}
@@ -81,21 +76,21 @@ export default function LandingPage() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
               >
-                <Badge className="mb-6 bg-[#E2D1C3] text-[#4A3E3E] hover:bg-[#E2D1C3] border-none px-4 py-1 uppercase tracking-[0.2em] text-[10px] font-black">
+                <Badge className="mb-6 bg-secondary/10 text-secondary border-none px-4 py-1 uppercase tracking-[0.2em] text-[10px] font-black">
                   The Future of Sculpture
                 </Badge>
                 <h1 className="text-7xl md:text-8xl font-serif font-black leading-[0.9] tracking-tighter mb-8 italic">
-                  Soul in <span className="text-[#8C7A6B] not-italic">Stone.</span>
+                  Soul in <span className="text-secondary not-italic">Stone.</span>
                 </h1>
-                <p className="text-xl text-[#4A3E3E] max-w-lg mb-10 leading-relaxed font-light">
+                <p className="text-xl text-neutral-black/80 max-w-lg mb-10 leading-relaxed font-light">
                   CultureLense uses advanced spatial AI to identify sculptures instantly. Discover their history, technique, and soul—or showcase your own creations to a global audience.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <Button onClick={handleLogin} size="lg" className="rounded-full h-16 px-10 bg-black text-white hover:bg-[#1A1A1A] text-base font-black uppercase tracking-widest transition-transform hover:scale-105 active:scale-95">
+                  <Button onClick={handleLogin} size="lg" className="rounded-full h-16 px-10 bg-primary text-white hover:bg-primary/90 text-base font-black uppercase tracking-widest transition-transform hover:scale-105 active:scale-95">
                     Start Scanning <Scan className="ml-2 w-5 h-5" />
                   </Button>
                   <Button size="lg" variant="outline" className="rounded-full h-16 px-10 border-black/20 text-base font-black uppercase tracking-widest transition-transform hover:scale-105 active:scale-95">
-                    Explore Gallery <ArrowRight className="ml-2 w-5 h-5" />
+                    Marketplace <ArrowRight className="ml-2 w-5 h-5" />
                   </Button>
                 </div>
                 
@@ -116,7 +111,7 @@ export default function LandingPage() {
                 className="relative aspect-[4/5] rounded-[2rem] overflow-hidden shadow-2xl group"
               >
                 <Image 
-                  src="https://images.unsplash.com/photo-1549887534-1541e9326642?q=80&w=2000&auto=format&fit=crop"
+                  src="/sclupture/shiva.webp"
                   alt="Ancient Greek Statue"
                   fill
                   className="object-cover transition-transform duration-1000 group-hover:scale-110"
@@ -145,7 +140,7 @@ export default function LandingPage() {
                   >
                     <div className="flex justify-between items-start mb-4">
                       <div>
-                        <h3 className="text-white font-serif text-2xl font-bold italic">Laocoon and His Sons</h3>
+                        <h3 className="text-white font-serif text-2xl font-bold italic">Shiva Nataraja</h3>
                         <p className="text-white/60 text-sm">Circa 200 BC • Hellenistic Period</p>
                       </div>
                       <Badge className="bg-white/20 text-white border-none">AI Verified</Badge>
@@ -160,16 +155,16 @@ export default function LandingPage() {
           </div>
           
           {/* Decorative Background Elements */}
-          <div className="absolute -top-24 -right-24 w-96 h-96 bg-[#E2D1C3]/20 blur-[120px] rounded-full" />
-          <div className="absolute bottom-24 -left-24 w-96 h-96 bg-[#8C7A6B]/10 blur-[120px] rounded-full" />
+          <div className="absolute -top-24 -right-24 w-96 h-96 bg-secondary/20 blur-[120px] rounded-full" />
+          <div className="absolute bottom-24 -left-24 w-96 h-96 bg-primary/10 blur-[120px] rounded-full" />
         </section>
 
         {/* Features Grid */}
         <section id="scan" className="py-24 bg-white">
           <div className="max-w-7xl mx-auto px-6">
             <div className="text-center max-w-3xl mx-auto mb-20">
-              <h2 className="text-5xl font-serif font-black mb-6 tracking-tight italic">Beyond <span className="not-italic text-[#8C7A6B]">Visuals.</span></h2>
-              <p className="text-[#4A3E3E]/70 text-lg">Every sculpture has a story etched in time. We help you read it with precision and grace.</p>
+              <h2 className="text-5xl font-serif font-black mb-6 tracking-tight italic">Beyond <span className="not-italic text-secondary">Visuals.</span></h2>
+              <p className="text-neutral-black/70 text-lg">Every sculpture has a story etched in time. We help you read it with precision and grace.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -193,13 +188,13 @@ export default function LandingPage() {
                 <motion.div 
                   key={i}
                   whileHover={{ y: -10 }}
-                  className="p-10 rounded-3xl bg-[#FDFCFB] border border-[#E2D1C3]/30 transition-all hover:shadow-xl hover:shadow-[#E2D1C3]/20"
+                  className="p-10 rounded-3xl bg-neutral-white border border-neutral-black/5 transition-all hover:shadow-xl hover:shadow-primary/5"
                 >
-                  <div className="w-16 h-16 bg-black rounded-2xl flex items-center justify-center text-white mb-8">
+                  <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center text-white mb-8">
                     {feat.icon}
                   </div>
                   <h3 className="text-2xl font-serif font-bold mb-4 italic">{feat.title}</h3>
-                  <p className="text-[#4A3E3E]/60 leading-relaxed font-light">
+                  <p className="text-neutral-black/60 leading-relaxed font-light">
                     {feat.desc}
                   </p>
                 </motion.div>
@@ -209,7 +204,7 @@ export default function LandingPage() {
         </section>
 
         {/* Marketplace/Exhibition Section */}
-        <section id="exhibition" className="py-24 bg-[#1A1A1A] text-white">
+        <section id="exhibition" className="py-24 bg-neutral-black text-white">
           <div className="max-w-7xl mx-auto px-6">
             <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
               <div className="max-w-xl">
@@ -217,10 +212,10 @@ export default function LandingPage() {
                   Curated Marketplace
                 </Badge>
                 <h2 className="text-6xl font-serif font-black tracking-tight italic">
-                  The <span className="not-italic text-white/40">Exhibition.</span>
+                  The <span className="not-italic text-white/40">Marketplace.</span>
                 </h2>
               </div>
-              <Button variant="link" className="text-white font-black uppercase tracking-[0.3em] text-[10px] hover:text-[#E2D1C3] flex items-center gap-2 px-0">
+              <Button variant="link" className="text-white font-black uppercase tracking-[0.3em] text-[10px] hover:text-secondary flex items-center gap-2 px-0">
                 View All Creations <ChevronRight className="w-4 h-4" />
               </Button>
             </div>
@@ -228,25 +223,25 @@ export default function LandingPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
                 {
-                  img: "https://images.unsplash.com/photo-1554188248-986adbb73be4?q=80&w=1000&auto=format&fit=crop",
+                  img: "/sclupture/shiva.webp",
                   title: "Fragmented Silence",
                   artist: "Marcus Aurelius II",
                   price: "4.5 ETH"
                 },
                 {
-                  img: "https://images.unsplash.com/photo-1531233076846-42e35141df48?q=80&w=1000&auto=format&fit=crop",
+                  img: "/sclupture/buddha.webp",
                   title: "Modern Muse",
                   artist: "Elena Vance",
                   price: "2.8 ETH"
                 },
                 {
-                  img: "https://images.unsplash.com/photo-1542385151-efd9000785a0?q=80&w=1000&auto=format&fit=crop",
+                  img: "/sclupture/hanuman.webp",
                   title: "Marble Wave",
                   artist: "Kenzo Arata",
                   price: "6.2 ETH"
                 },
                 {
-                  img: "https://images.unsplash.com/photo-1518331447901-8e6adbb219a0?q=80&w=1000&auto=format&fit=crop",
+                  img: "/sclupture/ganesh.webp",
                   title: "Eternal Youth",
                   artist: "Sofia Russo",
                   price: "3.5 ETH"
@@ -272,7 +267,7 @@ export default function LandingPage() {
                   </div>
                   <div className="flex justify-between items-start">
                     <div>
-                      <h4 className="font-serif text-lg font-bold italic group-hover:text-[#E2D1C3] transition-colors">{item.title}</h4>
+                      <h4 className="font-serif text-lg font-bold italic group-hover:text-secondary transition-colors">{item.title}</h4>
                       <p className="text-white/40 text-xs uppercase tracking-widest">{item.artist}</p>
                     </div>
                     <button className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-white hover:text-black transition-all">
@@ -286,17 +281,17 @@ export default function LandingPage() {
         </section>
 
         {/* For Creators Section */}
-        <section id="creators" className="py-32 bg-[#FDFCFB] overflow-hidden relative">
+        <section id="creators" className="py-32 bg-neutral-white overflow-hidden relative">
           <div className="max-w-7xl mx-auto px-6">
             <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
               <div>
-                <Badge className="mb-6 bg-black text-white px-4 py-1 uppercase tracking-widest text-[10px] font-black">
-                  For Artists & Vendors
+                <Badge className="mb-6 bg-primary text-white px-4 py-1 uppercase tracking-widest text-[10px] font-black">
+                  For Vendors
                 </Badge>
                 <h2 className="text-7xl font-serif font-black leading-[0.9] tracking-tighter mb-8 italic">
-                  Turn your studio into a <span className="text-[#8C7A6B] not-italic">Stage.</span>
+                  Turn your studio into a <span className="text-secondary not-italic">Stage.</span>
                 </h2>
-                <p className="text-xl text-[#4A3E3E] mb-10 leading-relaxed font-light">
+                <p className="text-xl text-neutral-black/80 mb-10 leading-relaxed font-light">
                   CultureLense isn&apos;t just a store—it&apos;s a platform for promotion. Connect with serious collectors, showcase your process through AR, and build your legacy in the digital age.
                 </p>
                 <ul className="space-y-6 mb-12">
@@ -306,23 +301,23 @@ export default function LandingPage() {
                     "Direct artist-to-collector messaging",
                     "Global shipping and insurance logistics"
                   ].map((item, i) => (
-                    <li key={i} className="flex items-center gap-4 text-[#1A1A1A] font-bold uppercase tracking-widest text-xs">
-                      <div className="w-6 h-6 rounded-full bg-[#E2D1C3] flex items-center justify-center">
+                    <li key={i} className="flex items-center gap-4 text-neutral-black font-bold uppercase tracking-widest text-xs">
+                      <div className="w-6 h-6 rounded-full bg-secondary flex items-center justify-center">
                         <ArrowRight className="w-3 h-3" />
                       </div>
                       {item}
                     </li>
                   ))}
                 </ul>
-                <Button size="lg" className="rounded-full h-16 px-10 bg-black text-white hover:bg-[#1A1A1A] text-base font-black uppercase tracking-widest">
-                  Apply as Creator
+                <Button size="lg" className="rounded-full h-16 px-10 bg-primary text-white hover:bg-primary/90 text-base font-black uppercase tracking-widest">
+                  Apply as Vendor
                 </Button>
               </div>
 
               <div className="relative">
                 <div className="relative aspect-square rounded-[3rem] overflow-hidden z-10 shadow-2xl">
                   <Image 
-                    src="https://images.unsplash.com/photo-1493397212122-2b85def8d0b0?q=80&w=2000&auto=format&fit=crop"
+                    src="/sclupture/hanuman.webp"
                     alt="Artist working on sculpture"
                     fill
                     className="object-cover"
@@ -332,7 +327,7 @@ export default function LandingPage() {
                 <motion.div 
                   animate={{ y: [0, -20, 0] }}
                   transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute -bottom-10 -left-10 z-20 p-8 bg-white shadow-2xl rounded-3xl max-w-xs border border-[#E2D1C3]/30"
+                  className="absolute -bottom-10 -left-10 z-20 p-8 bg-neutral-white shadow-2xl rounded-3xl max-w-xs border border-primary/10"
                 >
                   <div className="flex items-center gap-4 mb-4">
                     <div className="w-12 h-12 rounded-full bg-zinc-100 flex items-center justify-center">
@@ -340,17 +335,17 @@ export default function LandingPage() {
                     </div>
                     <div>
                       <h5 className="font-bold">Promotion Tier</h5>
-                      <p className="text-xs text-[#4A3E3E]/50 uppercase tracking-widest">Elite Member</p>
+                      <p className="text-xs text-neutral-black/50 uppercase tracking-widest">Elite Member</p>
                     </div>
                   </div>
-                  <p className="text-sm font-light text-[#4A3E3E]">
+                  <p className="text-sm font-light text-neutral-black">
                     &quot;CultureLense increased my gallery visits by 300% through their AR showcase feature.&quot;
                   </p>
                 </motion.div>
                 
                 {/* Background circles */}
-                <div className="absolute -top-10 -right-10 w-64 h-64 border-2 border-[#E2D1C3]/50 rounded-full" />
-                <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-[#E2D1C3]/20 rounded-full blur-3xl" />
+                <div className="absolute -top-10 -right-10 w-64 h-64 border-2 border-secondary/30 rounded-full" />
+                <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-secondary/20 rounded-full blur-3xl" />
               </div>
             </div>
           </div>
@@ -359,7 +354,7 @@ export default function LandingPage() {
         {/* CTA Section */}
         <section className="py-24 bg-white">
           <div className="max-w-5xl mx-auto px-6">
-            <div className="bg-[#1A1A1A] rounded-[3rem] p-16 md:p-24 text-center relative overflow-hidden">
+            <div className="bg-neutral-black rounded-[3rem] p-16 md:p-24 text-center relative overflow-hidden">
               <div className="relative z-10">
                 <h2 className="text-5xl md:text-6xl font-serif font-black text-white mb-8 italic">Ready to see the <span className="not-italic text-white/40">Unseen?</span></h2>
                 <p className="text-white/60 text-lg mb-12 max-w-2xl mx-auto">
@@ -376,32 +371,32 @@ export default function LandingPage() {
               </div>
               
               {/* Background light effect */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-gradient-to-br from-[#8C7A6B]/20 to-transparent blur-3xl pointer-events-none" />
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-gradient-to-br from-primary/20 to-transparent blur-3xl pointer-events-none" />
             </div>
           </div>
         </section>
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-[#E2D1C3]/30 py-20">
+      <footer className="bg-neutral-white border-t border-primary/10 py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-20">
             <div className="md:col-span-2">
               <div className="flex items-center gap-2 mb-8">
-                <div className="w-10 h-10 bg-black rounded-full flex items-center justify-center">
+                <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
                   <span className="text-white font-serif text-xl font-bold italic">C</span>
                 </div>
                 <span className="font-serif text-2xl font-black tracking-tighter uppercase">CultureLense</span>
               </div>
-              <p className="text-[#4A3E3E]/60 max-w-sm text-lg font-light leading-relaxed">
+              <p className="text-neutral-black/60 max-w-sm text-lg font-light leading-relaxed">
                 The world&apos;s leading platform for sculpture identification, promotion, and collection. Bridging 5,000 years of art with modern spatial AI.
               </p>
             </div>
             
             <div>
               <h5 className="font-black uppercase tracking-[0.2em] text-[10px] mb-8">Navigation</h5>
-              <ul className="space-y-4 text-sm font-medium text-[#4A3E3E]/80">
-                <li><a href="#" className="hover:text-black transition-colors">Exhibition</a></li>
+              <ul className="space-y-4 text-sm font-medium text-neutral-black/80">
+                <li><a href="#" className="hover:text-black transition-colors">Marketplace</a></li>
                 <li><a href="#" className="hover:text-black transition-colors">Artist Directory</a></li>
                 <li><a href="#" className="hover:text-black transition-colors">Scanning Guide</a></li>
                 <li><a href="#" className="hover:text-black transition-colors">Market Signals</a></li>
@@ -410,7 +405,7 @@ export default function LandingPage() {
 
             <div>
               <h5 className="font-black uppercase tracking-[0.2em] text-[10px] mb-8">Connect</h5>
-              <ul className="space-y-4 text-sm font-medium text-[#4A3E3E]/80">
+              <ul className="space-y-4 text-sm font-medium text-neutral-black/80">
                 <li><a href="#" className="hover:text-black transition-colors">Instagram</a></li>
                 <li><a href="#" className="hover:text-black transition-colors">X (Twitter)</a></li>
                 <li><a href="#" className="hover:text-black transition-colors">Discord</a></li>
@@ -419,11 +414,11 @@ export default function LandingPage() {
             </div>
           </div>
           
-          <Separator className="bg-[#E2D1C3]/30 mb-8" />
+          <Separator className="bg-primary/20 mb-8" />
           
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-            <p className="text-xs text-[#4A3E3E]/40 font-medium">© 2025 CULTURELENSE ART TECHNOLOGIES. ALL RIGHTS RESERVED.</p>
-            <div className="flex gap-10 text-xs font-black uppercase tracking-widest text-[#4A3E3E]/40">
+            <p className="text-xs text-neutral-black/40 font-medium">© 2025 CULTURELENSE ART TECHNOLOGIES. ALL RIGHTS RESERVED.</p>
+            <div className="flex gap-10 text-xs font-black uppercase tracking-widest text-neutral-black/40">
               <a href="#" className="hover:text-black transition-colors">Privacy</a>
               <a href="#" className="hover:text-black transition-colors">Terms</a>
               <a href="#" className="hover:text-black transition-colors">Cookies</a>
@@ -445,9 +440,9 @@ export default function LandingPage() {
               <X className="w-8 h-8" />
             </button>
             <a href="#scan" onClick={() => setIsMenuOpen(false)} className="text-4xl font-serif font-black italic">Scan</a>
-            <a href="#exhibition" onClick={() => setIsMenuOpen(false)} className="text-4xl font-serif font-black italic">Exhibition</a>
-            <a href="#creators" onClick={() => setIsMenuOpen(false)} className="text-4xl font-serif font-black italic">Creators</a>
-            <Button onClick={handleLogin} className="w-full h-16 rounded-full bg-black text-white font-black uppercase tracking-widest">Connect Wallet</Button>
+            <a href="#exhibition" onClick={() => setIsMenuOpen(false)} className="text-4xl font-serif font-black italic">Marketplace</a>
+            <a href="#creators" onClick={() => setIsMenuOpen(false)} className="text-4xl font-serif font-black italic">Vendors</a>
+            <Button onClick={handleLogin} className="w-full h-16 rounded-full bg-primary text-white font-black uppercase tracking-widest">Login</Button>
           </motion.div>
         )}
       </AnimatePresence>
