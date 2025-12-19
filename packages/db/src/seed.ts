@@ -64,7 +64,7 @@ async function seed() {
 
     // 4. Create Paid Content
     const contentData = [];
-    
+
     // Add content for Shiva
     const shiva = insertedDeities.find(d => d.slug === 'shiva');
     if (shiva) {
@@ -87,11 +87,11 @@ async function seed() {
         isPremium: true
       });
     }
-    
+
     // Add content for Ganesha
     const ganesha = insertedDeities.find(d => d.slug === 'ganesha');
     if (ganesha) {
-        contentData.push({
+      contentData.push({
         entityId: ganesha.id,
         type: 'audio',
         title: 'Ganesha Atharvashirsha',
@@ -103,9 +103,9 @@ async function seed() {
     }
 
     if (contentData.length > 0) {
-        // @ts-ignore - dynamic import fix
-       await db.insert(contentItems).values(contentData as any).returning();
-       console.log(`Created ${contentData.length} content items.`);
+      // @ts-ignore - dynamic import fix
+      await db.insert(contentItems).values(contentData as any).returning();
+      console.log(`Created ${contentData.length} content items.`);
     }
 
     console.log('✅ Seeding complete!');
