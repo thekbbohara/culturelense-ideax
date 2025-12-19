@@ -7,7 +7,14 @@ import { count, eq } from "drizzle-orm";
 
 export async function checkUserHistory() {
   const supabase = createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  let user = null;
+  try {
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+    user = authUser;
+  } catch (error) {
+    console.error("Auth error in checkUserHistory:", error);
+    return { hasHistory: false };
+  }
 
   if (!user) {
     return { hasHistory: false };

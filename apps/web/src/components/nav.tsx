@@ -36,7 +36,7 @@ export function Nav() {
         isVisible ? 'translate-y-0' : '-translate-y-full'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 md:h-20 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 md:h-16 flex items-center justify-between">
         <div className="flex items-center gap-2 shrink-0">
           <div className="w-8 h-8 md:w-10 md:h-10 bg-primary rounded-full flex items-center justify-center">
             <span className="text-white font-serif text-lg md:text-xl font-bold italic">C</span>

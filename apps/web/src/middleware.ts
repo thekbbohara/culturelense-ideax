@@ -54,9 +54,16 @@ export async function middleware(request: NextRequest) {
     },
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user = null;
+  try {
+    const {
+      data: { user: authUser },
+    } = await supabase.auth.getUser();
+    user = authUser;
+  } catch (error) {
+    // Treat as unauthenticated if session is corrupted
+    console.error('Middleware auth error:', error);
+  }
   const path = request.nextUrl.pathname;
 
   // White-listed public routes

@@ -11,7 +11,14 @@ export async function submitVendorApplication(prevState: any, formData: FormData
         const supabase = createClient();
         if (!supabase) throw new Error("Supabase client not initialized");
 
-        const { data: { user } } = await supabase.auth.getUser();
+        let user = null;
+        try {
+            const { data: { user: authUser } } = await supabase.auth.getUser();
+            user = authUser;
+        } catch (error) {
+            console.error("Auth error in submitVendorApplication:", error);
+            return { error: 'Authentication failed. Please try logging in again.' };
+        }
 
         if (!user) {
             return { error: 'You must be logged in to apply.' };

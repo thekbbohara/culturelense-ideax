@@ -21,7 +21,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         Nav has background.
         Let's just render Nav.
       */}
-      <div className="pt-20">
+      <div className="pt-16">
         {children}
         <Dock />
       </div>
