@@ -224,25 +224,21 @@ export default function LandingPage() {
                   img: "/sclupture/shiva.webp",
                   title: "Fragmented Silence",
                   artist: "Marcus Aurelius II",
-                  price: "4.5 ETH"
                 },
                 {
                   img: "/sclupture/buddha.webp",
                   title: "Modern Muse",
                   artist: "Elena Vance",
-                  price: "2.8 ETH"
                 },
                 {
                   img: "/sclupture/hanuman.webp",
                   title: "Marble Wave",
                   artist: "Kenzo Arata",
-                  price: "6.2 ETH"
                 },
                 {
                   img: "/sclupture/ganesh.webp",
                   title: "Eternal Youth",
                   artist: "Sofia Russo",
-                  price: "3.5 ETH"
                 }
               ].map((item, i) => (
                 <motion.div 
@@ -257,11 +253,6 @@ export default function LandingPage() {
                       fill
                       className="object-cover transition-transform duration-700 group-hover:scale-110"
                     />
-                    <div className="absolute top-4 right-4">
-                      <div className="bg-black/50 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-white/10">
-                        {item.price}
-                      </div>
-                    </div>
                   </div>
                   <div className="flex justify-between items-start">
                     <div>
