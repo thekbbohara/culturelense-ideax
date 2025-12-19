@@ -1,7 +1,8 @@
 'use server';
 
 import { db } from '@/lib/db';
-import { culturalEntities, eq } from '@/db';
+import { culturalEntities, godDetails } from '@/db';
+import { eq, inArray, sql } from 'drizzle-orm';
 
 
 export interface Entity {
@@ -12,6 +13,15 @@ export interface Entity {
   description: string;
   imageUrl: string | null;
   history?: string | null;
+  // Extended details
+  nickName?: string | null;
+  avatarNames?: string | null;
+  intro?: string | null;
+  journey?: string | null;
+  myth?: string | null;
+  religion?: string | null;
+  location?: string | null;
+  funFact?: string | null;
 }
 
 
@@ -27,10 +37,65 @@ export async function getEntities(): Promise<{ success: boolean; data: Entity[] 
 
 export async function getEntityBySlug(slug: string): Promise<{ success: boolean; data: Entity | null }> {
   try {
-    const result = await db.select().from(culturalEntities).where(eq(culturalEntities.slug, slug));
-    return { success: true, data: result[0] || null };
+    // case-insensitive match on slug, join with godDetails
+    const result = await db
+      .select()
+      .from(culturalEntities)
+      .leftJoin(godDetails, eq(culturalEntities.id, godDetails.entityId))
+      .where(sql`lower(${culturalEntities.slug}) = lower(${slug})`);
+
+    if (!result.length) return { success: true, data: null };
+
+    const row = result[0];
+    const combined: Entity = {
+      ...row.cultural_entities,
+      ...row.god_details, // This will override fields if names match, but ids match (ok), metadata might differ.
+      // Explicit mapping to ensure safety and type correctness
+      id: row.cultural_entities.id,
+      name: row.cultural_entities.name, // base name
+      slug: row.cultural_entities.slug,
+      type: row.cultural_entities.type,
+      description: row.cultural_entities.description,
+      imageUrl: row.cultural_entities.imageUrl,
+      history: row.cultural_entities.history,
+
+      // God details mappings
+      nickName: row.god_details?.nickName,
+      avatarNames: row.god_details?.avatarNames,
+      intro: row.god_details?.intro,
+      journey: row.god_details?.journey,
+      myth: row.god_details?.myth,
+      religion: row.god_details?.religion,
+      location: row.god_details?.location || row.cultural_entities.geoLocation, // Fallback or merge
+      funFact: row.god_details?.funFact,
+    };
+    console.log("slug", result)
+
+    return { success: true, data: combined };
   } catch (error) {
     console.error('Failed to fetch entity:', error);
     return { success: false, data: null };
+  }
+}
+
+export async function getEntitiesBySlugs(slugs: string[]): Promise<{ success: boolean; data: Entity[] }> {
+  try {
+    if (!slugs.length) return { success: true, data: [] };
+
+    // Create lowercase slugs for comparison
+    const lowerSlugs = slugs.map(s => s.toLowerCase());
+
+    // In a real scenario, we might want to do lower(col) IN (...), but simpler is to assume stored slugs are standard.
+    // However, for robustness as requested:
+    const result = await db
+      .select()
+      .from(culturalEntities)
+      .where(sql`lower(${culturalEntities.slug}) IN ${lowerSlugs}`);
+    console.log("slugs", result)
+
+    return { success: true, data: result };
+  } catch (error) {
+    console.error('Failed to fetch entities by slugs:', error);
+    return { success: false, data: [] };
   }
 }

@@ -2,8 +2,6 @@
 
 import { getEntityBySlug } from './entities';
 
-const API_URL = process.env.AI_SERVICE_URL || 'http://localhost:8000/api/v1';
-
 export async function scanImage(formData: FormData) {
   try {
     const file = formData.get('image') as File;
@@ -15,11 +13,13 @@ export async function scanImage(formData: FormData) {
     const aiFormData = new FormData();
     aiFormData.append('file', file);
 
-    const aiResponse = await fetch(`${API_URL}/predict`, {
+    const aiResponse = await fetch(`${process.env.NEXT_PUBLIC_SPATIAL_URL}/predict`, {
       method: 'POST',
       body: aiFormData as any, // Node fetch supports FormData
       cache: 'no-store'
     });
+
+    console.log(aiResponse)
 
     if (!aiResponse.ok) {
       console.error('AI Service Error:', await aiResponse.text());
