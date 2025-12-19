@@ -69,7 +69,6 @@ export async function getEntityBySlug(slug: string): Promise<{ success: boolean;
       location: row.god_details?.location || row.cultural_entities.geoLocation, // Fallback or merge
       funFact: row.god_details?.funFact,
     };
-    console.log("slug", result)
 
     return { success: true, data: combined };
   } catch (error) {
@@ -91,11 +90,23 @@ export async function getEntitiesBySlugs(slugs: string[]): Promise<{ success: bo
       .select()
       .from(culturalEntities)
       .where(sql`lower(${culturalEntities.slug}) IN ${lowerSlugs}`);
-    console.log("slugs", result)
 
     return { success: true, data: result };
   } catch (error) {
     console.error('Failed to fetch entities by slugs:', error);
+    return { success: false, data: [] };
+  }
+}
+
+export async function getEntitiesSlugs(): Promise<{ success: boolean; data: string[] }> {
+  try {
+    const result = await db
+      .select({ slug: culturalEntities.slug })
+      .from(culturalEntities);
+
+    return { success: true, data: result.map(row => row.slug) };
+  } catch (error) {
+    console.error('Failed to fetch entity slugs:', error);
     return { success: false, data: [] };
   }
 }

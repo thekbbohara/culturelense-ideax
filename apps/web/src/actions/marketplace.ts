@@ -24,6 +24,7 @@ export async function createListing(vendorId: string, data: any) {
       title: data.title,
       description: data.description,
       price: data.price,
+      quantity: data.quantity,
       imageUrl: data.imageUrl,
       entityId: data.entityId || null,
     });
