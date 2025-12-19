@@ -1,19 +1,30 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ProductForm } from '@/components/vendor/product-form';
-import { createVendorListing } from '@/actions/vendor-actions';
+import { createVendorListing, getVendorByUserId } from '@/actions/vendor-actions';
 import { type ProductFormValues } from '@/lib/validations/product-schema';
 import { toast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 
 export default function AddProductPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const [vendorId, setVendorId] = useState<string>('');
   const router = useRouter();
+
+  useEffect(() => {
+    async function fetchVendor() {
+      // Import dynamically nicely or just rely on existing import if possible,
+      // but imports need to be top-level.
+      // Assuming getVendorByUserId is imported.
+      const result = await getVendorByUserId();
+      if (result.success && result.data) {
+        setVendorId(result.data.id);
+      }
+    }
+    fetchVendor();
+  }, []);
 
   const handleSubmit = async (values: ProductFormValues) => {
     setIsLoading(true);
@@ -28,23 +39,12 @@ export default function AddProductPage() {
     setIsLoading(false);
   };
 
+  // ...
+
+  // Pass vendorId to ProductForm
   return (
     <div className="mx-auto space-y-6">
-      {/* Back Button */}
-      <Link href="/vendor/products">
-        <Button variant="ghost" className="gap-2">
-          <ArrowLeft className="w-4 h-4" />
-          Back to Products
-        </Button>
-      </Link>
-
-      {/* Header */}
-      <div>
-        <h1 className="text-4xl font-serif font-black italic text-foreground">Add New Product</h1>
-        <p className="text-muted-foreground mt-2">
-          Create a new product listing for your marketplace
-        </p>
-      </div>
+      {/* ... header ... */}
 
       {/* Form Card */}
       <Card className="border-border shadow-lg">
@@ -55,7 +55,12 @@ export default function AddProductPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-6">
-          <ProductForm onSubmit={handleSubmit} submitLabel="Create Product" isLoading={isLoading} />
+          <ProductForm
+            onSubmit={handleSubmit}
+            submitLabel="Create Product"
+            isLoading={isLoading}
+            vendorId={vendorId}
+          />
         </CardContent>
       </Card>
     </div>

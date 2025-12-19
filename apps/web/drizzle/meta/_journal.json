@@ -15,6 +15,13 @@
       "when": 1766149083239,
       "tag": "0001_clear_madame_web",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1766163130124,
+      "tag": "0002_low_wolfsbane",
+      "breakpoints": true
     }
   ]
 }

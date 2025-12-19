@@ -29,6 +29,7 @@ interface Product {
   title: string;
   description: string;
   price: string;
+  quantity: number;
   imageUrl: string;
   status: string;
   createdAt: Date;
@@ -84,6 +85,7 @@ export function ProductsTable({ products, onDelete }: ProductsTableProps) {
               <TableHead className="w-[100px]">Image</TableHead>
               <TableHead>Title</TableHead>
               <TableHead>Price</TableHead>
+              <TableHead>Quantity</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -113,7 +115,8 @@ export function ProductsTable({ products, onDelete }: ProductsTableProps) {
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="font-semibold text-primary">${product.price}</TableCell>
+                  <TableCell className="font-semibold text-primary">Rs.{product.price}</TableCell>
+                  <TableCell>{product.quantity}</TableCell>
                   <TableCell>{getStatusBadge(product.status)}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">

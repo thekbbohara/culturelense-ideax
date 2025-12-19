@@ -33,6 +33,7 @@ interface ProductFormProps {
   onSubmit: (values: ProductFormValues) => Promise<void>;
   submitLabel?: string;
   isLoading?: boolean;
+  vendorId?: string;
 }
 
 export function ProductForm({
@@ -40,6 +41,7 @@ export function ProductForm({
   onSubmit,
   submitLabel = 'Create Product',
   isLoading = false,
+  vendorId,
 }: ProductFormProps) {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -50,6 +52,7 @@ export function ProductForm({
       title: '',
       description: '',
       price: '',
+      quantity: '',
       imageUrl: '',
       entityId: '',
       status: 'active',
@@ -70,8 +73,9 @@ export function ProductForm({
     try {
       if (imageFile) {
         setIsUploading(true);
-        // Using 'uploads' as default folder, ideally pass vendorId if available
-        const result = await uploadProductImage(imageFile, 'uploads');
+        // Use provided vendorId or fallback (though parent should ensure it's passed)
+        const uploadPath = vendorId || 'uploads';
+        const result = await uploadProductImage(imageFile, uploadPath);
 
         if (!result.success || !result.url) {
           throw new Error(result.error || 'Failed to upload image');
@@ -155,7 +159,7 @@ export function ProductForm({
                     className="focus-visible:ring-primary"
                   />
                 </FormControl>
-                <FormDescription>Enter price in dollars</FormDescription>
+                <FormDescription>Enter price in rupees</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -185,34 +189,56 @@ export function ProductForm({
             )}
           />
         </div>
-        <FormField
-          control={form.control}
-          name="entityId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Deity/Entity</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <FormField
+            control={form.control}
+            name="quantity"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Quantity</FormLabel>
                 <FormControl>
-                  <SelectTrigger className="focus:ring-primary">
-                    <SelectValue placeholder="Select a deity or entity" />
-                  </SelectTrigger>
+                  <Input
+                    type="text"
+                    placeholder="1"
+                    {...field}
+                    className="focus-visible:ring-primary"
+                  />
                 </FormControl>
-                <SelectContent className="max-h-[400px] overflow-y-auto">
-                  <SelectItem value="none">None</SelectItem>
-                  {entities.map((entity) => (
-                    <SelectItem key={entity.id} value={entity.id}>
-                      {entity.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormDescription>
-                Associate this product with a specific cultural entity
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                <FormDescription>Enter quantity</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="entityId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Deity/Entity</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
+                  <FormControl>
+                    <SelectTrigger className="focus:ring-primary">
+                      <SelectValue placeholder="Select a deity or entity" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent className="max-h-[400px] overflow-y-auto">
+                    <SelectItem value="none">None</SelectItem>
+                    {entities.map((entity) => (
+                      <SelectItem key={entity.id} value={entity.id}>
+                        {entity.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormDescription>
+                  Associate this product with a specific cultural entity
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <FormField
           control={form.control}
