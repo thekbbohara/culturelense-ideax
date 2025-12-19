@@ -1,31 +1,77 @@
 # CultureLense Monorepo
 
-## Structure
+Welcome to CultureLense, a platform for discovering cultural entities.
 
+## Project Structure
+
+- **apps/web**: Next.js 14 web application (PWA enabled).
+- **packages/db**: Shared database schema and configuration (PostgreSQL/Drizzle).
+- **packages/shared**: Shared utilities and types.
+- **packages/ui**: Shared React UI component library.
+- **services/api**: FastAPI Python backend service.
+
+## Prerequisites
+
+- **Node.js**: v18+
+- **mpm**: v10+ (managed via package.json)
+- **Python**: 3.10+
+- **Poetry**: Python dependency manager
+
+## Getting Started
+
+### 1. Install Dependencies
+
+**Frontend & Shared Packages:**
+
+```bash
+npm install
 ```
-/culturelense
-├── apps/
-│   ├── web/                 # Next.js + PWA frontend
-│   └── admin/               # Admin dashboard
-├── services/
-│   ├── api/                 # FastAPI backend
-│   ├── ai/                  # AI model inference
-│   └── workers/             # background jobs (optional)
-├── packages/
-│   ├── db/                  # DB layer, migrations, shared schemas
-│   ├── shared/              # Shared TS/Python types, utils
-│   └── ui/                  # Reusable React/Tailwind components
-├── scripts/                 # Dev scripts, migration helpers
-├── tests/                   # Unit/E2E tests
+
+**Backend (Python):**
+Navigate to the API service directory and install with Poetry.
+
+```bash
+cd services/api
+poetry install
 ```
 
-## Setup
+### 2. Environment Variables
 
-1.  **Frontend**: `npm install` in root.
-2.  **Backend**: `poetry install` (or pip install from pyproject.toml).
-3.  **Environment**: See `.env.example` in each service.
+Create `.env` files in `apps/web` and `services/api` based on any examples provided (or configure as needed for your database/services).
 
-## Development
+### 3. Running the Project
 
-- `npm run dev`: Start frontend apps
-- `uvicorn services.api.app.main:app --reload`: Start API
+**Frontend (Web App):**
+To run the Next.js app in development mode:
+
+```bash
+# From root
+npm run dev
+```
+
+Access the web app at [http://localhost:3000](http://localhost:3000).
+
+**Backend (API Service):**
+
+```bash
+cd services/api
+poetry run uvicorn app.main:app --reload
+```
+
+Access the API documentation at [http://localhost:8000/docs](http://localhost:8000/docs).
+
+## Building PWA
+
+To build the web application for production (including PWA asset generation):
+
+```bash
+cd apps/web
+npm run build
+```
+
+## Tools
+
+- **TurboRepo**: Used for monorepo task management.
+- **Drizzle ORM**: Database interactions.
+- **TailwindCSS**: Styling.
+- **Next-PWA**: Progressive Web App capabilities.
