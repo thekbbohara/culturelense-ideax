@@ -25,7 +25,7 @@ export default function MarketplacePage() {
   const regularItems = items.slice(2);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground pb-32">
       {/* Hero Section with Gradient */}
       <div className="relative overflow-hidden bg-gradient-to-r from-primary via-primary/90 to-secondary/80 text-primary-foreground">
         <div className="absolute inset-0 bg-[url('/pattern.svg')] opacity-10" />
@@ -54,7 +54,7 @@ export default function MarketplacePage() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12">
         <MarketplaceHeader />
 
         <div className="flex flex-col lg:flex-row gap-8 mt-8">

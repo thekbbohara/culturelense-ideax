@@ -9,6 +9,7 @@ import { getRelatedEntities } from "@/actions/entities";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 
 // Animation Variants
 const containerVariants = {
@@ -27,38 +28,43 @@ const itemVariants = {
 };
 
 export default function HomePage() {
-    const [hasHistory, setHasHistory] = React.useState<boolean | null>(null);
-    const [recentEntities, setRecentEntities] = React.useState<any[]>([]);
-    const [recommendedEntities, setRecommendedEntities] = React.useState<any[]>([]);
-    const [isLoading, setIsLoading] = React.useState(true);
     const router = useRouter();
 
-    React.useEffect(() => {
-        const init = async () => {
-            const { hasHistory } = await checkUserHistory();
-            setHasHistory(hasHistory);
+    // 1. Check History
+    const { data: historyData, isLoading: isHistoryLoading } = useQuery({
+        queryKey: ['user-history'],
+        queryFn: () => checkUserHistory(),
+        staleTime: 5 * 60 * 1000,
+    });
 
-            if (hasHistory) {
-                setIsLoading(true);
-                const { data } = await getRecentSearchedEntities();
-                setRecentEntities(data || []);
+    const hasHistory = historyData?.hasHistory ?? null;
 
-                if (data && data.length > 0 && data[0]) {
-                    const related = await getRelatedEntities(data[0].id);
-                    setRecommendedEntities(related);
-                }
+    // 2. Fetch Recent Entities (Only if history exists)
+    const { data: recentEntities = [], isLoading: isRecentLoading } = useQuery({
+        queryKey: ['recent-entities'],
+        queryFn: async () => {
+            const { data } = await getRecentSearchedEntities();
+            return data || [];
+        },
+        enabled: !!hasHistory,
+        staleTime: 5 * 60 * 1000,
+    });
 
-                setIsLoading(false);
-            } else {
-                setIsLoading(false);
-            }
-        };
-        init();
-    }, []);
+    // 3. Fetch Recommendations (Only if we have a recent entity)
+    const firstEntityId = recentEntities?.[0]?.id;
+
+    const { data: recommendedEntities = [], isLoading: isRecommendedLoading } = useQuery({
+        queryKey: ['recommended-entities', firstEntityId],
+        queryFn: () => getRelatedEntities(firstEntityId as string),
+        enabled: !!firstEntityId,
+        staleTime: 5 * 60 * 1000,
+    });
+
+    const isLoading = isHistoryLoading || (hasHistory && isRecentLoading);
 
     // 1. IMPROVED INITIAL LOADING STATE (App Launch)
     // This mimics the "Scan" view structure to minimize layout shift for new users
-    if (hasHistory === null) {
+    if (isHistoryLoading) {
         return (
             <div className="min-h-screen bg-background flex flex-col items-center justify-center relative overflow-hidden px-6">
                 {/* Abstract Ambient Background */}
@@ -149,8 +155,7 @@ export default function HomePage() {
                     </div>
                 ) : (
                     // POPULATED STATE
-                    <div className="space-y-20 px-6 max-w-7xl mx-auto mt-8 lg:mt-12 w-full">
-
+                    <div className="space-y-20 px-6 max-w-7xl mx-auto pt-16 w-full">
                         {/* Featured Section - Bento Grid Layout */}
                         <section>
                             <div className="flex items-center justify-between mb-8">
@@ -189,13 +194,13 @@ export default function HomePage() {
                                     <motion.div
                                         initial={{ opacity: 0, y: 20 }}
                                         animate={{ opacity: 1, y: 0 }}
-                                        onClick={() => router.push(`/god/${recentEntities[0].slug}`)}
+                                        onClick={() => router.push(`/god/${recentEntities[0]?.slug}`)}
                                         className="col-span-1 md:col-span-2 lg:col-span-8 relative h-[400px] lg:h-[500px] rounded-[2rem] overflow-hidden group cursor-pointer border border-border bg-card shadow-sm hover:shadow-xl hover:shadow-primary/5 transition-all duration-500"
                                     >
-                                        {recentEntities[0].imageUrl ? (
+                                        {recentEntities[0]?.imageUrl ? (
                                             <Image
-                                                src={recentEntities[0].imageUrl}
-                                                alt={recentEntities[0].name}
+                                                src={recentEntities[0]?.imageUrl}
+                                                alt={recentEntities[0]?.name || 'Featured Deity'}
                                                 fill
                                                 className="object-cover transition-transform duration-700 group-hover:scale-105"
                                             />
@@ -205,9 +210,9 @@ export default function HomePage() {
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                                         <div className="absolute bottom-0 left-0 p-8 w-full">
                                             <span className="px-3 py-1 bg-primary/90 backdrop-blur-md text-primary-foreground text-[10px] font-bold uppercase tracking-widest rounded-full mb-3 inline-block">
-                                                {recentEntities[0].type}
+                                                {recentEntities[0]?.type}
                                             </span>
-                                            <h3 className="text-3xl lg:text-5xl font-serif font-bold text-white mb-2">{recentEntities[0].name}</h3>
+                                            <h3 className="text-3xl lg:text-5xl font-serif font-bold text-white mb-2">{recentEntities[0]?.name}</h3>
                                             <div className="flex items-center gap-2 text-white/80 group-hover:text-white transition-colors">
                                                 <span className="text-sm font-medium">View Details</span>
                                                 <ArrowRight className="w-4 h-4" />
@@ -217,7 +222,7 @@ export default function HomePage() {
 
                                     {/* Secondary Featured Items */}
                                     <div className="col-span-1 md:col-span-2 lg:col-span-4 flex flex-col gap-6 h-[400px] lg:h-[500px]">
-                                        {recentEntities.slice(1, 3).map((item, i) => (
+                                        {recentEntities.slice(1, 3).map((item: any, i: number) => (
                                             <motion.div
                                                 key={i}
                                                 initial={{ opacity: 0, x: 20 }}
@@ -265,7 +270,7 @@ export default function HomePage() {
                                 <h2 className="text-2xl lg:text-3xl font-serif font-black italic text-txt">Recommended for You</h2>
                             </div>
 
-                            {isLoading ? (
+                            {(isRecommendedLoading && hasHistory) ? (
                                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 lg:gap-6">
                                     {[1, 2, 3, 4, 5].map((_, i) => (
                                         <Card key={i} className="p-4 rounded-[2rem] bg-card border border-border h-full shadow-none">
@@ -284,7 +289,7 @@ export default function HomePage() {
                                     animate="show"
                                     className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-6"
                                 >
-                                    {recommendedEntities.length > 0 ? recommendedEntities.map((item, i) => (
+                                    {recommendedEntities.length > 0 ? recommendedEntities.map((item: any, i: number) => (
                                         <motion.div key={i} variants={itemVariants}>
                                             <Card
                                                 onClick={() => router.push(`/god/${item.slug}`)}

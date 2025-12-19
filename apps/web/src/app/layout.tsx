@@ -2,8 +2,7 @@ import '../styles/globals.css';
 import type { Metadata } from 'next';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
-import { Nav } from '@/components/nav';
-import { Dock } from '@/components/dock';
+import { QueryProvider } from '@/components/query-provider';
 
 export const metadata: Metadata = {
   title: 'CultureLense',
@@ -25,14 +24,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       style={{ scrollbarWidth: 'none', scrollBehavior: 'smooth' }}
     >
       <body>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <Nav />
-          {/* 
+        <QueryProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="light"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {/* 
                   Nav is fixed with h-16/h-20. 
                   Usually pages have padding-top to account for fixed header.
                   However, Nav component in `home/page.tsx` was just placed there, and `main` had `pt-32` or `pt-20`.
@@ -48,12 +47,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   Nav has background.
                   Let's just render Nav.
                 */}
-          <div className="pt-20">
-            {children}
-            <Dock />
-          </div>
-          <Toaster position="top-right" richColors />
-        </ThemeProvider>
+            <div>
+              {children}
+            </div>
+            <Toaster position="top-right" richColors />
+          </ThemeProvider>
+        </QueryProvider>
       </body>
     </html>
   );

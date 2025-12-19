@@ -3,103 +3,102 @@ import { VendorApplicationModal } from '@/components/vendor-application-modal';
 import { Button } from '@/components/ui-components';
 import { ProfileHeader } from '@/components/profile-header';
 import {
-  ArrowUpRight,
-  Package,
-  Clock,
-  ShieldCheck,
-  Fingerprint,
-  Store,
-  Sparkles,
+    ArrowUpRight,
+    Package,
+    Clock,
+    ShieldCheck,
+    Fingerprint,
+    Store,
+    Sparkles,
 } from 'lucide-react';
 import {
-  db,
-  vendors,
-  purchases,
-  contentItems,
-  scanHistory,
-  userPreferences,
-  eq,
-  count,
-  desc,
-  users,
+    db,
+    vendors,
+    purchases,
+    contentItems,
+    scanHistory,
+    userPreferences,
+    eq,
+    count,
+    desc,
+    users,
 } from '@/db';
 import Link from 'next/link';
 import { ProfileSettings } from '@/components/profile-settings';
 
 export default async function ProfilePage() {
-  let user = null;
-  let fullUserData = null;
-  let vendorData = null;
-  let preferencesData = null;
-  let recentOrders: any[] = [];
-  let totalScans = 0;
+    let user = null;
+    let fullUserData = null;
+    let vendorData = null;
+    let preferencesData = null;
+    let recentOrders: any[] = [];
+    let totalScans = 0;
 
-  try {
-    const supabase = createClient();
-    const { data } = await supabase.auth.getUser();
-    user = data.user;
+    try {
+        const supabase = createClient();
+        const { data } = await supabase.auth.getUser();
+        user = data.user;
 
-    if (user) {
-      fullUserData = await db.query.users.findFirst({
-        where: eq(users.id, user.id),
-      });
+        if (user) {
+            fullUserData = await db.query.users.findFirst({
+                where: eq(users.id, user.id),
+            });
 
-      vendorData = await db.query.vendors.findFirst({
-        where: eq(vendors.userId, user.id),
-      });
+            vendorData = await db.query.vendors.findFirst({
+                where: eq(vendors.userId, user.id),
+            });
 
-      preferencesData =
-        (await db.query.userPreferences.findFirst({
-          where: eq(userPreferences.userId, user.id),
-        })) || null;
+            preferencesData =
+                (await db.query.userPreferences.findFirst({
+                    where: eq(userPreferences.userId, user.id),
+                })) || null;
 
-      recentOrders = await db
-        .select({
-          id: purchases.id,
-          date: purchases.createdAt,
-          status: purchases.status,
-          price: contentItems.price,
-          item: contentItems.title,
-        })
-        .from(purchases)
-        .innerJoin(contentItems, eq(purchases.contentItemId, contentItems.id))
-        .where(eq(purchases.userId, user.id))
-        .orderBy(desc(purchases.createdAt))
-        .limit(5);
+            recentOrders = await db
+                .select({
+                    id: purchases.id,
+                    date: purchases.createdAt,
+                    status: purchases.status,
+                    price: contentItems.price,
+                    item: contentItems.title,
+                })
+                .from(purchases)
+                .innerJoin(contentItems, eq(purchases.contentItemId, contentItems.id))
+                .where(eq(purchases.userId, user.id))
+                .orderBy(desc(purchases.createdAt))
+                .limit(5);
 
-      const [scanResult] = await db
-        .select({ value: count() })
-        .from(scanHistory)
-        .where(eq(scanHistory.userId, user.id));
-      totalScans = scanResult?.value || 0;
+            const [scanResult] = await db
+                .select({ value: count() })
+                .from(scanHistory)
+                .where(eq(scanHistory.userId, user.id));
+            totalScans = scanResult?.value || 0;
+        }
+    } catch (e) {
+        console.error('Data fetch failed:', e);
     }
-  } catch (e) {
-    console.error('Data fetch failed:', e);
-  }
 
-  const isVerifiedVendor = vendorData?.verificationStatus === 'verified';
-  const isAdmin = fullUserData?.role === 'admin';
+    const isVerifiedVendor = vendorData?.verificationStatus === 'verified';
+    const isAdmin = fullUserData?.role === 'admin';
 
-  return (
-    <div className="min-h-screen bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
-      {/* Subtle Grain Texture Overlay */}
-      <div
-        className="fixed inset-0 opacity-[0.03] pointer-events-none z-0"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-        }}
-      />
+    return (
+        <div className="min-h-screen bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
+            {/* Subtle Grain Texture Overlay */}
+            <div
+                className="fixed inset-0 opacity-[0.03] pointer-events-none z-0"
+                style={{
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+                }}
+            />
 
-            <div className="relative z-10 container mx-auto pt-16 pb-20 px-6 max-w-7xl">
-                
+            <div className="relative z-10 container mx-auto pt-16 pb-32 px-6 max-w-7xl">
                 {/* Header Section: Minimal & Editorial */}
                 <div className="mb-16 border-b flex flex-col md:flex-row justify-between items-end gap-6">
                     <div className="space-y-2">
                         <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Identity</span>
-                        <ProfileHeader 
-                            userEmail={user?.email} 
+                        <ProfileHeader
+                            userEmail={user?.email}
                             memberSince={user?.created_at}
-                            className="text-4xl md:text-5xl font-light tracking-tight text-foreground" 
+                            className="text-4xl md:text-5xl font-light tracking-tight text-foreground"
                         />
                     </div>
                     <div className="text-right hidden md:block">
@@ -118,7 +117,7 @@ export default async function ProfilePage() {
                             <div className="absolute top-0 right-0 p-12 opacity-5">
                                 <Package className="w-64 h-64 -rotate-12" />
                             </div>
-                            
+
                             <div className="relative z-10 flex flex-col h-full justify-between gap-8">
                                 <div className="space-y-4">
                                     <div className="flex items-center gap-3 text-muted-foreground/80">
@@ -129,11 +128,11 @@ export default async function ProfilePage() {
                                     </div>
                                     <h2 className="text-3xl font-light max-w-lg leading-tight">
                                         {isAdmin ? (
-                                             <span>Review pending <span className="italic font-serif text-muted-foreground">vendor applications</span> and manage users.</span>
+                                            <span>Review pending <span className="italic font-serif text-muted-foreground">vendor applications</span> and manage users.</span>
                                         ) : isVerifiedVendor ? (
                                             <span>Manage <span className="italic font-serif text-muted-foreground">{vendorData?.businessName}</span> inventory & analytics.</span>
                                         ) : (
-                                            <span>Turn your artifacts into <br/><span className="italic font-serif text-muted-foreground">digital assets</span>.</span>
+                                            <span>Turn your artifacts into <br /><span className="italic font-serif text-muted-foreground">digital assets</span>.</span>
                                         )}
                                     </h2>
                                 </div>
@@ -157,7 +156,7 @@ export default async function ProfilePage() {
                                                 <VendorApplicationModal triggerClassName="bg-primary text-primary-foreground hover:bg-primary/80  rounded-full px-8 py-6 text-sm font-medium transition-transform active:scale-95 border-none" triggerText="Apply for Vendor" />
                                             </div>
                                         ) : (
-                                             <div className="px-4 py-2 border border-muted-foreground/30 rounded-full text-xs font-mono uppercase tracking-widest text-muted-foreground">
+                                            <div className="px-4 py-2 border border-muted-foreground/30 rounded-full text-xs font-mono uppercase tracking-widest text-muted-foreground">
                                                 Application {vendorData.verificationStatus}
                                             </div>
                                         )
@@ -191,7 +190,7 @@ export default async function ProfilePage() {
                                                     <div className="text-xs font-mono text-muted-foreground mt-1 flex gap-2">
                                                         <span>{new Date(order.date).toLocaleDateString()}</span>
                                                         <span className="text-border">•</span>
-                                                        <span>#{order.id.slice(0,8)}</span>
+                                                        <span>#{order.id.slice(0, 8)}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -213,12 +212,12 @@ export default async function ProfilePage() {
 
                     {/* Right Column: Stats & Settings (4 cols) */}
                     <div className="lg:col-span-4 space-y-8">
-                        
+
                         {/* NEW: Profile Settings Block */}
                         {user && (
-                            <ProfileSettings 
-                                userId={user.id} 
-                                initialPreferences={preferencesData} 
+                            <ProfileSettings
+                                userId={user.id}
+                                initialPreferences={preferencesData}
                             />
                         )}
 

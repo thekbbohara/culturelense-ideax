@@ -1,5 +1,6 @@
 import { getExploreData } from "@/actions/map";
 import dynamic from "next/dynamic";
+import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query';
 
 const Map = dynamic(() => import("@/components/explore/Map"), {
   ssr: false,
@@ -11,13 +12,22 @@ const Map = dynamic(() => import("@/components/explore/Map"), {
 });
 
 export default async function ExplorePage() {
-  const temples = await getExploreData();
+  const queryClient = new QueryClient();
+
+  await queryClient.prefetchQuery({
+    queryKey: ['explore-data'],
+    queryFn: getExploreData,
+  });
 
   return (
-    <div className="h-screen flex flex-col pt-16 md:pt-20 px-4 md:px-6 gap-4 overflow-hidden">
-
+    <div className="h-screen flex flex-col px-4 md:px-6 gap-4 overflow-hidden">
       <div className="flex-1 min-h-0 pb-6">
-        <Map temples={temples} />
+        <div className="">
+          Places you have been to:
+        </div>
+        <HydrationBoundary state={dehydrate(queryClient)}>
+          <Map />
+        </HydrationBoundary>
       </div>
     </div>
   );

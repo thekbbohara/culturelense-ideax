@@ -105,7 +105,7 @@ export default function ScanPage() {
 
   return (
     <div className="min-h-screen bg-black text-white p-4 flex flex-col items-center">
-      <h1 className="text-2xl font-bold mb-6">Scan Artifact</h1>
+      <h1 className="text-2xl font-bold mb-6">Scan Sculpture</h1>
 
       {error && (
         <div className="bg-red-500/20 text-red-200 p-3 rounded mb-4 w-full text-center max-w-md">

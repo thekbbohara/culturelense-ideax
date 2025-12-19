@@ -46,7 +46,7 @@ export function Dock() {
   const [hoveredTab, setHoveredTab] = React.useState<string | null>(null);
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] w-auto max-w-[95vw]">
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[999] w-auto max-w-[95vw]">
       {/* Ambient Glow behind the dock */}
       <div className="absolute -inset-4 bg-gradient-to-t from-primary/20 to-transparent blur-3xl rounded-full opacity-50 pointer-events-none" />
 

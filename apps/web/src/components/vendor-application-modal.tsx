@@ -5,6 +5,8 @@ import { Button, Card, CardContent } from '@/components/ui-components';
 import { submitVendorApplication } from '@/actions/vendor';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
+import { useMutation } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
 interface VendorApplicationModalProps {
     triggerClassName?: string;
@@ -14,31 +16,30 @@ interface VendorApplicationModalProps {
 
 export function VendorApplicationModal({ triggerClassName, triggerText = "Apply for Vendor", variant = 'default' }: VendorApplicationModalProps) {
     const [isOpen, setIsOpen] = useState(false);
-    const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
-    const [message, setMessage] = useState('');
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        setStatus('submitting');
-        const formData = new FormData(e.currentTarget);
-        try {
+    const { mutate, isPending } = useMutation({
+        mutationFn: async (formData: FormData) => {
             const result = await submitVendorApplication(null, formData);
-
-            if (result.error) {
-                setStatus('error');
-                setMessage(result.error);
-            } else {
-                setStatus('success');
-                setMessage(result.message || 'Application submitted!');
-                setTimeout(() => {
-                    setIsOpen(false);
-                    setStatus('idle');
-                }, 2000);
+            if (result?.error) {
+                throw new Error(result.error);
             }
-        } catch (e) {
-            setStatus('error');
-            setMessage("An unexpected error occurred.");
+            return result;
+        },
+        onSuccess: (data) => {
+            toast.success(data?.message || 'Application submitted!');
+            setTimeout(() => {
+                setIsOpen(false);
+            }, 500);
+        },
+        onError: (error) => {
+            toast.error(error.message || "An unexpected error occurred.");
         }
+    });
+
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        mutate(formData);
     };
 
     return (
@@ -90,15 +91,9 @@ export function VendorApplicationModal({ triggerClassName, triggerText = "Apply 
                                             />
                                         </div>
 
-                                        {message && (
-                                            <div className={`text-sm ${status === 'error' ? 'text-destructive' : 'text-green-600'}`}>
-                                                {message}
-                                            </div>
-                                        )}
-
                                         <div className="flex justify-end pt-4">
-                                            <Button type="submit" disabled={status === 'submitting'}>
-                                                {status === 'submitting' ? 'Submitting...' : 'Submit Application'}
+                                            <Button type="submit" disabled={isPending}>
+                                                {isPending ? 'Submitting...' : 'Submit Application'}
                                             </Button>
                                         </div>
                                     </form>
