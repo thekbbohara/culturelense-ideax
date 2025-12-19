@@ -25,6 +25,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       suppressHydrationWarning
       style={{ scrollbarWidth: 'none', scrollBehavior: 'smooth' }}
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                window.pwaEvent = e;
+              });
+            `,
+          }}
+        />
+      </head>
       <body>
         <QueryProvider>
           <PWAProvider>

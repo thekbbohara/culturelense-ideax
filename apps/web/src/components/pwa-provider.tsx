@@ -25,9 +25,16 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
 
     window.addEventListener("beforeinstallprompt", handler);
 
+    // Check if event already fired
+    if ((window as any).pwaEvent) {
+        setDeferredPrompt((window as any).pwaEvent);
+        setIsInstallable(true);
+    }
+
     window.addEventListener('appinstalled', () => {
         setDeferredPrompt(null);
         setIsInstallable(false);
+        (window as any).pwaEvent = null;
     });
 
     return () => {
