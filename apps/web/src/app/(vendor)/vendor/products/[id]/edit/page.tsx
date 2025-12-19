@@ -3,35 +3,20 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ProductForm } from '@/components/vendor/product-form';
-import {
-  getListingById,
-  updateVendorListing,
-  deleteVendorListing,
-  getVendorByUserId,
-} from '@/actions/vendor-actions';
+import { getListingById, updateVendorListing, getVendorByUserId } from '@/actions/vendor-actions';
 import { type ProductFormValues } from '@/lib/validations/product-schema';
 import { toast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { ArrowLeft, Trash2 } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 
 export default function EditProductPage() {
   const params = useParams();
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [product, setProduct] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [vendorId, setVendorId] = useState<string>('');
 
   useEffect(() => {
@@ -69,19 +54,6 @@ export default function EditProductPage() {
     setIsLoading(false);
   };
 
-  const handleDelete = async () => {
-    setIsDeleting(true);
-    const result = await deleteVendorListing(params.id as string);
-
-    if (result.success) {
-      toast.success(result.message || 'Product deleted successfully');
-      router.push('/vendor/products');
-    } else {
-      toast.error(result.error || 'Failed to delete product');
-    }
-    setIsDeleting(false);
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -94,22 +66,19 @@ export default function EditProductPage() {
     <div className="mx-auto space-y-6">
       {/* Back Button */}
       <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-4xl font-serif font-black italic text-foreground">Edit Product</h1>
+          <p className="text-muted-foreground mt-2">Update your product listing details</p>
+        </div>
         <Link href="/vendor/products">
-          <Button variant="ghost" className="gap-2">
+          <Button
+            variant="outline"
+            className="gap-2 border-primary text-primary hover:bg-primary hover:text-white ease-linear duration-200"
+          >
             <ArrowLeft className="w-4 h-4" />
             Back to Products
           </Button>
         </Link>
-        <Button variant="destructive" className="gap-2" onClick={() => setDeleteDialogOpen(true)}>
-          <Trash2 className="w-4 h-4" />
-          Delete Product
-        </Button>
-      </div>
-
-      {/* Header */}
-      <div>
-        <h1 className="text-4xl font-serif font-black italic text-foreground">Edit Product</h1>
-        <p className="text-muted-foreground mt-2">Update your product listing details</p>
       </div>
 
       {/* Form Card */}
@@ -130,27 +99,6 @@ export default function EditProductPage() {
           />
         </CardContent>
       </Card>
-
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete Product</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete this product? This action cannot be undone. The
-              product and its image will be permanently removed.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
-              {isDeleting ? 'Deleting...' : 'Delete'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
