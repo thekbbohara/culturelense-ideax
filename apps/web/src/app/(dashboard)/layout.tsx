@@ -1,5 +1,5 @@
-import { Nav } from '@/components/nav';
-import { Dock } from '@/components/dock';
+import { Dock } from "@/components/dock";
+import { Nav } from "@/components/nav";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (

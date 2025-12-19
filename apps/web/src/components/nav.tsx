@@ -32,9 +32,8 @@ export function Nav() {
 
   return (
     <nav
-      className={`fixed top-0 w-full z-50 bg-white/90 backdrop-blur-xl border-b border-primary/10 transition-transform duration-300 ${
-        isVisible ? 'translate-y-0' : '-translate-y-full'
-      }`}
+      className={`fixed top-0 w-full z-50 bg-white/90 backdrop-blur-xl border-b border-primary/10 transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'
+        }`}
     >
       <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 md:h-16 flex items-center justify-between">
         <div className="flex items-center gap-2 shrink-0">

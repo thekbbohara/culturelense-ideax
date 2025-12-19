@@ -2,32 +2,51 @@ import { createClient } from '@/lib/supabase/server';
 import { VendorApplicationModal } from '@/components/vendor-application-modal';
 import { Button } from '@/components/ui-components';
 import { ProfileHeader } from '@/components/profile-header';
-import { ArrowUpRight, Package, Clock, ShieldCheck, Fingerprint, Store, Sparkles } from 'lucide-react';
-import { db, vendors, purchases, contentItems, scanHistory, userPreferences, eq, count, desc, users } from '@/db';
+import {
+  ArrowUpRight,
+  Package,
+  Clock,
+  ShieldCheck,
+  Fingerprint,
+  Store,
+  Sparkles,
+} from 'lucide-react';
+import {
+  db,
+  vendors,
+  purchases,
+  contentItems,
+  scanHistory,
+  userPreferences,
+  eq,
+  count,
+  desc,
+  users,
+} from '@/db';
 import Link from 'next/link';
 import { ProfileSettings } from '@/components/profile-settings';
 
 export default async function ProfilePage() {
-    let user = null;
-    let fullUserData = null;
-    let vendorData = null;
-    let preferencesData = null;
-    let recentOrders: any[] = [];
-    let totalScans = 0;
+  let user = null;
+  let fullUserData = null;
+  let vendorData = null;
+  let preferencesData = null;
+  let recentOrders: any[] = [];
+  let totalScans = 0;
 
   try {
     const supabase = createClient();
     const { data } = await supabase.auth.getUser();
     user = data.user;
 
-        if (user) {
-            fullUserData = await db.query.users.findFirst({
-                where: eq(users.id, user.id),
-            });
+    if (user) {
+      fullUserData = await db.query.users.findFirst({
+        where: eq(users.id, user.id),
+      });
 
-            vendorData = await db.query.vendors.findFirst({
-                where: eq(vendors.userId, user.id),
-            });
+      vendorData = await db.query.vendors.findFirst({
+        where: eq(vendors.userId, user.id),
+      });
 
       preferencesData =
         (await db.query.userPreferences.findFirst({
@@ -58,15 +77,18 @@ export default async function ProfilePage() {
     console.error('Data fetch failed:', e);
   }
 
-    const isVerifiedVendor = vendorData?.verificationStatus === 'verified';
-    const isAdmin = fullUserData?.role === 'admin';
+  const isVerifiedVendor = vendorData?.verificationStatus === 'verified';
+  const isAdmin = fullUserData?.role === 'admin';
 
-    return (
-        <div className="min-h-screen bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
-            {/* Subtle Grain Texture Overlay */}
-            <div className="fixed inset-0 opacity-[0.03] pointer-events-none z-0" 
-                 style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} 
-            />
+  return (
+    <div className="min-h-screen bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
+      {/* Subtle Grain Texture Overlay */}
+      <div
+        className="fixed inset-0 opacity-[0.03] pointer-events-none z-0"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+        }}
+      />
 
             <div className="relative z-10 container mx-auto pt-16 pb-20 px-6 max-w-7xl">
                 

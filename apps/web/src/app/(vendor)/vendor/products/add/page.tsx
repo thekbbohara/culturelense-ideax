@@ -7,6 +7,8 @@ import { createVendorListing, getVendorByUserId } from '@/actions/vendor-actions
 import { type ProductFormValues } from '@/lib/validations/product-schema';
 import { toast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { MoveLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export default function AddProductPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -45,6 +47,14 @@ export default function AddProductPage() {
   return (
     <div className="mx-auto space-y-6">
       {/* ... header ... */}
+
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-semibold">Add New Product</h2>
+        <Button variant="outline" onClick={() => router.push('/vendor/products')} className="flex items-center gap-3 border-primary text-primary hover:bg-primary hover:text-white ease-linear duration-200">
+          <MoveLeft />
+          Back to Products
+        </Button>
+      </div>
 
       {/* Form Card */}
       <Card className="border-border shadow-lg">
