@@ -8,7 +8,6 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useDebounce } from "@/lib/hooks/use-debounce";
 import { AnimatePresence, motion } from "framer-motion";
-import { Button } from "@/components/ui-components";
 
 export function NavSearch() {
   const [query, setQuery] = React.useState("");
