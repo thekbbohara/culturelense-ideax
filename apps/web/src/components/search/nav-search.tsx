@@ -57,7 +57,7 @@ export function NavSearch() {
 
   return (
     <div ref={wrapperRef} className="relative w-full">
-       <div className={`relative flex items-center bg-neutral-black/5 rounded-full px-4 py-2 transition-all border ${isFocused ? 'bg-white border-primary shadow-lg ring-4 ring-primary/5' : 'border-transparent hover:bg-neutral-black/10'}`}>
+       <div className={`relative flex items-center bg-neutral-black/5 rounded-full px-4 py-2 transition-all border ${isFocused ? 'bg-white border-primary shadow-lg ring-4 ring-primary/5' : 'border-black/5 hover:bg-neutral-black/10'}`}>
           <Search className={`w-4 h-4 mr-3 ${isFocused ? 'text-primary' : 'text-neutral-black/40'}`} />
           <input 
             type="text"

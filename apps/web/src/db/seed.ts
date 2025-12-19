@@ -29,17 +29,24 @@ async function seed() {
         where: eq(culturalEntities.slug, slug)
     });
 
+    const validImageUrl = `https://dztlpbogmnjdxmhaaleg.supabase.co/storage/v1/object/public/images/gods/${slug.toLocaleLowerCase()}.webp`;
+
     if (existingEntity) {
         entityId = existingEntity.id;
-        // Optional: Update details if needed
+        // Update existing entity to ensure image URL and other details are current
+         await db.update(culturalEntities).set({
+            imageUrl: validImageUrl,
+            description: god.intro,
+            history: god.myth
+        }).where(eq(culturalEntities.id, entityId));
     } else {
         const result = await db.insert(culturalEntities).values({
             name: god.name,
             slug: slug,
             type: 'deity',
             description: god.intro,
-            history: god.myth, // Mapping myth to history for now, or intro + journey
-            imageUrl: '', // No image yet
+            history: god.myth, 
+            imageUrl: validImageUrl,
         }).returning({ id: culturalEntities.id });
         entityId = result[0].id;
     }
