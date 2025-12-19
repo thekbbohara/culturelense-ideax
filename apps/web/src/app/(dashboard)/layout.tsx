@@ -1,11 +1,7 @@
-import { Nav } from "@/components/nav";
-import { Dock } from "@/components/dock";
+import { Nav } from '@/components/nav';
+import { Dock } from '@/components/dock';
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <Nav />
@@ -25,8 +21,11 @@ export default function DashboardLayout({
         Nav has background.
         Let's just render Nav.
       */}
-      {children}
-      <Dock />
+      <div className="pt-20">
+        {children}
+
+        <Dock />
+      </div>
     </>
   );
 }
