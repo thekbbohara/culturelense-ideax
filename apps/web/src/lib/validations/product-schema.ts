@@ -7,9 +7,9 @@ export const productFormSchema = z.object({
     const num = parseFloat(val);
     return !isNaN(num) && num > 0;
   }, 'Price must be a positive number'),
-  imageUrl: z.string().url('Must be a valid URL'),
+  imageUrl: z.string().url('Product image is required'),
   status: z.enum(['draft', 'active', 'sold', 'archived']),
-  entityId: z.string().optional(),
+  entityId: z.string().min(1, 'Entity is required'),
 });
 
 export type ProductFormValues = z.infer<typeof productFormSchema>;

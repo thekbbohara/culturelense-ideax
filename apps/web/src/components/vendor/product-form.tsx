@@ -1,8 +1,11 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { productFormSchema, type ProductFormValues } from '@/lib/validations/product-schema';
+import { uploadProductImage } from '@/lib/supabase/storage';
+import { getEntities } from '@/actions/entities';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -23,6 +26,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Loader2 } from 'lucide-react';
+import { ImageUpload } from './image-upload';
 
 interface ProductFormProps {
   defaultValues?: Partial<ProductFormValues>;
@@ -37,6 +41,9 @@ export function ProductForm({
   submitLabel = 'Create Product',
   isLoading = false,
 }: ProductFormProps) {
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productFormSchema),
     defaultValues: defaultValues || {
@@ -49,9 +56,54 @@ export function ProductForm({
     },
   });
 
+  const handleFileChange = (file: File | null) => {
+    setImageFile(file);
+    if (file) {
+      const previewUrl = URL.createObjectURL(file);
+      form.setValue('imageUrl', previewUrl);
+    } else {
+      form.setValue('imageUrl', '');
+    }
+  };
+
+  const handleFormSubmit = async (values: ProductFormValues) => {
+    try {
+      if (imageFile) {
+        setIsUploading(true);
+        // Using 'uploads' as default folder, ideally pass vendorId if available
+        const result = await uploadProductImage(imageFile, 'uploads');
+
+        if (!result.success || !result.url) {
+          throw new Error(result.error || 'Failed to upload image');
+        }
+
+        values.imageUrl = result.url;
+      }
+
+      await onSubmit(values);
+    } catch (error) {
+      console.error('Form submission error:', error);
+      // If passing error to parent is needed, or just toast here
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const [entities, setEntities] = useState<any[]>([]);
+
+  useEffect(() => {
+    async function fetchEntities() {
+      const result = await getEntities();
+      if (result.success && result.data) {
+        setEntities(result.data);
+      }
+    }
+    fetchEntities();
+  }, []);
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
         <FormField
           control={form.control}
           name="title"
@@ -133,22 +185,30 @@ export function ProductForm({
             )}
           />
         </div>
-
         <FormField
           control={form.control}
-          name="imageUrl"
+          name="entityId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Image URL</FormLabel>
-              <FormControl>
-                <Input
-                  type="url"
-                  placeholder="https://example.com/image.jpg"
-                  {...field}
-                  className="focus-visible:ring-primary"
-                />
-              </FormControl>
-              <FormDescription>Provide a direct link to the product image</FormDescription>
+              <FormLabel>Deity/Entity</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
+                <FormControl>
+                  <SelectTrigger className="focus:ring-primary">
+                    <SelectValue placeholder="Select a deity or entity" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent className="max-h-[400px] overflow-y-auto">
+                  <SelectItem value="none">None</SelectItem>
+                  {entities.map((entity) => (
+                    <SelectItem key={entity.id} value={entity.id}>
+                      {entity.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormDescription>
+                Associate this product with a specific cultural entity
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -156,18 +216,19 @@ export function ProductForm({
 
         <FormField
           control={form.control}
-          name="entityId"
+          name="imageUrl"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Deity/Entity ID (Optional)</FormLabel>
+              <FormLabel>Product Image</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="Link to a specific deity or cultural entity"
-                  {...field}
-                  className="focus-visible:ring-primary"
+                <ImageUpload
+                  value={field.value}
+                  onChange={field.onChange}
+                  onFileChange={handleFileChange}
+                  disabled={isLoading || isUploading}
                 />
               </FormControl>
-              <FormDescription>Optional: Associate this product with a deity</FormDescription>
+              <FormDescription>Upload a product image (max 5MB, JPEG/PNG/WebP/GIF)</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -176,10 +237,10 @@ export function ProductForm({
         <div className="flex gap-4 pt-4">
           <Button
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || isUploading}
             className="bg-primary hover:bg-primary/90 text-primary-foreground"
           >
-            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {(isLoading || isUploading) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {submitLabel}
           </Button>
         </div>

@@ -36,7 +36,10 @@ export function VendorNav() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center space-x-8 h-16">
           {navItems.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+            const isActive =
+              item.href === '/vendor'
+                ? pathname === '/vendor'
+                : pathname === item.href || pathname.startsWith(item.href + '/');
             const Icon = item.icon;
 
             return (
