@@ -1,107 +1,192 @@
-import React from "react";
-import { Button, Card, Badge } from "@/components/ui-components";
-import Link from "next/link";
-import { ArrowLeft, MapPin, BookOpen, Quote, Sparkles } from "lucide-react";
-import { getGodBySlug } from "@/actions/god";
-import Image from "next/image";
+import React from 'react';
+import Image from 'next/image';
+import { getEntityBySlug } from '@/actions/entities';
+import { getListingsByEntityId } from '@/actions/marketplace';
+import { Button, Badge, Card, Separator } from '@/components/ui-components';
+import { ArrowLeft, Share2, Heart, Sparkles, MapPin, ScrollText, History } from 'lucide-react';
+import Link from 'next/link';
 
-export default async function GodDetailsPage({ params }: { params: { slug: string } }) {
-  const god = await getGodBySlug(params.slug);
+export default async function GodPage({ params }: { params: { slug: string } }) {
+  const { data: entity } = await getEntityBySlug(params.slug);
 
-  if (!god) {
+  if (!entity) {
     return (
-      <div className="min-h-screen bg-neutral-white p-6 flex flex-col items-center justify-center text-center">
-         <h1 className="text-4xl font-serif font-black italic mb-4">404</h1>
-         <p className="text-neutral-black/60 mb-8">Deity not found in our archives.</p>
-         <Link href="/home">
-            <Button variant="outline" className="rounded-full">Back to Home</Button>
-         </Link>
-      </div>
+        <div className="min-h-screen flex items-center justify-center bg-background">
+            <div className="text-center">
+                <h1 className="text-2xl font-bold mb-4">Entity Not Found</h1>
+                <Link href="/"><Button>Return Home</Button></Link>
+            </div>
+        </div>
     );
   }
 
+  const { data: listings } = await getListingsByEntityId(entity.id);
+
   return (
-    <div className="min-h-screen bg-neutral-white pb-20">
-      {/* Hero Header with Image */}
-      <div className="relative h-[50vh] w-full bg-neutral-black/90 overflow-hidden">
-        {god.imageUrl && (
-             <Image 
-                src={god.imageUrl} 
-                alt={god.name} 
+    <div className="min-h-screen bg-background pb-20">
+      {/* Hero Section */}
+      <div className="relative h-[70vh] w-full overflow-hidden">
+        {entity.imageUrl ? (
+            <Image 
+                src={entity.imageUrl} 
+                alt={entity.name} 
                 fill 
-                className="object-cover opacity-60"
+                className="object-cover"
                 priority
-             />
+            />
+        ) : (
+            <div className="w-full h-full bg-neutral-200" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-neutral-white via-transparent to-transparent" />
-        
-        <div className="absolute top-6 left-6 z-10">
-            <Link href="/home">
-                <Button variant="ghost" className="rounded-full gap-2 text-white hover:text-white/80 hover:bg-white/10">
-                    <ArrowLeft className="w-4 h-4" /> Back to Home
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+        <div className="absolute top-0 left-0 w-full p-6 flex justify-between items-start z-10 pt-24">
+            <Link href="/">
+                <Button variant="ghost" size="icon" className="bg-white/20 backdrop-blur-md hover:bg-white/30 text-white rounded-full">
+                    <ArrowLeft className="w-6 h-6" />
                 </Button>
             </Link>
+            <div className="flex gap-2">
+                <Button variant="ghost" size="icon" className="bg-white/20 backdrop-blur-md hover:bg-white/30 text-white rounded-full">
+                    <Share2 className="w-5 h-5" />
+                </Button>
+            </div>
         </div>
-
-        <div className="absolute bottom-0 w-full px-6 pb-12 max-w-7xl mx-auto">
-             <Badge className="bg-secondary text-neutral-black hover:bg-secondary mb-4 uppercase tracking-widest">{god.type}</Badge>
-             <h1 className="text-6xl font-serif font-black italic text-neutral-black mb-2">{god.name}</h1>
-             {god.location && (
-                <div className="flex items-center gap-2 text-neutral-black/60 font-medium">
-                    <MapPin className="w-4 h-4" />
-                    <span>{god.location}</span>
+        
+        <div className="absolute bottom-0 left-0 w-full p-6 sm:p-10">
+            <div className="max-w-4xl mx-auto">
+                <div className="flex flex-wrap gap-2 mb-4">
+                    <Badge className="bg-primary/90 hover:bg-primary text-white border-none uppercase tracking-widest text-[10px] py-1 px-3">
+                        {entity.type}
+                    </Badge>
+                    {entity.religion && (
+                        <Badge className="bg-white/10 backdrop-blur-sm text-white border-white/20 uppercase tracking-widest text-[10px] py-1 px-3">
+                            {entity.religion}
+                        </Badge>
+                    )}
                 </div>
-             )}
-        </div>
-      </div>
-
-      <main className="px-6 max-w-7xl mx-auto -mt-8 relative z-10 space-y-12">
-        {/* Intro Section */}
-        <section className="bg-white p-8 rounded-[2rem] border border-neutral-black/5 shadow-xl shadow-neutral-black/5">
-             <p className="text-2xl font-serif leading-relaxed text-neutral-black/80">
-                {god.description}
-             </p>
-             {god.intro && <p className="mt-4 text-neutral-black/60 leading-relaxed">{god.intro}</p>}
-        </section>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Legend/Myth */}
-            {god.myth && (
-                <Card className="p-8 rounded-[2rem] bg-tertiary/5 border-tertiary/10">
-                    <div className="flex items-center gap-3 mb-6">
-                        <BookOpen className="w-6 h-6 text-tertiary" />
-                        <h2 className="text-2xl font-serif font-bold text-tertiary">Mythological Journey</h2>
-                    </div>
-                    <p className="text-neutral-black/70 leading-relaxed max-h-[300px] overflow-y-auto pr-4">
-                        {god.myth}
+                <h1 className="text-5xl sm:text-7xl font-serif font-black text-white italic mb-4 drop-shadow-2xl">
+                    {entity.name}
+                </h1>
+                {entity.nickName && (
+                    <p className="text-xl text-white/90 font-medium mb-6 italic">
+                        "{entity.nickName}"
                     </p>
-                </Card>
-            )}
-
-            {/* Fun Fact & Journey */}
-            <div className="space-y-8">
-                {god.funFact && (
-                    <Card className="p-8 rounded-[2rem] bg-secondary/10 border-secondary/20 relative overflow-hidden">
-                        <Quote className="absolute top-4 right-4 w-24 h-24 text-secondary/10 rotate-12" />
-                        <div className="flex items-center gap-3 mb-4 relative z-10">
-                            <Sparkles className="w-5 h-5 text-secondary" />
-                            <h3 className="font-bold uppercase tracking-widest text-secondary text-sm">Did you know?</h3>
-                        </div>
-                        <p className="text-xl font-serif italic text-neutral-black/80 relative z-10">
-                            &quot;{god.funFact}&quot;
-                        </p>
-                    </Card>
-                )}
-                
-                {god.religion && (
-                    <div className="p-6 rounded-2xl border border-neutral-black/10 flex items-center justify-between">
-                        <span className="text-neutral-black/40 font-bold uppercase tracking-widest text-sm">Religion</span>
-                        <span className="font-serif font-bold text-lg">{god.religion}</span>
-                    </div>
                 )}
             </div>
         </div>
-      </main>
+      </div>
+
+      <div className="max-w-4xl mx-auto px-6 -mt-10 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-10">
+            <div className="space-y-10">
+                {/* Intro */}
+                <div className="bg-card/50 backdrop-blur-sm p-6 rounded-3xl border border-border/50">
+                     <p className="text-lg leading-relaxed text-muted-foreground font-serif">
+                        {entity.description}
+                     </p>
+                     {entity.intro && (
+                        <div className="mt-6 pt-6 border-t border-border">
+                            <p className="text-base text-foreground/80 leading-relaxed">
+                                {entity.intro}
+                            </p>
+                        </div>
+                     )}
+                </div>
+
+                {/* Additional Details */}
+                {(entity.myth || entity.history) && (
+                    <div className="space-y-6">
+                        <div className="flex items-center gap-2">
+                             <History className="w-5 h-5 text-primary" />
+                             <h2 className="text-2xl font-serif font-black italic">Mythology & History</h2>
+                        </div>
+                        <div className="prose prose-neutral dark:prose-invert max-w-none text-muted-foreground">
+                            {entity.myth && <p>{entity.myth}</p>}
+                            {entity.history && <p className="mt-4">{entity.history}</p>}
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            <div className="space-y-6">
+                 {/* Quick Facts */}
+                 <Card className="p-6 rounded-3xl bg-card border-none shadow-sm space-y-4">
+                    <h3 className="font-bold uppercase tracking-widest text-xs text-muted-foreground mb-4">Quick Details</h3>
+                    
+                    {entity.location && (
+                        <div className="flex items-start gap-3">
+                            <MapPin className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                            <div>
+                                <span className="block text-xs font-bold uppercase text-muted-foreground">Location</span>
+                                <span className="text-sm font-medium">{entity.location}</span>
+                            </div>
+                        </div>
+                    )}
+                    
+                    {entity.funFact && (
+                         <div className="flex items-start gap-3">
+                            <Sparkles className="w-5 h-5 text-secondary shrink-0 mt-0.5" />
+                            <div>
+                                <span className="block text-xs font-bold uppercase text-muted-foreground">Did You Know?</span>
+                                <span className="text-sm font-medium italic">"{entity.funFact}"</span>
+                            </div>
+                        </div>
+                    )}
+                 </Card>
+            </div>
+        </div>
+
+        <Separator className="my-16" />
+
+        {/* Product Lists / Marketplace */}
+        <section className="space-y-8">
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-secondary" />
+                    <h2 className="text-2xl font-serif font-black italic">Related Artifacts used in Pooja</h2>
+                </div>
+            </div>
+
+            {listings && listings.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {listings.map((item, i) => (
+                        <Card 
+                            key={i}
+                            className="group cursor-pointer overflow-hidden rounded-[2rem] border-none bg-card shadow-sm hover:shadow-xl transition-all duration-300"
+                        >
+                            <div className="aspect-square relative overflow-hidden bg-muted">
+                                {item.imageUrl ? (
+                                    <Image 
+                                        src={item.imageUrl} 
+                                        alt={item.title} 
+                                        fill 
+                                        className="object-cover transition-transform duration-700 group-hover:scale-110"
+                                    />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-muted-foreground">No Image</div>
+                                )}
+                                <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors" />
+                            </div>
+                            <div className="p-6">
+                                <h3 className="font-serif font-bold text-lg mb-2 group-hover:text-primary transition-colors">{item.title}</h3>
+                                <p className="text-sm text-muted-foreground line-clamp-2 mb-4">{item.description}</p>
+                                {/* Price removed as per previous instruction, can re-enable if needed */}
+                                {/* 
+                                <div className="flex items-center justify-between">
+                                    <span className="font-bold text-lg">{item.price}</span> 
+                                </div>
+                                */}
+                                <Button className="w-full rounded-full" variant="outline">View Details</Button>
+                            </div>
+                        </Card>
+                    ))}
+                </div>
+            ) : (
+                <div className="text-center py-20 bg-muted/30 rounded-[3rem] border border-dashed border-border">
+                    <p className="text-muted-foreground font-serif italic">No artifacts available for this entity yet.</p>
+                </div>
+            )}
+        </section>
+      </div>
     </div>
   );
 }
