@@ -47,7 +47,6 @@ export async function scanImage(formData: FormData) {
     aiFormData.append('file', file);
 
     const aiResponse = await axios.post(`${process.env.NEXT_PUBLIC_SPATIAL_URL}/predictv2`, aiFormData);
-
     if (!aiResponse.data) {
       console.error('AI Service Error:', aiResponse.data);
       throw new Error('Failed to analyze image');
@@ -159,7 +158,7 @@ export async function scanImage(formData: FormData) {
     });
 
     if (!entityData) {
-      return { success: false, error: 'Entity recognized but not found in our database.', data: { imageUrl: publicUrl } };
+      return { success: false, error: 'Unknown Entity. Please provide a better image and try again.', data: { imageUrl: publicUrl } };
     }
 
     return {
