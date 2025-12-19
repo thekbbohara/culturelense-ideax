@@ -1,6 +1,7 @@
-import "../styles/globals.css";
-import type { Metadata } from "next";
-import { ThemeProvider } from "@/components/theme-provider";
+import '../styles/globals.css';
+import type { Metadata } from 'next';
+import { ThemeProvider } from '@/components/theme-provider';
+import { Toaster } from '@/components/ui/sonner';
 
 export const metadata: Metadata = {
   title: 'CultureLense',
@@ -25,6 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           disableTransitionOnChange
         >
           {children}
+          <Toaster position="top-right" richColors />
         </ThemeProvider>
       </body>
     </html>

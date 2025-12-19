@@ -15,10 +15,10 @@ export default async function ProfilePage() {
     let recentOrders: any[] = [];
     let totalScans = 0;
 
-    try {
-        const supabase = createClient();
-        const { data } = await supabase.auth.getUser();
-        user = data.user;
+  try {
+    const supabase = createClient();
+    const { data } = await supabase.auth.getUser();
+    user = data.user;
 
         if (user) {
             fullUserData = await db.query.users.findFirst({
@@ -29,32 +29,34 @@ export default async function ProfilePage() {
                 where: eq(vendors.userId, user.id),
             });
 
-            preferencesData = await db.query.userPreferences.findFirst({
-                where: eq(userPreferences.userId, user.id),
-            }) || null;
+      preferencesData =
+        (await db.query.userPreferences.findFirst({
+          where: eq(userPreferences.userId, user.id),
+        })) || null;
 
-            recentOrders = await db.select({
-                id: purchases.id,
-                date: purchases.createdAt,
-                status: purchases.status,
-                price: contentItems.price,
-                item: contentItems.title,
-            })
-                .from(purchases)
-                .innerJoin(contentItems, eq(purchases.contentItemId, contentItems.id))
-                .where(eq(purchases.userId, user.id))
-                .orderBy(desc(purchases.createdAt))
-                .limit(5);
+      recentOrders = await db
+        .select({
+          id: purchases.id,
+          date: purchases.createdAt,
+          status: purchases.status,
+          price: contentItems.price,
+          item: contentItems.title,
+        })
+        .from(purchases)
+        .innerJoin(contentItems, eq(purchases.contentItemId, contentItems.id))
+        .where(eq(purchases.userId, user.id))
+        .orderBy(desc(purchases.createdAt))
+        .limit(5);
 
-            const [scanResult] = await db.select({ value: count() })
-                .from(scanHistory)
-                .where(eq(scanHistory.userId, user.id));
-            totalScans = scanResult?.value || 0;
-        }
-
-    } catch (e) {
-        console.error("Data fetch failed:", e);
+      const [scanResult] = await db
+        .select({ value: count() })
+        .from(scanHistory)
+        .where(eq(scanHistory.userId, user.id));
+      totalScans = scanResult?.value || 0;
     }
+  } catch (e) {
+    console.error('Data fetch failed:', e);
+  }
 
     const isVerifiedVendor = vendorData?.verificationStatus === 'verified';
     const isAdmin = fullUserData?.role === 'admin';
