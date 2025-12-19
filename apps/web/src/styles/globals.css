@@ -19,6 +19,9 @@
     --secondary: 218 165 32;
     --secondary-foreground: 26 26 26;
 
+    --tertiary: 226 114 91;
+    --tertiary-foreground: 255 255 255;
+
     --muted: 244 244 245;
     --muted-foreground: 115 115 115;
 
@@ -50,6 +53,9 @@
 
     --secondary: 218 165 32;
     --secondary-foreground: 26 26 26;
+
+    --tertiary: 226 114 91;
+    --tertiary-foreground: 255 255 255;
 
     --muted: 38 38 38;
     --muted-foreground: 163 163 163;

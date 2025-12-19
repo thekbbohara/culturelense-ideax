@@ -95,7 +95,7 @@ export default function ScanPage() {
       } else {
         console.error("Scan failed:", err);
         setError(err.message || "Failed to scan image.");
-        setIsScanning(false); // Only stop scanning state if not cancelled (cancelled handles its own state usually, but here reset is fine)
+        setIsScanning(false); 
       }
     } finally {
       // Don't set isScanning(false) if successful redirect happens? 
@@ -154,10 +154,6 @@ export default function ScanPage() {
         </div>
       )}
 
-      {/* 
-        We no longer render existing logic for scanning state separately. 
-        CameraCapture handles the scanning visualization internally now.
-      */}
       <CameraCapture
         onCapture={handleCapture}
         onRetake={handleRetake}

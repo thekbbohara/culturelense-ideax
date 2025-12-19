@@ -1,8 +1,9 @@
 import React, { useRef, useCallback } from "react";
 import Webcam from "react-webcam";
 import { Button } from "@culturelense/ui";
-import { Upload, X, Camera, RefreshCw } from "lucide-react";
+import { Upload, X, Camera, RefreshCw, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
+import { BackButton } from "../back-button";
 
 interface CameraCaptureProps {
   onCapture: (fileOrSrc: string | File) => void;
@@ -95,22 +96,7 @@ export const CameraCapture: React.FC<CameraCaptureProps> = ({
 
             {/* Camera Controls */}
             <div className="absolute bottom-8 left-0 right-0 flex items-center justify-center gap-8 px-4">
-              {/* Upload Button */}
-              <button
-                onClick={triggerFileUpload}
-                className="p-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 transition-all"
-                aria-label="Upload image"
-              >
-                <Upload className="w-6 h-6" />
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleFileChange}
-                  accept="image/*"
-                  className="hidden"
-                />
-              </button>
-
+              <BackButton href="/home" icon={<ArrowLeft />} direction="left" />
               {/* Capture Button */}
               <button
                 onClick={capture}
@@ -120,8 +106,22 @@ export const CameraCapture: React.FC<CameraCaptureProps> = ({
                 <div className="w-full h-full bg-white rounded-full border-2 border-black/50" />
               </button>
 
-              {/* Spacer for balance */}
-              <div className="w-12" />
+              {/* Upload Button */}
+              <span
+                onClick={triggerFileUpload}
+                aria-label="Upload image"
+              >
+                {/* <Upload className="w-6 h-6" /> */}
+                <BackButton href="/home" text="Upload" icon={<Upload />} direction="right" />
+
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  accept="image/*"
+                  className="hidden"
+                />
+              </span>
             </div>
           </div>
         )}
