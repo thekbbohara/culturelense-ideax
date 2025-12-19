@@ -12,6 +12,8 @@
     "@culturelense/db": "*",
     "@culturelense/shared": "*",
     "@culturelense/ui": "*",
+    "@supabase/ssr": "^0.8.0",
+    "@supabase/supabase-js": "^2.89.0",
     "next": "14.1.0",
     "next-pwa": "^5.6.0",
     "react": "^18.2.0",
