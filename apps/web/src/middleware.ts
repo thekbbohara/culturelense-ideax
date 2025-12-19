@@ -8,6 +8,7 @@ export async function middleware(request: NextRequest) {
     },
   })
 
+  // 1. Create Supabase Client
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -54,11 +55,34 @@ export async function middleware(request: NextRequest) {
     }
   )
 
+  // 2. Fetch authenticated user
   const { data: { user } } = await supabase.auth.getUser()
 
-  // If user is logged in and on the landing page, redirect to home
+  // 3. User is logged in and on landing page -> redirect to home
   if (user && request.nextUrl.pathname === '/') {
     return NextResponse.redirect(new URL('/home', request.url))
+  }
+
+  // 4. Protect Admin Routes
+  if (request.nextUrl.pathname.startsWith('/admin')) {
+    if (!user) {
+      // If not logged in, redirect to auth (or landing for now)
+      return NextResponse.redirect(new URL('/', request.url))
+    }
+
+    // Query the database for the user's role
+    // Note: This relies on RLS policies allowing the user to read their own 'role'.
+    // If RLS blocks this, it will fail (return 404 or null).
+    const { data: dbUser, error } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (error || !dbUser || dbUser.role !== 'admin') {
+      // Redirect unauthorized users to home
+      return NextResponse.redirect(new URL('/home', request.url));
+    }
   }
 
   return response
@@ -66,13 +90,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * Feel free to modify this pattern to include more paths.
-     */
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }

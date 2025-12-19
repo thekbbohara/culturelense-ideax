@@ -19,8 +19,6 @@ export async function scanImage(formData: FormData) {
       cache: 'no-store'
     });
 
-    console.log(aiResponse)
-
     if (!aiResponse.ok) {
       console.error('AI Service Error:', await aiResponse.text());
       throw new Error('Failed to analyze image');

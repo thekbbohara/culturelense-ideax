@@ -1,22 +1,19 @@
 "use server";
 
 import { db } from "@/db";
-import { searchHistory, users, culturalEntities } from "@/db/schema";
+import { searchHistory, culturalEntities } from "@/db/schema";
 import { desc, eq, inArray } from "drizzle-orm";
 
-async function getUserId() {
-  const existingUsers = await db.select().from(users).limit(1);
-  if (existingUsers.length > 0) {
-    return existingUsers[0].id;
-  }
+import { createClient } from "@/lib/supabase/server";
 
-  // Create default user if none exists
-  const [newUser] = await db.insert(users).values({
-    email: 'user@example.com',
-    role: 'user',
-  }).returning();
+async function getUserId() {
+  const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
   
-  return newUser.id;
+  if (!user) {
+    throw new Error("User not authenticated");
+  }
+  return user.id;
 }
 
 export async function saveSearchEntry(query: string) {
