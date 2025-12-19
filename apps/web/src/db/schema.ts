@@ -3,13 +3,29 @@ import { relations } from 'drizzle-orm';
 
 // Enums
 export const userRoleEnum = pgEnum('user_role', ['admin', 'user', 'vendor']);
-export const verificationStatusEnum = pgEnum('verification_status', ['pending', 'verified', 'rejected']);
-export const entityTypeEnum = pgEnum('entity_type', ['deity', 'mythology', 'temple', 'sculpture', 'ritual']);
+export const verificationStatusEnum = pgEnum('verification_status', [
+  'pending',
+  'verified',
+  'rejected',
+]);
+export const entityTypeEnum = pgEnum('entity_type', [
+  'deity',
+  'mythology',
+  'temple',
+  'sculpture',
+  'ritual',
+]);
 export const contentTypeEnum = pgEnum('content_type', ['audio', 'pdf', 'video', 'deep_mythology']);
 export const purchaseStatusEnum = pgEnum('purchase_status', ['pending', 'completed', 'failed']);
 export const listingStatusEnum = pgEnum('listing_status', ['draft', 'active', 'sold', 'archived']);
 export const escrowStateEnum = pgEnum('escrow_state', ['held', 'released', 'refunded', 'disputed']);
-export const orderStatusEnum = pgEnum('order_status', ['pending', 'processing', 'shipped', 'delivered', 'cancelled']);
+export const orderStatusEnum = pgEnum('order_status', [
+  'pending',
+  'processing',
+  'shipped',
+  'delivered',
+  'cancelled',
+]);
 
 // Users Table
 export const users = pgTable('users', {
@@ -23,7 +39,10 @@ export const users = pgTable('users', {
 
 export const userPreferences = pgTable('user_preferences', {
   id: uuid('id').defaultRandom().primaryKey(),
-  userId: uuid('user_id').references(() => users.id).notNull().unique(),
+  userId: uuid('user_id')
+    .references(() => users.id)
+    .notNull()
+    .unique(),
   enableNotifications: boolean('enable_notifications').default(true),
   language: text('language').default('en'),
   privacyLocation: boolean('privacy_location').default(true),
@@ -34,7 +53,10 @@ export const userPreferences = pgTable('user_preferences', {
 // Vendors Table
 export const vendors = pgTable('vendors', {
   id: uuid('id').defaultRandom().primaryKey(),
-  userId: uuid('user_id').references(() => users.id).notNull().unique(),
+  userId: uuid('user_id')
+    .references(() => users.id)
+    .notNull()
+    .unique(),
   businessName: text('business_name').notNull(),
   description: text('description'),
   verificationStatus: verificationStatusEnum('verification_status').default('pending').notNull(),
@@ -44,7 +66,10 @@ export const vendors = pgTable('vendors', {
 
 export const vendorDetails = pgTable('vendor_details', {
   id: uuid('id').defaultRandom().primaryKey(),
-  vendorId: uuid('vendor_id').references(() => vendors.id).notNull().unique(),
+  vendorId: uuid('vendor_id')
+    .references(() => vendors.id)
+    .notNull()
+    .unique(),
   logoUrl: text('logo_url'),
   bannerUrl: text('banner_url'),
   contactEmail: text('contact_email'),
@@ -57,7 +82,9 @@ export const vendorDetails = pgTable('vendor_details', {
 
 export const godDetails = pgTable('god_details', {
   id: uuid('id').defaultRandom().primaryKey(),
-  entityId: uuid('entity_id').references(() => culturalEntities.id).notNull(),
+  entityId: uuid('entity_id')
+    .references(() => culturalEntities.id)
+    .notNull(),
   name: text('name').notNull(),
   nickName: text('nick_name'),
   avatarNames: text('avatar_names'), // Stored as comma-separated string or JSON string
@@ -86,23 +113,33 @@ export const culturalEntities = pgTable('cultural_entities', {
 });
 
 // Entity Relationships (Graph)
-export const entityRelationships = pgTable('entity_relationships', {
-  fromEntityId: uuid('from_entity_id').references(() => culturalEntities.id).notNull(),
-  toEntityId: uuid('to_entity_id').references(() => culturalEntities.id).notNull(),
-  relationshipType: text('relationship_type').notNull(), // e.g., 'parent_of', 'located_in', 'associated_with'
-}, (t) => ({
-  pk: primaryKey({ columns: [t.fromEntityId, t.toEntityId] }),
-}));
+export const entityRelationships = pgTable(
+  'entity_relationships',
+  {
+    fromEntityId: uuid('from_entity_id')
+      .references(() => culturalEntities.id)
+      .notNull(),
+    toEntityId: uuid('to_entity_id')
+      .references(() => culturalEntities.id)
+      .notNull(),
+    relationshipType: text('relationship_type').notNull(), // e.g., 'parent_of', 'located_in', 'associated_with'
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.fromEntityId, t.toEntityId] }),
+  }),
+);
 
 // Purchase/Content Layers
 
 export const contentItems = pgTable('content_items', {
   id: uuid('id').defaultRandom().primaryKey(),
-  entityId: uuid('entity_id').references(() => culturalEntities.id).notNull(),
+  entityId: uuid('entity_id')
+    .references(() => culturalEntities.id)
+    .notNull(),
   type: contentTypeEnum('type').notNull(),
   title: text('title').notNull(),
   description: text('description'),
-  price:  text('price').notNull(), // storing as string for simple decimal handling in MVP (e.g. "4.99")
+  price: text('price').notNull(), // storing as string for simple decimal handling in MVP (e.g. "4.99")
   previewUrl: text('preview_url'),
   contentUrl: text('content_url').notNull(), // Secure URL or path
   isPremium: boolean('is_premium').default(true).notNull(),
@@ -111,8 +148,12 @@ export const contentItems = pgTable('content_items', {
 
 export const purchases = pgTable('purchases', {
   id: uuid('id').defaultRandom().primaryKey(),
-  userId: uuid('user_id').references(() => users.id).notNull(),
-  contentItemId: uuid('content_item_id').references(() => contentItems.id).notNull(),
+  userId: uuid('user_id')
+    .references(() => users.id)
+    .notNull(),
+  contentItemId: uuid('content_item_id')
+    .references(() => contentItems.id)
+    .notNull(),
   status: purchaseStatusEnum('status').default('pending').notNull(),
   transactionId: text('transaction_id'), // Stripe ID
   createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -122,7 +163,9 @@ export const purchases = pgTable('purchases', {
 
 export const listings = pgTable('listings', {
   id: uuid('id').defaultRandom().primaryKey(),
-  vendorId: uuid('vendor_id').references(() => vendors.id).notNull(),
+  vendorId: uuid('vendor_id')
+    .references(() => vendors.id)
+    .notNull(),
   entityId: uuid('entity_id').references(() => culturalEntities.id), // Optional linking to specific deity
   title: text('title').notNull(),
   description: text('description').notNull(),
@@ -134,8 +177,12 @@ export const listings = pgTable('listings', {
 
 export const escrowTransactions = pgTable('escrow_transactions', {
   id: uuid('id').defaultRandom().primaryKey(),
-  listingId: uuid('listing_id').references(() => listings.id).notNull(),
-  buyerId: uuid('buyer_id').references(() => users.id).notNull(),
+  listingId: uuid('listing_id')
+    .references(() => listings.id)
+    .notNull(),
+  buyerId: uuid('buyer_id')
+    .references(() => users.id)
+    .notNull(),
   amount: text('amount').notNull(),
   state: escrowStateEnum('state').default('held').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -146,14 +193,18 @@ export const escrowTransactions = pgTable('escrow_transactions', {
 
 export const searchHistory = pgTable('search_history', {
   id: uuid('id').defaultRandom().primaryKey(),
-  userId: uuid('user_id').references(() => users.id).notNull(),
+  userId: uuid('user_id')
+    .references(() => users.id)
+    .notNull(),
   query: text('query').notNull(),
   timestamp: timestamp('timestamp').defaultNow().notNull(),
 });
 
 export const scanHistory = pgTable('scan_history', {
   id: uuid('id').defaultRandom().primaryKey(),
-  userId: uuid('user_id').references(() => users.id).notNull(),
+  userId: uuid('user_id')
+    .references(() => users.id)
+    .notNull(),
   entityId: uuid('entity_id').references(() => culturalEntities.id), // Nullable if not identified
   imageUrl: text('image_url').notNull(),
   timestamp: timestamp('timestamp').defaultNow().notNull(),
@@ -161,7 +212,9 @@ export const scanHistory = pgTable('scan_history', {
 
 export const visitedLocations = pgTable('visited_locations', {
   id: uuid('id').defaultRandom().primaryKey(),
-  userId: uuid('user_id').references(() => users.id).notNull(),
+  userId: uuid('user_id')
+    .references(() => users.id)
+    .notNull(),
   entityId: uuid('entity_id').references(() => culturalEntities.id),
   placeName: text('place_name').notNull(),
   latitude: text('latitude').notNull(),
@@ -173,12 +226,32 @@ export const visitedLocations = pgTable('visited_locations', {
 
 export const orders = pgTable('orders', {
   id: uuid('id').defaultRandom().primaryKey(),
-  buyerId: uuid('buyer_id').references(() => users.id).notNull(),
-  listingId: uuid('listing_id').references(() => listings.id).notNull(),
+  buyerId: uuid('buyer_id')
+    .references(() => users.id)
+    .notNull(),
+  listingId: uuid('listing_id')
+    .references(() => listings.id)
+    .notNull(),
   quantity: text('quantity').default('1').notNull(), // text to be safe or integer
   totalAmount: text('total_amount').notNull(),
   status: orderStatusEnum('status').default('pending').notNull(),
   shippingAddress: text('shipping_address').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+// Reviews/Feedback
+
+export const reviews = pgTable('reviews', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  listingId: uuid('listing_id')
+    .references(() => listings.id)
+    .notNull(),
+  buyerId: uuid('buyer_id')
+    .references(() => users.id)
+    .notNull(),
+  rating: text('rating').notNull(), // 1-5 stored as text
+  comment: text('comment'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
@@ -222,7 +295,7 @@ export const vendorDetailsRelations = relations(vendorDetails, ({ one }) => ({
   }),
 }));
 
-export const listingsRelations = relations(listings, ({ one }) => ({
+export const listingsRelations = relations(listings, ({ one, many }) => ({
   vendor: one(vendors, {
     fields: [listings.vendorId],
     references: [vendors.id],
@@ -231,6 +304,7 @@ export const listingsRelations = relations(listings, ({ one }) => ({
     fields: [listings.entityId],
     references: [culturalEntities.id],
   }),
+  reviews: many(reviews),
 }));
 
 export const culturalEntitiesRelations = relations(culturalEntities, ({ one, many }) => ({
@@ -273,7 +347,6 @@ export const entityRelationshipsRelations = relations(entityRelationships, ({ on
     references: [culturalEntities.id],
     relationName: 'incoming',
   }),
-
 }));
 
 export const godDetailsRelations = relations(godDetails, ({ one }) => ({
@@ -313,5 +386,16 @@ export const visitedLocationsRelations = relations(visitedLocations, ({ one }) =
   entity: one(culturalEntities, {
     fields: [visitedLocations.entityId],
     references: [culturalEntities.id],
+  }),
+}));
+
+export const reviewsRelations = relations(reviews, ({ one }) => ({
+  listing: one(listings, {
+    fields: [reviews.listingId],
+    references: [listings.id],
+  }),
+  buyer: one(users, {
+    fields: [reviews.buyerId],
+    references: [users.id],
   }),
 }));

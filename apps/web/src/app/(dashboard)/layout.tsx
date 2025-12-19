@@ -23,7 +23,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       */}
       <div className="pt-20">
         {children}
-
         <Dock />
       </div>
     </>
