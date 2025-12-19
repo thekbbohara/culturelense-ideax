@@ -13,7 +13,7 @@ export async function scanImage(formData: FormData) {
     const aiFormData = new FormData();
     aiFormData.append('file', file);
 
-    const aiResponse = await fetch(`${process.env.NEXT_PUBLIC_SPATIAL_URL}/predict`, {
+    const aiResponse = await fetch(`${process.env.NEXT_PUBLIC_SPATIAL_URL}/predictv2`, {
       method: 'POST',
       body: aiFormData as any, // Node fetch supports FormData
       cache: 'no-store'
