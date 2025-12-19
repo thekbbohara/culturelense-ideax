@@ -19,8 +19,10 @@ import {
   Menu,
   X
 } from "lucide-react";
-// Using the local UI components file I created since standard path didn't exist
-import { Button, Card, CardContent, Badge, Separator } from "@/components/ui-components";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LandingPage() {

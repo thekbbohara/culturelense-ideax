@@ -2,42 +2,55 @@
 
 import React, { useEffect, useState } from 'react';
 import { getRecentListings } from '@/actions/marketplace';
+import { ProductCard } from '@/components/marketplace/ProductCard';
+import { FilterSidebar } from '@/components/marketplace/FilterSidebar';
+import { MarketplaceHeader } from '@/components/marketplace/MarketplaceHeader';
+import { dummyProducts } from '@/data/dummy-products';
 
 export default function MarketplacePage() {
-  const [items, setItems] = useState<any[]>([]);
+  const [items, setItems] = useState<any[]>(dummyProducts);
 
   useEffect(() => {
     getRecentListings().then(res => {
-        if (res.success) setItems(res.data);
+        if (res.success && res.data.length > 0) setItems(res.data);
     });
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
-      <header className="bg-white p-4 shadow-sm sticky top-0 z-10">
-        <h1 className="text-xl font-bold text-gray-900">Marketplace</h1>
-      </header>
-      
-      <div className="p-4 grid grid-cols-2 gap-4">
-        {items.map(item => (
-            <div key={item.id} className="bg-white rounded-xl overflow-hidden shadow-sm">
-                <div className="h-32 bg-gray-200">
-                    <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover"/>
-                </div>
-                <div className="p-3">
-                    <h3 className="font-semibold text-gray-800 text-sm truncate">{item.title}</h3>
-                    <p className="text-gray-500 text-xs mt-1 line-clamp-2">{item.description}</p>
-                    <div className="mt-2 flex justify-between items-center">
-                        <span className="font-bold text-gray-900">${item.price}</span>
+    <div className="min-h-screen bg-gray-50/50">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <MarketplaceHeader />
+        
+        <div className="flex flex-col lg:flex-row gap-8">
+          <FilterSidebar />
+          
+          <div className="flex-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {items.map(item => (
+                <ProductCard
+                  key={item.id}
+                  id={item.id}
+                  title={item.title}
+                  artist={item.artist || "Culture Lense Artist"}
+                  price={item.price}
+                  imageUrl={item.imageUrl}
+                  isNew={item.isNew !== undefined ? item.isNew : Math.random() > 0.8}
+                />
+              ))}
+              {items.length === 0 && (
+                <div className="col-span-full flex flex-col items-center justify-center py-20 text-center">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                        <span className="text-2xl">🎨</span>
                     </div>
+                    <h3 className="text-lg font-semibold text-gray-900">No sculptures found</h3>
+                    <p className="text-gray-500 mt-1 max-w-sm">
+                        We couldn't find any listings at the moment. Check back later for new arrivals from our artists.
+                    </p>
                 </div>
+              )}
             </div>
-        ))}
-        {items.length === 0 && (
-            <div className="col-span-2 text-center text-gray-400 py-10">
-                No listings found yet. Be the first vendor!
-            </div>
-        )}
+          </div>
+        </div>
       </div>
     </div>
   );
