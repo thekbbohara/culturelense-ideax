@@ -39,62 +39,53 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-neutral-white text-neutral-black font-sans">
         <nav className="fixed top-0 w-full z-50 bg-neutral-white/90 backdrop-blur-xl border-b border-primary/10">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 md:h-20 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-              <span className="text-white font-serif text-xl font-bold italic">C</span>
+            <div className="w-8 h-8 md:w-10 md:h-10 bg-primary rounded-full flex items-center justify-center">
+              <span className="text-white font-serif text-lg md:text-xl font-bold italic">C</span>
             </div>
-            <span className="font-serif text-2xl font-black tracking-tighter uppercase">CultureLense</span>
+            <span className="font-serif text-xl md:text-2xl font-black tracking-tighter uppercase hidden sm:block">CultureLense</span>
           </div>
 
-          <Button onClick={handleLogout} variant="outline" className="rounded-full border-neutral-black font-bold uppercase tracking-widest text-[10px] px-6 hover:bg-neutral-black hover:text-white transition-colors flex items-center gap-2">
-             Logout <LogOut className="w-3 h-3" />
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" className="rounded-full hover:bg-neutral-black/5">
+                <Search className="w-5 h-5" />
             </Button>
+            <Button onClick={handleLogout} variant="outline" className="rounded-full border-neutral-black font-bold uppercase tracking-widest text-[10px] px-4 md:px-6 hover:bg-neutral-black hover:text-white transition-colors flex items-center gap-2">
+                <span className="hidden sm:inline">Logout</span> <LogOut className="w-3 h-3" />
+            </Button>
+          </div>
         </div>
       </nav>
 
-      <main className="pt-32 px-6 max-w-7xl mx-auto pb-20">
+      <main className="pt-20 min-h-screen flex flex-col">
         {!hasHistory ? (
-            // EMPTY STATE: Large Scan Area
-            <div className="flex flex-col items-center justify-center min-h-[60vh] relative">
-                 <motion.div 
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="w-full max-w-2xl aspect-video bg-white rounded-[3rem] border-2 border-primary/10 shadow-2xl shadow-primary/5 flex flex-col items-center justify-center cursor-pointer hover:border-primary/30 transition-all group relative overflow-hidden"
-                 >
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    
-                    <motion.div 
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="w-24 h-24 bg-primary text-white rounded-full flex items-center justify-center mb-6 shadow-lg z-10"
-                    >
-                        <Scan className="w-10 h-10" />
-                    </motion.div>
-                    <h2 className="text-3xl font-serif font-black italic mb-2 z-10">Start Scanning</h2>
-                    <p className="text-neutral-black/50 z-10">Point at any sculpture to identify</p>
-
-                    {/* Decorative arrow annotation from wireframe logic */}
-                    <div className="absolute -right-32 top-1/2 -translate-y-1/2 hidden lg:block">
-                        <div className="flex items-center gap-4">
-                            <ArrowRight className="w-8 h-8 text-neutral-black/30 rotate-180" />
-                            <span className="font-handwriting text-neutral-black/40 text-sm rotate-6">Start your journey here</span>
-                        </div>
-                    </div>
-                 </motion.div>
-
-                 <div className="mt-12 text-center">
-                     <p className="text-sm font-bold uppercase tracking-widest text-neutral-black/30 mb-4">Or manually search</p>
-                     <div className="flex gap-4">
-                        <Button variant="outline" className="rounded-full border-neutral-black/10 px-8 h-12 hover:bg-neutral-black hover:text-white transition-colors">
-                            <Search className="w-4 h-4 mr-2" /> Search Database
-                        </Button>
-                     </div>
+            // EMPTY STATE: Immersive Scan
+            <div className="flex-1 flex flex-col items-center justify-center relative bg-neutral-white overflow-hidden">
+                 {/* Camera view finder lines */}
+                 <div className="absolute inset-4 sm:inset-8 border border-neutral-black/10 rounded-[2rem] sm:rounded-[3rem] pointer-events-none z-0">
+                    <div className="absolute top-0 left-0 w-6 h-6 sm:w-8 sm:h-8 border-t-4 border-l-4 border-primary rounded-tl-2xl sm:rounded-tl-3xl" />
+                    <div className="absolute top-0 right-0 w-6 h-6 sm:w-8 sm:h-8 border-t-4 border-r-4 border-primary rounded-tr-2xl sm:rounded-tr-3xl" />
+                    <div className="absolute bottom-0 left-0 w-6 h-6 sm:w-8 sm:h-8 border-b-4 border-l-4 border-primary rounded-bl-2xl sm:rounded-bl-3xl" />
+                    <div className="absolute bottom-0 right-0 w-6 h-6 sm:w-8 sm:h-8 border-b-4 border-r-4 border-primary rounded-br-2xl sm:rounded-br-3xl" />
                  </div>
+
+                 <motion.div 
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="w-full h-full flex flex-col items-center justify-center z-10 cursor-pointer"
+                 >
+                    <div className="w-24 h-24 bg-primary text-white rounded-full flex items-center justify-center mb-6 shadow-2xl shadow-primary/20 animate-pulse">
+                        <Scan className="w-10 h-10" />
+                    </div>
+                    <h2 className="text-3xl font-serif font-black italic mb-2">Tap to Scan</h2>
+                    <p className="text-neutral-black/50">Point at art to identify</p>
+                 </motion.div>
             </div>
         ) : (
             // POPULATED STATE: Featured & Recommended
-            <div className="space-y-16">
+            <div className="space-y-16 px-6 max-w-7xl mx-auto mt-12">
                 {/* Featured Section */}
                 <div>
                    <div className="flex items-center gap-2 mb-8">
