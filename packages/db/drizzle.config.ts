@@ -1,10 +1,10 @@
-import type { Config } from 'drizzle-kit';
+import { defineConfig } from 'drizzle-kit';
 
-export default {
+export default defineConfig({
   schema: './src/schema.ts',
   out: './drizzle',
-  driver: 'pg',
+  dialect: 'postgresql',
   dbCredentials: {
-    connectionString: process.env.DATABASE_URL || 'postgres://postgres:postgres@localhost:5432/culturelense',
+    url: process.env.DATABASE_URL || 'postgres://postgres:postgres@localhost:5432/culturelense',
   },
-} satisfies Config;
+});
