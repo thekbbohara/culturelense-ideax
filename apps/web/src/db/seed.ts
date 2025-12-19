@@ -2,7 +2,6 @@ import 'dotenv/config';
 import { db, culturalEntities, godDetails } from './index';
 import { godSeedData } from './godseed';
 import { eq } from 'drizzle-orm';
-import { slugify } from '@/lib/utils'; // Assuming this exists or I'll implement a simple one locally
 
 const generateSlug = (name: string) => {
   return name
