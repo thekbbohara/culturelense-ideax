@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { FeedbackForm } from '@/components/marketplace/FeedbackForm';
+import { ReviewsList } from '@/components/marketplace/ReviewsList';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -168,12 +169,20 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
 
             <Separator className="bg-primary/10" />
 
-            {/* Feedback Section */}
-            <div>
-              <h3 className="text-2xl font-serif font-black italic text-neutral-black mb-6">
+            {/* Ratings & Feedback Section */}
+            <div className="space-y-8">
+              <h3 className="text-2xl font-serif font-black italic text-neutral-black">
                 Ratings & Feedback
               </h3>
-              <FeedbackForm />
+
+              {/* Existing Reviews */}
+              <ReviewsList />
+
+              {/* Feedback Form */}
+              <div>
+                <h4 className="text-xl font-bold text-neutral-black mb-4">Write a Review</h4>
+                <FeedbackForm />
+              </div>
             </div>
           </motion.div>
         </div>

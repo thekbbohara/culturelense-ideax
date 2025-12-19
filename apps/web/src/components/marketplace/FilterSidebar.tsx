@@ -3,6 +3,7 @@ import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { SlidersHorizontal, X } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Slider } from '../ui/slider';
 
 export const FilterSidebar = () => {
   return (
@@ -46,25 +47,7 @@ export const FilterSidebar = () => {
             Price Range
           </h4>
           <div className="space-y-4">
-            <input
-              type="range"
-              min="0"
-              max="10000"
-              className="w-full h-2 bg-primary/10 rounded-full appearance-none cursor-pointer accent-primary"
-            />
-            <div className="flex items-center gap-3">
-              <input
-                type="number"
-                placeholder="Min"
-                className="flex-1 px-3 py-2 rounded-lg border border-primary/10 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10 text-sm"
-              />
-              <span className="text-neutral-black/30">-</span>
-              <input
-                type="number"
-                placeholder="Max"
-                className="flex-1 px-3 py-2 rounded-lg border border-primary/10 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10 text-sm"
-              />
-            </div>
+            <Slider defaultValue={[200]} step={10} max={4000} />
           </div>
         </div>
 
