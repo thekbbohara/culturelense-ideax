@@ -19,7 +19,7 @@ export function PWAInstallPrompt() {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 50, scale: 0.9 }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          className="fixed top-24 right-6 z-50 flex items-center gap-3 p-4 bg-background/80 backdrop-blur-md border border-border rounded-2xl shadow-2xl max-w-sm"
+          className="fixed top-24 right-6 z-[9999] flex items-center gap-3 p-4 bg-background/80 backdrop-blur-md border border-border rounded-2xl shadow-2xl max-w-sm"
         >
             <div className="flex-1">
                 <h4 className="font-bold text-sm text-foreground">Install App</h4>

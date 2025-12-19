@@ -2,6 +2,8 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 
+import { toast } from "sonner";
+
 interface PWAContextType {
   isInstallable: boolean;
   install: () => Promise<void>;
@@ -35,7 +37,12 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const install = async () => {
-    if (!deferredPrompt) return;
+    if (!deferredPrompt) {
+        toast("Install not available", {
+            description: "App is already installed or browser doesn't support PWA installation.",
+        });
+        return;
+    }
 
     deferredPrompt.prompt();
 
