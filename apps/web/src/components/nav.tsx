@@ -2,7 +2,6 @@
 
 import React from "react";
 import { NavSearch } from "@/components/search/nav-search";
-import { createClient } from "@/lib/supabase/client";
 
 export function Nav() {
 

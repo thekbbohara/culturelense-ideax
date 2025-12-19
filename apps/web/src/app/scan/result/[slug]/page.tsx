@@ -53,12 +53,10 @@ export default async function ResultPage({
     <div className="min-h-screen bg-[#1A1A1A] text-[#FDFBF7] font-sans selection:bg-[#DAA520] selection:text-black">
 
       {/* Floating Navigation (Mobile & Desktop) */}
-      <nav className="fixed top-0 left-0 right-0 z-50 p-6 flex justify-between items-start pointer-events-none">
+      <nav className="fixed top-0 left-0 right-0 z-50 p-6 flex justify-between items-start ">
         <AnimatedButton href="/home" icon={<ArrowLeft />} direction="left" />
 
-        <button className="pointer-events-auto p-3 rounded-full bg-background/20 backdrop-blur-xl border border-white/10 transition-all hover:bg-foreground hover:text-background text-foreground">
-          <Share2 className="w-5 h-5" />
-        </button>
+        <AnimatedButton icon={<Share2 />} direction="right" />
       </nav>
 
       <main className="lg:flex min-h-screen">
@@ -203,7 +201,7 @@ export default async function ResultPage({
                           </span>
                         </div>
                       </div>
-                      <h4 className="text-lg font-medium text-foreground group-hover:text-secondary transition-colors">
+                      <h4 className="text-lg font-medium text-txt group-hover:text-secondary transition-colors">
                         {sug.name}
                       </h4>
                     </Link>
@@ -211,10 +209,6 @@ export default async function ResultPage({
                 </div>
               </div>
             )}
-
-            {/* Footer Space */}
-            <div className="h-20" />
-
           </div>
         </div>
       </main>

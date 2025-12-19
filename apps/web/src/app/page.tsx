@@ -3,24 +3,19 @@
 import React from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Scan, 
-  Camera, 
-  ShoppingBag, 
-  Palette, 
-  Search, 
-  ChevronRight, 
-  Globe, 
-  History, 
-  Sparkles,
+import {
+  Scan,
+  Camera,
+  ShoppingBag,
+  Palette,
+  ChevronRight,
+  Globe,
+  History,
   ArrowRight,
-  Upload,
-  User,
   Menu,
   X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/lib/supabase/client";
@@ -56,9 +51,9 @@ export default function LandingPage() {
             <span className="font-serif text-2xl font-black tracking-tighter uppercase">CultureLense</span>
           </div>
 
-            <Button onClick={handleLogin} variant="outline" className="rounded-full border-neutral-black font-bold uppercase tracking-widest text-[10px] px-6 hover:bg-neutral-black hover:text-white transition-colors">
-              Login
-            </Button>
+          <Button onClick={handleLogin}  className="rounded-full border-neutral-black font-bold uppercase tracking-widest text-[10px] px-6 hover:bg-neutral-black/80 hover:text-white transition-all">
+            Login
+          </Button>
 
           <button className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
             {isMenuOpen ? <X /> : <Menu />}
@@ -71,7 +66,7 @@ export default function LandingPage() {
         <section className="relative pt-40 pb-20 overflow-hidden">
           <div className="max-w-7xl mx-auto px-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, x: -50 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
@@ -82,7 +77,7 @@ export default function LandingPage() {
                 <h1 className="text-7xl md:text-8xl font-serif font-black leading-[0.9] tracking-tighter mb-8 italic">
                   Soul in <span className="text-secondary not-italic">Stone.</span>
                 </h1>
-                <p className="text-xl text-neutral-black/80 max-w-lg mb-10 leading-relaxed font-light">
+                <p className="text-2xl text-neutral-black/80 max-w-lg mb-10 leading-relaxed font-light">
                   CultureLense uses advanced spatial AI to identify sculptures instantly. Discover their history, technique, and soul—or showcase your own creations to a global audience.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4">
@@ -93,35 +88,26 @@ export default function LandingPage() {
                     Marketplace <ArrowRight className="ml-2 w-5 h-5" />
                   </Button>
                 </div>
-                
-                <div className="mt-16 flex items-center gap-8 opacity-40">
-                  <div className="flex -space-x-3">
-                    {[1,2,3,4].map(i => (
-                      <div key={i} className="w-10 h-10 rounded-full border-2 border-white bg-zinc-200" />
-                    ))}
-                  </div>
-                  <p className="text-sm font-medium uppercase tracking-tighter">Joined by 12k+ Collectors</p>
-                </div>
               </motion.div>
 
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, scale: 0.8, rotate: 5 }}
                 animate={{ opacity: 1, scale: 1, rotate: 0 }}
                 transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
                 className="relative aspect-[4/5] rounded-[2rem] overflow-hidden shadow-2xl group"
               >
-                <Image 
-                  src="/sclupture/shiva.webp"
+                <Image
+                  src="/sclupture/ganesh.webp"
                   alt="Ancient Greek Statue"
                   fill
-                  className="object-cover transition-transform duration-1000 group-hover:scale-110"
+                  className="object-cover transition-transform duration-500 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                
+
                 {/* Scanning UI Mockup */}
                 <AnimatePresence>
                   {isScanning && (
-                    <motion.div 
+                    <motion.div
                       initial={{ top: "-10%" }}
                       animate={{ top: "110%" }}
                       exit={{ opacity: 0 }}
@@ -132,7 +118,7 @@ export default function LandingPage() {
                 </AnimatePresence>
 
                 <div className="absolute bottom-10 left-10 right-10">
-                  <motion.div 
+                  <motion.div
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 1 }}
@@ -153,7 +139,7 @@ export default function LandingPage() {
               </motion.div>
             </div>
           </div>
-          
+
           {/* Decorative Background Elements */}
           <div className="absolute -top-24 -right-24 w-96 h-96 bg-secondary/20 blur-[120px] rounded-full" />
           <div className="absolute bottom-24 -left-24 w-96 h-96 bg-primary/10 blur-[120px] rounded-full" />
@@ -185,7 +171,7 @@ export default function LandingPage() {
                   desc: "Project life-sized 3D models of sculptures into your space using AR, and study every chisel mark in detail."
                 }
               ].map((feat, i) => (
-                <motion.div 
+                <motion.div
                   key={i}
                   whileHover={{ y: -10 }}
                   className="p-10 rounded-3xl bg-neutral-white border border-neutral-black/5 transition-all hover:shadow-xl hover:shadow-primary/5"
@@ -204,18 +190,18 @@ export default function LandingPage() {
         </section>
 
         {/* Marketplace/Exhibition Section */}
-        <section id="exhibition" className="py-24 bg-neutral-black text-white">
+        <section id="exhibition" className="py-24 bg-neutral-black text-txt">
           <div className="max-w-7xl mx-auto px-6">
             <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
               <div className="max-w-xl">
-                <Badge className="mb-4 bg-white/10 text-white border-none px-4 py-1 uppercase tracking-widest text-[10px] font-black">
+                <Badge className="mb-4 bg-white/10 text-txt border-none px-4 py-1 uppercase tracking-widest text-[10px] font-black">
                   Curated Marketplace
                 </Badge>
                 <h2 className="text-6xl font-serif font-black tracking-tight italic">
-                  The <span className="not-italic text-white/40">Marketplace.</span>
+                  The <span className="not-italic text-txt">Marketplace.</span>
                 </h2>
               </div>
-              <Button variant="link" className="text-white font-black uppercase tracking-[0.3em] text-[10px] hover:text-secondary flex items-center gap-2 px-0">
+              <Button variant="link" className="text-txt font-black uppercase tracking-[0.3em] text-[10px] hover:text-secondary flex items-center gap-2 px-0">
                 View All Creations <ChevronRight className="w-4 h-4" />
               </Button>
             </div>
@@ -243,13 +229,13 @@ export default function LandingPage() {
                   artist: "Sofia Russo",
                 }
               ].map((item, i) => (
-                <motion.div 
+                <motion.div
                   key={i}
                   whileHover={{ scale: 1.02 }}
                   className="group cursor-pointer"
                 >
                   <div className="relative aspect-[3/4] rounded-2xl overflow-hidden mb-6">
-                    <Image 
+                    <Image
                       src={item.img}
                       alt={item.title}
                       fill
@@ -307,7 +293,7 @@ export default function LandingPage() {
 
               <div className="relative">
                 <div className="relative aspect-square rounded-[3rem] overflow-hidden z-10 shadow-2xl">
-                  <Image 
+                  <Image
                     src="/sclupture/hanuman.webp"
                     alt="Artist working on sculpture"
                     fill
@@ -315,25 +301,26 @@ export default function LandingPage() {
                   />
                 </div>
                 {/* Decorative floating card */}
-                <motion.div 
+                <motion.div
                   animate={{ y: [0, -20, 0] }}
                   transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute -bottom-10 -left-10 z-20 p-8 bg-neutral-white shadow-2xl rounded-3xl max-w-xs border border-primary/10"
+                  className="absolute -bottom-8 -left-10 z-[20] p-8 max-w-xs rounded-3xl bg-white/20 backdrop-blur-md shadow-2xl border border-white/30"
+
                 >
                   <div className="flex items-center gap-4 mb-4">
-                    <div className="w-12 h-12 rounded-full bg-zinc-100 flex items-center justify-center">
-                      <Palette className="w-6 h-6" />
+                    <div className="w-12 h-12 rounded-full bg-tertiary text-txt flex items-center justify-center">
+                      <Palette color="black" className="w-6 h-6" />
                     </div>
                     <div>
-                      <h5 className="font-bold">Promotion Tier</h5>
-                      <p className="text-xs text-neutral-black/50 uppercase tracking-widest">Elite Member</p>
+                      <h5 className="font-bold text-xl">Promotion Tier</h5>
+                      <p className="text-sm font-semibold text-txt uppercase tracking-widest">Elite Member</p>
                     </div>
                   </div>
-                  <p className="text-sm font-light text-neutral-black">
+                  <p className="text-sm text-txt font-light">
                     &quot;CultureLense increased my gallery visits by 300% through their AR showcase feature.&quot;
                   </p>
                 </motion.div>
-                
+
                 {/* Background circles */}
                 <div className="absolute -top-10 -right-10 w-64 h-64 border-2 border-secondary/30 rounded-full" />
                 <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-secondary/20 rounded-full blur-3xl" />
@@ -345,9 +332,9 @@ export default function LandingPage() {
         {/* CTA Section */}
         <section className="py-24 bg-white">
           <div className="max-w-5xl mx-auto px-6">
-            <div className="bg-neutral-black rounded-[3rem] p-16 md:p-24 text-center relative overflow-hidden">
+            <div className="bg-primary/60 rounded-[3rem] p-16 md:p-24 text-center relative overflow-hidden">
               <div className="relative z-10">
-                <h2 className="text-5xl md:text-6xl font-serif font-black text-white mb-8 italic">Ready to see the <span className="not-italic text-white/40">Unseen?</span></h2>
+                <h2 className="text-5xl md:text-6xl font-serif font-black text-white mb-8 italic">Ready to see the <span className="not-italic text-accent">Unseen?</span></h2>
                 <p className="text-white/60 text-lg mb-12 max-w-2xl mx-auto">
                   Join the world&apos;s most advanced sculpture community. Download the app to start scanning or browse the exhibition.
                 </p>
@@ -355,12 +342,12 @@ export default function LandingPage() {
                   <Button onClick={handleLogin} size="lg" className="rounded-full h-16 px-10 bg-white text-black hover:bg-zinc-200 text-base font-black uppercase tracking-widest">
                     Get the App
                   </Button>
-                  <Button size="lg" variant="outline" className="rounded-full h-16 px-10 border-white/20 text-white hover:bg-white/10 text-base font-black uppercase tracking-widest">
+                  <Button size="lg"  className="rounded-full h-16 px-10 border-white/20 text-white hover:bg-white/10 text-base font-black uppercase tracking-widest">
                     Create Account
                   </Button>
                 </div>
               </div>
-              
+
               {/* Background light effect */}
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-gradient-to-br from-primary/20 to-transparent blur-3xl pointer-events-none" />
             </div>
@@ -383,7 +370,7 @@ export default function LandingPage() {
                 The world&apos;s leading platform for sculpture identification, promotion, and collection. Bridging 5,000 years of art with modern spatial AI.
               </p>
             </div>
-            
+
             <div>
               <h5 className="font-black uppercase tracking-[0.2em] text-[10px] mb-8">Navigation</h5>
               <ul className="space-y-4 text-sm font-medium text-neutral-black/80">
@@ -404,9 +391,9 @@ export default function LandingPage() {
               </ul>
             </div>
           </div>
-          
+
           <Separator className="bg-primary/20 mb-8" />
-          
+
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <p className="text-xs text-neutral-black/40 font-medium">© 2025 CULTURELENSE ART TECHNOLOGIES. ALL RIGHTS RESERVED.</p>
             <div className="flex gap-10 text-xs font-black uppercase tracking-widest text-neutral-black/40">
@@ -421,7 +408,7 @@ export default function LandingPage() {
       {/* Mobile Menu Overlay */}
       <AnimatePresence>
         {isMenuOpen && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
