@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { getVendorByUserId, getVendorListings } from '@/actions/vendor-actions';
 import { ProductsTable } from '@/components/vendor/products-table';
 import { Button } from '@/components/ui/button';
@@ -11,7 +10,6 @@ import Link from 'next/link';
 export default function ProductsPage() {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
 
   const fetchProducts = async () => {
     setLoading(true);

@@ -4,12 +4,15 @@ import { db } from '@/lib/db';
 import { listings, orders, reviews, vendors, eq, desc, and } from '@/db';
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
+import { deleteProductImage } from '@/lib/supabase/storage';
 
 export async function getVendorByUserId() {
   try {
     const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     if (!user) {
       return { success: false, error: 'Not authenticated' };
     }
@@ -36,7 +39,7 @@ export async function getVendorListings(vendorId: string) {
       .from(listings)
       .where(eq(listings.vendorId, vendorId))
       .orderBy(desc(listings.createdAt));
-    
+
     return { success: true, data: items };
   } catch (error) {
     console.error('Error fetching vendor listings:', error);
@@ -86,6 +89,11 @@ export async function updateVendorListing(listingId: string, data: any) {
       return { success: false, error: 'Listing not found or unauthorized' };
     }
 
+    // Check for image update and cleanup old image
+    if (listing.imageUrl && data.imageUrl && listing.imageUrl !== data.imageUrl) {
+      await deleteProductImage(listing.imageUrl);
+    }
+
     await db
       .update(listings)
       .set({
@@ -95,6 +103,7 @@ export async function updateVendorListing(listingId: string, data: any) {
         imageUrl: data.imageUrl,
         entityId: data.entityId || null,
         status: data.status,
+        quantity: data.quantity, // Ensure quantity is updated too if strictly typed, or rely on pass-through
       })
       .where(eq(listings.id, listingId));
 
@@ -123,26 +132,25 @@ export async function deleteVendorListing(listingId: string) {
       return { success: false, error: 'Listing not found or unauthorized' };
     }
 
-    // Soft delete by setting status to archived
-    await db
-      .update(listings)
-      .set({ status: 'archived' })
-      .where(eq(listings.id, listingId));
+    // Delete image from storage if it exists
+    if (listing.imageUrl) {
+      await deleteProductImage(listing.imageUrl);
+    }
+
+    // Hard delete field from DB
+    await db.delete(listings).where(eq(listings.id, listingId));
 
     revalidatePath('/vendor/products');
-    return { success: true, message: 'Product archived successfully' };
+    return { success: true, message: 'Product deleted successfully' };
   } catch (error) {
     console.error('Error deleting listing:', error);
-    return { success: false, error: 'Failed to archive product' };
+    return { success: false, error: 'Failed to delete product' };
   }
 }
 
 export async function getVendorOrders(vendorId: string) {
   try {
-    const vendorListings = await db
-      .select()
-      .from(listings)
-      .where(eq(listings.vendorId, vendorId));
+    const vendorListings = await db.select().from(listings).where(eq(listings.vendorId, vendorId));
 
     const listingIds = vendorListings.map((l) => l.id);
 
@@ -205,10 +213,7 @@ export async function updateOrderStatus(orderId: string, status: string) {
 
 export async function getVendorReviews(vendorId: string) {
   try {
-    const vendorListings = await db
-      .select()
-      .from(listings)
-      .where(eq(listings.vendorId, vendorId));
+    const vendorListings = await db.select().from(listings).where(eq(listings.vendorId, vendorId));
 
     const listingIds = vendorListings.map((l) => l.id);
 

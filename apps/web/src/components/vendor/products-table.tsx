@@ -153,10 +153,10 @@ export function ProductsTable({ products, onDelete }: ProductsTableProps) {
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Archive Product</DialogTitle>
+            <DialogTitle>Delete Product</DialogTitle>
             <DialogDescription>
-              Are you sure you want to archive "{selectedProduct?.title}"? This will hide it from
-              the marketplace but you can restore it later.
+              Are you sure you want to delete "{selectedProduct?.title}"? This action cannot be
+              undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -164,7 +164,7 @@ export function ProductsTable({ products, onDelete }: ProductsTableProps) {
               Cancel
             </Button>
             <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
-              {isDeleting ? 'Archiving...' : 'Archive'}
+              {isDeleting ? 'Deleting...' : 'Delete'}
             </Button>
           </DialogFooter>
         </DialogContent>

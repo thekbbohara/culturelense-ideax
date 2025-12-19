@@ -3,7 +3,12 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ProductForm } from '@/components/vendor/product-form';
-import { getListingById, updateVendorListing, deleteVendorListing } from '@/actions/vendor-actions';
+import {
+  getListingById,
+  updateVendorListing,
+  deleteVendorListing,
+  getVendorByUserId,
+} from '@/actions/vendor-actions';
 import { type ProductFormValues } from '@/lib/validations/product-schema';
 import { toast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -27,9 +32,17 @@ export default function EditProductPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [vendorId, setVendorId] = useState<string>('');
 
   useEffect(() => {
-    async function fetchProduct() {
+    async function fetchData() {
+      // Fetch Vendor ID
+      const vendorResult = await getVendorByUserId();
+      if (vendorResult.success && vendorResult.data) {
+        setVendorId(vendorResult.data.id);
+      }
+
+      // Fetch Product
       const result = await getListingById(params.id as string);
       if (result.success && result.data) {
         setProduct(result.data);
@@ -40,7 +53,7 @@ export default function EditProductPage() {
       setLoading(false);
     }
 
-    fetchProduct();
+    fetchData();
   }, [params.id, router]);
 
   const handleSubmit = async (values: ProductFormValues) => {
@@ -61,10 +74,10 @@ export default function EditProductPage() {
     const result = await deleteVendorListing(params.id as string);
 
     if (result.success) {
-      toast.success(result.message || 'Product archived successfully');
+      toast.success(result.message || 'Product deleted successfully');
       router.push('/vendor/products');
     } else {
-      toast.error(result.error || 'Failed to archive product');
+      toast.error(result.error || 'Failed to delete product');
     }
     setIsDeleting(false);
   };
@@ -89,7 +102,7 @@ export default function EditProductPage() {
         </Link>
         <Button variant="destructive" className="gap-2" onClick={() => setDeleteDialogOpen(true)}>
           <Trash2 className="w-4 h-4" />
-          Archive Product
+          Delete Product
         </Button>
       </div>
 
@@ -109,10 +122,11 @@ export default function EditProductPage() {
         </CardHeader>
         <CardContent className="pt-6">
           <ProductForm
-            defaultValues={product}
+            defaultValues={{ ...product, quantity: String(product.quantity) }}
             onSubmit={handleSubmit}
             submitLabel="Update Product"
             isLoading={isLoading}
+            vendorId={vendorId}
           />
         </CardContent>
       </Card>
@@ -121,10 +135,10 @@ export default function EditProductPage() {
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Archive Product</DialogTitle>
+            <DialogTitle>Delete Product</DialogTitle>
             <DialogDescription>
-              Are you sure you want to archive this product? It will be hidden from the marketplace
-              but you can restore it later.
+              Are you sure you want to delete this product? This action cannot be undone. The
+              product and its image will be permanently removed.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -132,7 +146,7 @@ export default function EditProductPage() {
               Cancel
             </Button>
             <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
-              {isDeleting ? 'Archiving...' : 'Archive'}
+              {isDeleting ? 'Deleting...' : 'Delete'}
             </Button>
           </DialogFooter>
         </DialogContent>
