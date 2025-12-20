@@ -10,9 +10,9 @@ import { cn } from '@/lib/utils';
 interface ProductCardProps {
   id: string;
   title: string;
-  artist: string;
   price: number;
   imageUrl: string;
+  artist?: string;
   isNew?: boolean;
   className?: string;
 }
@@ -20,9 +20,9 @@ interface ProductCardProps {
 export const ProductCard: React.FC<ProductCardProps> = ({
   id,
   title,
-  artist,
   price,
   imageUrl,
+  artist,
   isNew,
   className,
 }) => {
@@ -76,11 +76,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                 <h3 className="font-bold text-foreground text-lg mb-1 line-clamp-1 group-hover:text-primary transition-colors">
                   {title}
                 </h3>
-                <p className="text-sm text-muted-foreground font-medium">{artist}</p>
+                {artist && <p className="text-sm text-muted-foreground font-medium">{artist}</p>}
               </div>
 
               <div className="flex items-center justify-between pt-2 border-t border-border">
-                <span className="font-black text-2xl text-primary">${price.toLocaleString()}</span>
+                <span className="font-black text-2xl text-primary">
+                  Rs.{price.toLocaleString()}
+                </span>
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}

@@ -5,18 +5,33 @@ import { getRecentListings } from '@/actions/marketplace';
 import { ProductCard } from '@/components/marketplace/ProductCard';
 import { FilterSidebar } from '@/components/marketplace/FilterSidebar';
 import { MarketplaceHeader } from '@/components/marketplace/MarketplaceHeader';
-import { dummyProducts } from '@/data/dummy-products';
 import { motion } from 'framer-motion';
 import { Sparkles, TrendingUp } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
+type Product = {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  imageUrl: string;
+  artist?: string | null;
+  isNew?: boolean;
+};
+
 export default function MarketplacePage() {
-  const [items, setItems] = useState<any[]>(dummyProducts);
+  const [items, setItems] = useState<Product[]>([]);
 
   useEffect(() => {
     getRecentListings().then((res) => {
       if (res.success && res.data && res.data.length > 0) {
-        setItems(res.data);
+        const mappedData: Product[] = res.data.map((item: any) => ({
+          ...item,
+          price: parseFloat(item.price) || 0,
+          isNew:
+            new Date().getTime() - new Date(item.createdAt).getTime() < 7 * 24 * 60 * 60 * 1000,
+        }));
+        setItems(mappedData);
       }
     });
   }, []);

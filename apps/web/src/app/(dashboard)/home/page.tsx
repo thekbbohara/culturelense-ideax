@@ -11,13 +11,12 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 
-export function formatText(text: string) {
+function formatText(text: string) {
   return text
-    .replace(/[-_]+/g, " ")   // replace - and _ with space
-    .replace(/\s+/g, " ")     // remove extra spaces
+    .replace(/[-_]+/g, ' ') // replace - and _ with space
+    .replace(/\s+/g, ' ') // remove extra spaces
     .trim();
 }
-
 
 // Animation Variants
 const containerVariants = {
@@ -201,9 +200,7 @@ export default function HomePage() {
                               {item.type}
                             </span>
                           </div>
-                          <h3 className="text-3xl font-serif font-bold text-white mb-2">
-
-                          </h3>
+                          <h3 className="text-3xl font-serif font-bold text-white mb-2"></h3>
                           <div className="flex items-center gap-2 text-white/80 text-sm font-medium">
                             <span>Explore Mythology</span>
                             <ArrowRight className="w-4 h-4" />

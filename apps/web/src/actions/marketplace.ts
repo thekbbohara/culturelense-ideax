@@ -6,13 +6,28 @@ import { listings, vendors, eq, desc, and } from '@/db';
 export async function getRecentListings() {
   try {
     const items = await db
-      .select()
+      .select({
+        id: listings.id,
+        vendorId: listings.vendorId,
+        entityId: listings.entityId,
+        categoryId: listings.categoryId,
+        title: listings.title,
+        description: listings.description,
+        price: listings.price,
+        quantity: listings.quantity,
+        imageUrl: listings.imageUrl,
+        status: listings.status,
+        createdAt: listings.createdAt,
+        artist: vendors.businessName,
+      })
       .from(listings)
+      .leftJoin(vendors, eq(listings.vendorId, vendors.id))
       .where(eq(listings.status, 'active'))
       .orderBy(desc(listings.createdAt))
       .limit(20);
     return { success: true, data: items };
   } catch (error) {
+    console.error('Failed to fetch recent listings:', error);
     return { success: false, data: [] };
   }
 }

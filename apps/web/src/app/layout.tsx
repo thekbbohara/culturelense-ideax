@@ -33,6 +33,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 e.preventDefault();
                 window.pwaEvent = e;
               });
+
+              // Clear service workers in development
+              if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                if ('serviceWorker' in navigator) {
+                  navigator.serviceWorker.getRegistrations().then((registrations) => {
+                    for (const registration of registrations) {
+                      registration.unregister();
+                      console.log('Unregistered service worker:', registration);
+                    }
+                  });
+                }
+              }
             `,
           }}
         />
@@ -46,9 +58,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               enableSystem
               disableTransitionOnChange
             >
-              <div>
-                {children}
-              </div>
+              <div>{children}</div>
               <Toaster position="top-right" richColors />
               <PWAInstallPrompt />
             </ThemeProvider>
