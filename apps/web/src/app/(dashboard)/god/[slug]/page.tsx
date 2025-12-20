@@ -6,10 +6,11 @@ import { Button, Badge, Card, Separator } from '@/components/ui-components';
 import { ArrowLeft, Share2, Heart, Sparkles, MapPin, ScrollText, History } from 'lucide-react';
 import Link from 'next/link';
 import { AnimatedButton } from '@/components/animated-button';
+import { RecordVisit } from '@/components/history/RecordVisit';
 
 export default async function GodPage({ params }: { params: { slug: string } }) {
     const { data: entity } = await getEntityBySlug(params.slug);
-    
+
     if (!entity) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-background">
@@ -25,6 +26,7 @@ export default async function GodPage({ params }: { params: { slug: string } }) 
 
     return (
         <div className="min-h-screen bg-background pb-20">
+            <RecordVisit entityName={entity.name} />
             {/* Hero Section */}
             <div className="relative h-[70vh] w-full overflow-hidden">
                 {entity.imageUrl ? (

@@ -1,0 +1,63 @@
+{
+    "nav": {
+        "home": "Inicio",
+        "explore": "Explorar",
+        "scan": "Escanear",
+        "profile": "Perfil",
+        "admin": "Administrador",
+        "logout": "Cerrar sesión",
+        "marketplace": "Mercado",
+        "vendors": "Vendedores"
+    },
+    "common": {
+        "loading": "Cargando...",
+        "save": "Guardar",
+        "cancel": "Cancelar",
+        "delete": "Eliminar",
+        "edit": "Editar",
+        "search": "Buscar",
+        "close": "Cerrar",
+        "submit": "Enviar",
+        "select": "Seleccionar"
+    },
+    "profile": {
+        "settings": "Configuración",
+        "visualMode": "Modo Visual",
+        "interface": "Interfaz",
+        "theme": {
+            "light": "Claro",
+            "dark": "Oscuro",
+            "auto": "Automático"
+        },
+        "language": {
+            "label": "Idioma",
+            "en": "English (Inglés)",
+            "es": "Español (Predeterminado)",
+            "fr": "Français (Francés)",
+            "hi": "हिन्दी (Hindi)",
+            "ne": "नेपाली (Nepalí)"
+        }
+    },
+    "map": {
+        "searchPlaceholder": "Buscar templos...",
+        "markVisited": "Marcar como Visitado",
+        "markUnvisited": "Marcar como No Visitado",
+        "loadingMap": "Cargando mapa...",
+        "findLocation": "Encontrar mi ubicación",
+        "locationError": "No se pudo acceder a su ubicación."
+    },
+    "explore": {
+        "title": "Lugares que has visitado:",
+        "noResults": "No se encontraron templos"
+    },
+    "errors": {
+        "generic": "Ocurrió un error. Por favor, inténtelo de nuevo.",
+        "networkError": "Error de red. Por favor, verifique su conexión.",
+        "unauthorized": "No está autorizado para realizar esta acción."
+    },
+    "success": {
+        "saved": "¡Guardado exitosamente!",
+        "updated": "¡Actualizado exitosamente!",
+        "deleted": "¡Eliminado exitosamente!"
+    }
+}

@@ -10,13 +10,7 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-
-function formatText(text: string) {
-  return text
-    .replace(/[-_]+/g, ' ') // replace - and _ with space
-    .replace(/\s+/g, ' ') // remove extra spaces
-    .trim();
-}
+import { formatText } from '@/utils/re-usables';
 
 // Animation Variants
 const containerVariants = {

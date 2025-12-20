@@ -3,13 +3,14 @@ import { Button } from '@culturelense/ui';
 import Link from 'next/link';
 import { ArrowLeft, Share2 } from 'lucide-react';
 import { AnimatedButton } from '@/components/animated-button';
+import { RecordVisit } from '@/components/history/RecordVisit';
 
 export default async function ResultPage({
   params,
   searchParams,
 }: {
   params: { slug: string };
-  searchParams: { confidence: string; data?: string };
+  searchParams: { source: string; confidence: string; data?: string };
 }) {
   const result = await getEntityBySlug(params.slug);
   const entity = result.data;
@@ -51,6 +52,7 @@ export default async function ResultPage({
 
   return (
     <div className="min-h-screen bg-[#1A1A1A] text-[#FDFBF7] font-sans selection:bg-[#DAA520] selection:text-black">
+      <RecordVisit entityName={entity.name} />
 
       {/* Floating Navigation (Mobile & Desktop) */}
       <nav className="fixed top-0 left-0 right-0 z-50 p-6 flex justify-between items-start ">
@@ -120,7 +122,7 @@ export default async function ResultPage({
                 </div>
               )}
               {entity.religion && (
-                <div className="p-4 rounded-xl bg-primary/30 border border-border">
+                <div className={`p-4 rounded-xl ${searchParams.source === 'p' ? 'bg-primary/30' : 'bg-secondary/30'} border border-border`}>
                   <span className="block text-xs uppercase tracking-wider text-white/80 mb-1">Origin</span>
                   <span className="text-lg font-medium text-white">{entity.religion}</span>
                 </div>

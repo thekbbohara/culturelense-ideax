@@ -5,15 +5,13 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Scan,
-  Camera,
   ShoppingBag,
   Palette,
   ChevronRight,
-  Globe,
-  History,
   ArrowRight,
-  Menu,
-  X
+  ScanFace,
+  Network,
+  ShieldCheck
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -21,15 +19,11 @@ import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/lib/supabase/client";
 import { usePWAInstall } from "@/components/pwa-provider";
 
+import { LanguageSelector } from "@/components/language-selector";
+
 export default function LandingPage() {
-  // const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [isScanning, setIsScanning] = React.useState(false);
   const { install } = usePWAInstall();
-
-  const toggleScan = () => {
-    setIsScanning(true);
-    setTimeout(() => setIsScanning(false), 3000);
-  };
 
   const handleLogin = async () => {
     const supabase = createClient();
@@ -53,9 +47,12 @@ export default function LandingPage() {
             <span className="font-serif text-2xl font-black tracking-tighter uppercase">CultureLense</span>
           </div>
 
-          <Button onClick={handleLogin} className="rounded-full border-neutral-black font-bold uppercase tracking-widest text-[10px] px-6 hover:bg-neutral-black/80 hover:text-white transition-all">
-            Login
-          </Button>
+          <div className="flex items-center gap-4">
+            <LanguageSelector variant="minimal" />
+            <Button onClick={handleLogin} className="rounded-full border-neutral-black font-bold uppercase tracking-widest text-[10px] px-6 hover:bg-neutral-black/80 hover:text-white transition-all">
+              Login
+            </Button>
+          </div>
         </div>
       </nav>
 
@@ -75,9 +72,14 @@ export default function LandingPage() {
                 <h1 className="text-7xl md:text-8xl font-serif font-black leading-[0.9] tracking-tighter mb-8 italic">
                   Soul in <span className="text-secondary not-italic">Stone.</span>
                 </h1>
-                <p className="text-2xl text-neutral-black/80 max-w-lg mb-10 leading-relaxed font-light">
-                  CultureLense uses advanced spatial AI to identify sculptures instantly. Discover their history, technique, and soul—or showcase your own creations to a global audience.
-                </p>
+                <div className="max-w-xl mb-10 space-y-6">
+                  <p className="text-xl text-neutral-black/80 leading-relaxed font-light">
+                    For centuries, the stories of our gods and ancestors have been locked in stone—silent, static, and slowly fading. <span className="font-medium text-neutral-black">CultureLense changes that.</span>
+                  </p>
+                  <p className="text-lg text-neutral-black/70 leading-relaxed font-light">
+                    We are building the <span className="font-bold text-primary">Shazam for Heritage</span>: a tool that doesn't just see a statue, but understands its soul. By merging sophisticated AI with deep mythological context, we turn every smartphone into a digital archaeologist, ensuring that the wisdom of the past isn't just remembered—it's experienced.
+                  </p>
+                </div>
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Button onClick={handleLogin} size="lg" className="rounded-full h-16 px-10 bg-primary text-white hover:bg-primary/90 text-base font-black uppercase tracking-widest transition-transform hover:scale-105 active:scale-95">
                     Start Scanning <Scan className="ml-2 w-5 h-5" />
@@ -143,45 +145,86 @@ export default function LandingPage() {
         </section>
 
         {/* Features Grid */}
-        <section id="scan" className="py-24 bg-white">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="text-center max-w-3xl mx-auto mb-20">
-              <h2 className="text-5xl font-serif font-black mb-6 tracking-tight italic">Beyond <span className="not-italic text-secondary">Visuals.</span></h2>
-              <p className="text-neutral-black/70 text-lg">Every sculpture has a story etched in time. We help you read it with precision and grace.</p>
-            </div>
+        {/* Mission Section */}
+        {/* Mission Section */}
+        <section className="relative overflow-hidden bg-neutral-950 text-white">
+           {/* Background Decoration */}
+           <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-secondary/5 rounded-full blur-[120px] pointer-events-none" />
+           
+           {/* Fade Transitions - Extended for smoothness */}
+           <div className="absolute top-0 inset-x-0 h-64 bg-gradient-to-b from-white via-white/40 to-transparent z-10 pointer-events-none" />
+           <div className="absolute bottom-0 inset-x-0 h-64 bg-gradient-to-t from-white via-white/40 to-transparent z-10 pointer-events-none" />
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {[
-                {
-                  icon: <Camera className="w-8 h-8" />,
-                  title: "Instant Recognition",
-                  desc: "Simply point your camera or upload a photo. Our neural engine identifies the work across 5,000 years of art history."
-                },
-                {
-                  icon: <History className="w-8 h-8" />,
-                  title: "Deep Provenance",
-                  desc: "Access verified data on materials, tools used, historical context, and previous owners of the identified piece."
-                },
-                {
-                  icon: <Globe className="w-8 h-8" />,
-                  title: "Virtual Showcase",
-                  desc: "Project life-sized 3D models of sculptures into your space using AR, and study every chisel mark in detail."
-                }
-              ].map((feat, i) => (
-                <motion.div
-                  key={i}
-                  whileHover={{ y: -10 }}
-                  className="p-10 rounded-3xl bg-neutral-white border border-neutral-black/5 transition-all hover:shadow-xl hover:shadow-primary/5"
-                >
-                  <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center text-white mb-8">
-                    {feat.icon}
-                  </div>
-                  <h3 className="text-2xl font-serif font-bold mb-4 italic">{feat.title}</h3>
-                  <p className="text-neutral-black/60 leading-relaxed font-light">
-                    {feat.desc}
-                  </p>
-                </motion.div>
-              ))}
+          <div className="max-w-7xl mx-auto px-6 relative z-20 py-48">
+            <div className="flex flex-col lg:flex-row gap-16 items-center">
+              
+              {/* Left Content */}
+              <div className="flex-1 space-y-10">
+                <div>
+                  <Badge className="mb-4 bg-white/10 text-white border-0 px-3 py-1 uppercase tracking-widest text-[10px] font-bold backdrop-blur-md">
+                    Our Mission
+                  </Badge>
+                  <h2 className="text-4xl md:text-5xl font-serif font-black leading-tight text-white italic tracking-tighter drop-shadow-2xl">
+                    Preserve. <br/>
+                    Promote. <br/>
+                    <span className="text-secondary not-italic">Prosper.</span>
+                  </h2>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {[
+                    {
+                      title: "Awaken History",
+                      desc: "Decoding iconography with AI to reveal myths behind the marble.",
+                      color: "bg-blue-500/20 text-blue-300" 
+                    },
+                    {
+                      title: "Preserve Legacy",
+                      desc: "Creating an immutable digital archive to safeguard Nepal's heritage.",
+                      color: "bg-amber-500/20 text-amber-300"
+                    },
+                    {
+                      title: "Empower Artisans",
+                      desc: "Connecting local creators with global collectors for an economic renaissance.",
+                      color: "bg-emerald-500/20 text-emerald-300"
+                    },
+                    {
+                      title: "Democratize Access",
+                      desc: "Making cultural wisdom universally accessible across language barriers.",
+                       color: "bg-purple-500/20 text-purple-300"
+                    }
+                  ].map((goal, i) => (
+                    <motion.div 
+                      key={i}
+                      whileHover={{ y: -5 }}
+                      className="p-6 rounded-3xl bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all shadow-xl"
+                    >
+                      <div className={`w-2 h-2 rounded-full mb-4 ${goal.color.split(" ")[0].replace("/20", "")}`} />
+                      <h3 className="text-xl font-bold mb-2 text-white">{goal.title}</h3>
+                      <p className="text-sm text-neutral-200 leading-relaxed font-light">{goal.desc}</p>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Right Image */}
+              <div className="flex-1 relative w-full aspect-[4/5] lg:aspect-square max-w-lg lg:max-w-none mx-auto">
+                 <div className="absolute inset-0 bg-gradient-to-tr from-secondary/20 to-primary/20 rounded-[3rem] rotate-3 blur-2xl" />
+                 <div className="relative h-full w-full rounded-[2.5rem] overflow-hidden border border-white/10 shadow-2xl">
+                    <Image
+                      src="/sclupture/shiva.webp"
+                      alt="Cultural preservation"
+                      fill
+                      className="object-cover scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-neutral-black/80 via-transparent to-transparent" />
+                    <div className="absolute bottom-8 left-8 right-8">
+                       <p className="text-xs font-mono text-white/60 uppercase tracking-widest mb-2">Figure 01</p>
+                       <p className="text-2xl font-serif italic text-white">The Guardian of Lineage</p>
+                    </div>
+                 </div>
+              </div>
+
             </div>
           </div>
         </section>
@@ -207,22 +250,22 @@ export default function LandingPage() {
               {[
                 {
                   img: "/sclupture/shiva.webp",
-                  title: "Fragmented Silence",
+                  title: "The Cosmic Dancer",
                   artist: "Marcus Aurelius II",
                 },
                 {
                   img: "/sclupture/buddha.webp",
-                  title: "Modern Muse",
+                  title: "Awakened Silence",
                   artist: "Elena Vance",
                 },
                 {
                   img: "/sclupture/hanuman.webp",
-                  title: "Marble Wave",
+                  title: "Son of The Wind",
                   artist: "Kenzo Arata",
                 },
                 {
                   img: "/sclupture/ganesh.webp",
-                  title: "Eternal Youth",
+                  title: "Divine Beginning",
                   artist: "Sofia Russo",
                 }
               ].map((item, i) => (
@@ -232,11 +275,10 @@ export default function LandingPage() {
                   className="group cursor-pointer"
                 >
                   <div className="relative aspect-[3/4] rounded-2xl overflow-hidden mb-6">
-                    <Image
+                    <img
                       src={item.img}
                       alt={item.title}
-                      fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-110"
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
                   </div>
                   <div className="flex justify-between items-start">
@@ -249,6 +291,48 @@ export default function LandingPage() {
                     </button>
                   </div>
                 </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Methodology Section */}
+        <section className="py-32 bg-white relative overflow-hidden">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="mb-20 max-w-4xl">
+              <Badge className="mb-6 bg-primary/10 text-primary border-none px-4 py-1 uppercase tracking-widest text-[10px] font-black">
+                The Methodology
+              </Badge>
+              <h2 className="text-5xl md:text-6xl font-serif font-black mb-6 italic text-neutral-black leading-tight">
+                We didn't just build an app; we built a <span className="text-secondary not-italic">Cultural Intelligence Engine.</span>
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[
+                {
+                  title: 'AI That "Sees" Culture',
+                  desc: 'Our dual-core AI system goes beyond pixel matching. It understands iconography—interpreting posture, symbols, and style to identify deities with unprecedented accuracy, even in low light or weather-worn conditions.',
+                  icon: <ScanFace className="w-8 h-8" />
+                },
+                {
+                  title: 'The Knowledge Web',
+                  desc: 'We are mapping the "DNA" of our mythology. Our proprietary Cultural Graph links every deity to their lineage, temples, and legends, turning isolated facts into a living tapestry of knowledge.',
+                   icon: <Network className="w-8 h-8" />
+                },
+                {
+                  title: 'Trust-Based Commerce',
+                  desc: 'We enable culture to sustain itself. Our verified vendor system and secure escrow transactions ensure that every purchase is authentic, transparent, and directly supports the preservation of the art form.',
+                   icon: <ShieldCheck className="w-8 h-8" />
+                }
+              ].map((item, i) => (
+                <div key={i} className="group p-10 rounded-[2.5rem] bg-neutral-50 border border-neutral-200 hover:border-neutral-300 transition-all hover:shadow-2xl hover:shadow-neutral-black/5">
+                  <div className="w-16 h-16 rounded-2xl bg-neutral-black text-white flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-500">
+                    {item.icon}
+                  </div>
+                  <h3 className="text-2xl font-serif font-bold mb-4 italic group-hover:text-primary transition-colors">{item.title}</h3>
+                  <p className="text-neutral-black/60 leading-relaxed font-light">{item.desc}</p>
+                </div>
               ))}
             </div>
           </div>

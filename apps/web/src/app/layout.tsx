@@ -5,12 +5,16 @@ import { Toaster } from '@/components/ui/sonner';
 import { QueryProvider } from '@/components/query-provider';
 import { PWAInstallPrompt } from '@/components/pwa-install-prompt';
 import { PWAProvider } from '@/components/pwa-provider';
+import { GoogleTranslateScript } from '@/components/google-translate-script';
 import { ReduxProvider } from '@/components/providers/ReduxProvider';
 
 export const metadata: Metadata = {
   title: 'CultureLense',
   description: 'Discover cultural entities',
   manifest: '/manifest.json',
+  other: {
+    google: 'translate',
+  },
 };
 
 export const viewport = {
@@ -27,28 +31,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       style={{ scrollbarWidth: 'none', scrollBehavior: 'smooth' }}
     >
       <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                window.pwaEvent = e;
-              });
-
-              // Clear service workers in development
-              if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-                if ('serviceWorker' in navigator) {
-                  navigator.serviceWorker.getRegistrations().then((registrations) => {
-                    for (const registration of registrations) {
-                      registration.unregister();
-                      console.log('Unregistered service worker:', registration);
-                    }
-                  });
-                }
-              }
-            `,
-          }}
-        />
+        <style>{`
+          .goog-te-banner-frame { display: none !important; }
+          body { top: 0px !important; }
+          iframe.goog-te-banner-frame { display: none !important; }
+        `}</style>
       </head>
       <body>
         <ReduxProvider>
@@ -60,7 +47,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 enableSystem
                 disableTransitionOnChange
               >
-                <div>{children}</div>
+                <div suppressHydrationWarning>
+                  <div
+                    id="google_translate_element"
+                    className="hidden"
+                    suppressHydrationWarning
+                  ></div>
+                  {children}
+                </div>
+                <GoogleTranslateScript />
                 <Toaster position="top-right" richColors />
                 <PWAInstallPrompt />
               </ThemeProvider>

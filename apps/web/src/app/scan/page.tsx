@@ -35,7 +35,7 @@ export default function ScanPage() {
       const result = await scanImage(formData);
 
       if (result.success && result.data) {
-        const { entity, confidence, top_3 } = result.data;
+        const { source, entity, confidence, top_3 } = result.data;
 
         // Ensure slug format
         const slug = entity?.slug.toLowerCase().trim().replace(/\s+/g, '-');
@@ -52,10 +52,12 @@ export default function ScanPage() {
           }
         }
 
-        const params = new URLSearchParams(); 
+        const params = new URLSearchParams();
         params.set('confidence', finalConfidence.toString());
+        if (source) params.set('source', source);
 
         const passedData = {
+          source: source,
           prediction: entity?.slug,
           entity: entity,
           confidence: confidence,
