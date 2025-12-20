@@ -10,7 +10,7 @@ export default async function ResultPage({
   searchParams,
 }: {
   params: { slug: string };
-  searchParams: { confidence: string; data?: string };
+  searchParams: { source: string; confidence: string; data?: string };
 }) {
   const result = await getEntityBySlug(params.slug);
   const entity = result.data;
@@ -122,7 +122,7 @@ export default async function ResultPage({
                 </div>
               )}
               {entity.religion && (
-                <div className="p-4 rounded-xl bg-primary/30 border border-border">
+                <div className={`p-4 rounded-xl ${searchParams.source === 'p' ? 'bg-primary/30' : 'bg-secondary/30'} border border-border`}>
                   <span className="block text-xs uppercase tracking-wider text-white/80 mb-1">Origin</span>
                   <span className="text-lg font-medium text-white">{entity.religion}</span>
                 </div>
