@@ -4,11 +4,13 @@ import { useEffect, useState, useMemo, useRef } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { Button } from "@/components/ui/button";
-import { toggleVisited } from "@/actions/map";
+import { getExploreData, toggleVisited } from "@/actions/map";
 import { Landmark, Search, Locate, Loader2 } from "lucide-react";
 import L from "leaflet";
 import { renderToStaticMarkup } from "react-dom/server";
 import { cn } from "@/lib/utils";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 interface Temple {
     id: string;
@@ -19,10 +21,6 @@ interface Temple {
     lat: number;
     lng: number;
     isVisited: boolean;
-}
-
-interface MapProps {
-    temples: Temple[];
 }
 
 // Map Events: Update Zoom state
@@ -143,7 +141,7 @@ function LocationMarker() {
     };
 
     return (
-        <div className="absolute top-4 right-4 z-[1000]">
+        <div className="absolute bottom-4 right-4 z-[1000]">
             <Button
                 size="icon"
                 variant="secondary"
@@ -158,20 +156,55 @@ function LocationMarker() {
     );
 }
 
-export default function Map({ temples }: MapProps) {
-    const [visitedState, setVisitedState] = useState<Record<string, boolean>>({});
+export default function Map() {
+    const queryClient = useQueryClient();
     const [currentZoom, setCurrentZoom] = useState(13);
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const markerRefs = useRef<Record<string, L.Marker | null>>({});
 
-    // Initial State
-    useEffect(() => {
-        const initial: Record<string, boolean> = {};
-        temples.forEach((t) => {
-            initial[t.id] = t.isVisited;
-        });
-        setVisitedState(initial);
-    }, [temples]);
+    const { data: temples = [] } = useQuery({
+        queryKey: ['explore-data'],
+        queryFn: () => getExploreData(),
+    });
+
+    const { mutate: toggleVisit } = useMutation({
+        mutationFn: async (temple: Temple) => {
+            return toggleVisited(temple.id, {
+                name: temple.name,
+                lat: temple.lat.toString(),
+                lng: temple.lng.toString(),
+            });
+        },
+        onMutate: async (templeToToggle) => {
+            await queryClient.cancelQueries({ queryKey: ['explore-data'] });
+            const previousTemples = queryClient.getQueryData<Temple[]>(['explore-data']);
+
+            if (previousTemples) {
+                queryClient.setQueryData<Temple[]>(['explore-data'], (old) => {
+                    if (!old) return [];
+                    return old.map(t =>
+                        t.id === templeToToggle.id
+                            ? { ...t, isVisited: !t.isVisited }
+                            : t
+                    );
+                });
+            }
+
+            return { previousTemples };
+        },
+        onError: (err, newTodo, context) => {
+            if (context?.previousTemples) {
+                queryClient.setQueryData(['explore-data'], context.previousTemples);
+            }
+            toast.error("Failed to update visited status");
+        },
+        onSettled: () => {
+            queryClient.invalidateQueries({ queryKey: ['explore-data'] });
+            queryClient.invalidateQueries({ queryKey: ['user-history'] });
+            queryClient.invalidateQueries({ queryKey: ['recent-entities'] });
+            queryClient.invalidateQueries({ queryKey: ['recommended-entities'] });
+        },
+    });
 
     // Handle Selection: Open Popup
     useEffect(() => {
@@ -180,19 +213,8 @@ export default function Map({ temples }: MapProps) {
         }
     }, [selectedId]);
 
-    const handleToggle = async (temple: Temple) => {
-        const wasVisited = visitedState[temple.id];
-        setVisitedState((prev) => ({ ...prev, [temple.id]: !wasVisited }));
-        try {
-            await toggleVisited(temple.id, {
-                name: temple.name,
-                lat: temple.lat.toString(),
-                lng: temple.lng.toString(),
-            });
-        } catch (e) {
-            console.error("Failed to toggle visited status", e);
-            setVisitedState((prev) => ({ ...prev, [temple.id]: wasVisited }));
-        }
+    const handleToggle = (temple: Temple) => {
+        toggleVisit(temple);
     };
 
     // Refined Sizing Logic
@@ -259,12 +281,21 @@ export default function Map({ temples }: MapProps) {
         ? [temples[0].lat, temples[0].lng]
         : [27.7172, 85.3240];
 
+    // Nepal geographical boundaries
+    const nepalBounds: [[number, number], [number, number]] = [
+        [26.3, 80.0],  // Southwest corner
+        [30.4, 88.2]   // Northeast corner
+    ];
+
     return (
-        <div className="relative h-full w-full rounded-lg overflow-hidden border border-border shadow-sm group bg-neutral-100">
+        <div className="relative h-full w-full overflow-hidden group bg-neutral-100">
             <MapContainer
                 center={center}
                 zoom={13}
-                style={{ height: "100%", width: "100%" }}
+                minZoom={7}
+                maxBounds={nepalBounds}
+                maxBoundsViscosity={1.0}
+                style={{ height: "100%", width: "100%", padding: 0, margin: 0 }}
             >
                 <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -276,7 +307,7 @@ export default function Map({ temples }: MapProps) {
                 <LocationMarker />
 
                 {temples.map((temple) => {
-                    const isVisited = visitedState[temple.id];
+                    const isVisited = temple.isVisited; // Directly from prop/query data
                     const isSelected = selectedId === temple.id;
 
                     return (

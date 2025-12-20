@@ -1,4 +1,7 @@
 # CultureLense Monorepo
+## Live Site at:
+[https://culturelense.peridot.com.np](https://culturelense.peridot.com.np).
+[https://culturelense.vercel.app](https://culturelense.vercel.app).
 
 Welcome to CultureLense, a platform for discovering cultural entities.
 

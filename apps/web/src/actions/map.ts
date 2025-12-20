@@ -1,7 +1,7 @@
 'use server';
 
 import { db } from '../db';
-import { culturalEntities, visitedLocations } from '../db/schema';
+import { culturalEntities, visitedLocations, searchHistory } from '../db/schema';
 import { eq, and } from 'drizzle-orm';
 import { createClient } from '../lib/supabase/server';
 import { revalidatePath } from 'next/cache';
@@ -80,6 +80,12 @@ export async function toggleVisited(entityId: string, locationData: { name: stri
             placeName: locationData.name,
             latitude: locationData.lat,
             longitude: locationData.lng,
+        });
+
+        // Also record in search history
+        await db.insert(searchHistory).values({
+            userId: user.id,
+            query: locationData.name,
         });
     }
 

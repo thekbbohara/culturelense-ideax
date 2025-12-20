@@ -110,3 +110,24 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Hide Google Translate default widget and toolbar */
+#google_translate_element {
+  display: none !important;
+}
+
+.goog-te-banner-frame {
+  display: none !important;
+}
+
+.goog-te-balloon-frame {
+  display: none !important;
+}
+
+body {
+  top: 0px !important;
+}
+
+.skiptranslate {
+  display: none !important;
+}

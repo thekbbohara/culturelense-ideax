@@ -3,6 +3,7 @@ import { createClient } from './client';
 const BUCKET_NAME = 'images';
 
 export async function uploadProductImage(
+  folderName: string,
   file: File,
   vendorId: string,
 ): Promise<{ success: boolean; url?: string; error?: string }> {
@@ -28,7 +29,7 @@ export async function uploadProductImage(
     const timestamp = Date.now();
     const fileExt = file.name.split('.').pop();
     // Path: listings/{vendorId}/{timestamp}.{ext}
-    const fileName = `listings/${vendorId}/${timestamp}.${fileExt}`;
+    const fileName = `${folderName}/${vendorId}/${timestamp}.${fileExt}`;
 
     // Upload file to Supabase storage
     const { data, error } = await supabase.storage.from(BUCKET_NAME).upload(fileName, file, {

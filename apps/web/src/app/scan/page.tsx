@@ -35,7 +35,7 @@ export default function ScanPage() {
       const result = await scanImage(formData);
 
       if (result.success && result.data) {
-        const { entity, confidence, top_3 } = result.data;
+        const { source, entity, confidence, top_3 } = result.data;
 
         // Ensure slug format
         const slug = entity?.slug.toLowerCase().trim().replace(/\s+/g, '-');
@@ -52,10 +52,12 @@ export default function ScanPage() {
           }
         }
 
-        const params = new URLSearchParams(); 
+        const params = new URLSearchParams();
         params.set('confidence', finalConfidence.toString());
+        if (source) params.set('source', source);
 
         const passedData = {
+          source: source,
           prediction: entity?.slug,
           entity: entity,
           confidence: confidence,
@@ -105,7 +107,7 @@ export default function ScanPage() {
 
   return (
     <div className="min-h-screen bg-black text-white p-4 flex flex-col items-center">
-      <h1 className="text-2xl font-bold mb-6">Scan Artifact</h1>
+      <h1 className="text-2xl font-bold mb-6">Scan Sculpture</h1>
 
       {error && (
         <div className="bg-red-500/20 text-red-200 p-3 rounded mb-4 w-full text-center max-w-md">
@@ -122,7 +124,6 @@ export default function ScanPage() {
 
       <div className="mt-8 text-sm text-gray-400 text-center">
         <p>Point at a deity or sculpture.</p>
-        <p className="text-xs mt-2 text-gray-500">Supports JPG, PNG</p>
       </div>
     </div>
   );

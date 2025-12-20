@@ -5,174 +5,218 @@ import { getEntitiesSlugs, getEntityBySlug } from './entities';
 import { db } from '@/db';
 import { scanHistory } from '@/db/schema';
 import { randomUUID } from 'crypto';
-import axios from "axios";
-import { GoogleGenAI } from "@google/genai";
+import axios from 'axios';
+import { GoogleGenAI } from '@google/genai';
+import { saveSearchEntry } from './history';
+
+type AIResult = {
+  source: 'p' | 'g';
+  isStatue: boolean;
+  prediction: string;
+  confidence: number;
+  top_3: { god: string; confidence: number }[];
+};
 
 export async function scanImage(formData: FormData) {
   try {
+    /* ---------------- AUTH ---------------- */
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-      return { success: false, error: 'You must be logged in to scan.' };
-    }
+    if (!user) return { success: false, error: 'You must be logged in.' };
 
     const file = formData.get('image') as File;
-    if (!file) {
-      throw new Error('No image provided');
+    if (!file) throw new Error('No image provided');
+
+    /* ---------------- STORAGE ---------------- */
+    const filePath = `${user.id}/scan_${Date.now()}_${randomUUID()}.${file.name.split('.').pop()}`;
+    const { error } = await supabase.storage.from('scans').upload(filePath, file);
+    if (error) throw new Error('Image upload failed');
+
+    const { data: { publicUrl } } = supabase.storage.from('scans').getPublicUrl(filePath);
+
+    /* ---------------- PYTHON AI ---------------- */
+    const pythonForm = new FormData();
+    pythonForm.append('file', file);
+
+    const pythonRes = await axios.post(
+      `${process.env.NEXT_PUBLIC_SPATIAL_URL}/predict`,
+      pythonForm
+    );
+
+    let pythonAI: AIResult | null = null;
+
+    if (pythonRes.data?.prediction && pythonRes.data.prediction !== 'unknown') {
+      pythonAI = {
+        source: 'p',
+        isStatue: true,
+        prediction: pythonRes.data.prediction,
+        confidence: pythonRes.data.confidence ?? 0.8,
+        top_3: pythonRes.data.top_3 ?? [],
+      };
     }
 
-    // 1. Upload Image to Supabase Storage
-    const timestamp = Date.now();
-    const fileExt = file.name.split('.').pop();
-    const filePath = `${user.id}/scan_${timestamp}_${randomUUID()}.${fileExt}`;
+    /* ---------------- GEMINI ---------------- */
+    if (!process.env.NEXT_PUBLIC_GEMINI_API) throw new Error('GEMINI_API missing');
 
-    const { error: uploadError } = await supabase.storage
-      .from('scans')
-      .upload(filePath, file);
+    const { data: slugs } = await getEntitiesSlugs();
+    const base64 = Buffer.from(await file.arrayBuffer()).toString('base64');
 
-    if (uploadError) {
-      console.error('Storage Upload Error:', uploadError);
-      throw new Error('Failed to upload scan image');
-    }
+    const genAI = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API });
 
-    // Get Public URL
-    const { data: { publicUrl } } = supabase.storage
-      .from('scans')
-      .getPublicUrl(filePath);
-
-
-    // 2. Call Python AI Service
-    const aiFormData = new FormData();
-    aiFormData.append('file', file);
-
-    const aiResponse = await axios.post(`${process.env.NEXT_PUBLIC_SPATIAL_URL}/predictv2`, aiFormData);
-    if (!aiResponse.data) {
-      console.error('AI Service Error:', aiResponse.data);
-      throw new Error('Failed to analyze image');
-    }
-
-    let aiResult = aiResponse.data;
-
-    if (!aiResult.prediction) {
-      if (!process.env.GEMINI_API_KEY) {
-        throw new Error('GEMINI_API_KEY is not set');
-      }
-
-      console.log('Primary AI failed, falling back to Gemini...');
-
-      const { data: slugs } = await getEntitiesSlugs();
-      const slugsList = slugs.join(', ');
-
-      const arrayBuffer = await file.arrayBuffer();
-      const base64Image = Buffer.from(arrayBuffer).toString('base64');
-
-      const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-
-      // Using gemini-1.5-flash as it's typically faster and cheaper for this task
-      const response = await genAI.models.generateContent({
-        model: "gemini-1.5-flash",
-        contents: [
+    const response = await genAI.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: [{
+        role: 'user',
+        parts: [
           {
-            role: "user",
-            parts: [
+            text: `
+              You are an expert in Nepali culture, heritage, and religious iconography.
+
+              Analyze the provided image and follow the rules EXACTLY.
+
+              STEP 1 — OBJECT TYPE CHECK
+              - If the image shows a REAL living being (human, animal, bird, plant, cartoon, drawing, scenery):
+                → isStatue = false
+                → prediction = "unknown"
+
+              - If the image shows a STATUE or SCULPTURE:
+                → isStatue = true
+                → continue to STEP 2
+
+              STEP 2 — CULTURAL IDENTIFICATION (ONLY IF isStatue = true)
+              - Identify the Nepali cultural entity (God / Goddess / Monument).
+              - Use ONLY slugs from this list if they match exactly:
+              [${slugs}]
+
+              - If matched:
+                → return that exact slug
+
+              - If NOT in the list OR unsure:
+                → prediction = "unknown"
+
+              SLUG RULES:
+              - lowercase
+              - hyphen ('-') instead of spaces
+              - no special characters
+
+              RETURN STRICT JSON ONLY (NO TEXT, NO MARKDOWN):
+
+              If NOT a statue:
               {
-                text: `You are an expert in Nepali culture and heritage.
-                  Analyze this image and identify the cultural entity (God/Goddess/Monument) depicted.
-
-                  Your task is to return the **slug** corresponding to the identified entity.
-                  A "slug" is a URL-friendly version of the name (lowercase, hyphens instead of spaces).
-
-                  Known Slugs from Database:
-                  [${slugsList}]
-
-                  Instructions:
-                  1. Identify the entity in the image.
-                  2. If it matches a Known Slug, return that exact slug.
-                  3. If it is a Nepali cultural entity but NOT in the list, format its name as a slug (e.g. "Durga Mata" -> "durga_mata") and return it.
-                  4. If it is NOT a cultural entity or strictly unrecognizable, return "unknown".
-
-                  Output strictly valid JSON (no markdown):
-                  {
-                    "prediction": "slug-result",
-                    "confidence": 0.95,
-                    "top_3": [
-                      { "god": "candidate-slug-1", "confidence": 0.5 },
-                      { "god": "candidate-slug-2", "confidence": 0.3 }
-                    ]
-                  }`
-              },
-              {
-                inlineData: {
-                  mimeType: file.type || "image/jpeg",
-                  data: base64Image
-                }
+                "source": "g",
+                "isStatue": false,
+                "prediction": "unknown",
+                "confidence": 0,
+                "top_3": []
               }
-            ]
-          }
+
+              If statue AND identified:
+              {
+                "source": "g",
+                "isStatue": true,
+                "prediction": "ganesh",
+                "confidence": 0.92,
+                "top_3": [
+                  { "god": "ganesh", "confidence": 0.6 },
+                  { "god": "shiva", "confidence": 0.25 },
+                  { "god": "unknown", "confidence": 0.15 }
+                ]
+              }
+
+              If statue but NOT identifiable:
+              {
+                "source": "g",
+                "isStatue": true,
+                "prediction": "unknown",
+                "confidence": 0,
+                "top_3": []
+              }
+            `
+          },
+          {
+            inlineData: {
+              mimeType: file.type || 'image/jpeg',
+              data: base64,
+            },
+          },
         ],
-        config: {
-          responseMimeType: "application/json"
-        }
+      }],
+      config: { responseMimeType: 'application/json' },
+    });
+
+    const geminiText = response.text;
+
+    if (!geminiText) throw new Error('Gemini empty response');
+
+    const geminiAI: AIResult = JSON.parse(geminiText);
+
+    /* ---------------- DECISION ENGINE ---------------- */
+    let finalAI: AIResult | null = null;
+
+    if (pythonAI && pythonAI.prediction === geminiAI.prediction) {
+      finalAI = pythonAI;
+    } else if (!pythonAI && geminiAI.prediction !== 'unknown') {
+      finalAI = geminiAI;
+    } else if (
+      pythonAI &&
+      geminiAI.prediction !== 'unknown' &&
+      pythonAI.prediction !== geminiAI.prediction
+    ) {
+      const geminiEntity = await getEntityBySlug(geminiAI.prediction);
+      if (geminiEntity.success) finalAI = geminiAI;
+      else finalAI = pythonAI;
+    }
+
+    /* ---------------- FAIL SAFE ---------------- */
+    if (!finalAI || finalAI.prediction === 'unknown') {
+      await db.insert(scanHistory).values({
+        userId: user.id,
+        entityId: null,
+        imageUrl: publicUrl,
       });
 
-      const text = (response as any).text
-        ? (response as any).text()
-        : (response as any).data?.candidates?.[0]?.content?.parts?.[0]?.text
-        || (response as any).candidates?.[0]?.content?.parts?.[0]?.text;
-
-      if (!text) {
-        throw new Error('Gemini returned no content: ' + JSON.stringify(response));
-      }
-
-      try {
-        const jsonStr = text.replace(/```json\n?|\n?```/g, '').trim();
-        aiResult = JSON.parse(jsonStr);
-        console.log("Gemini Fallback Result:", aiResult);
-      } catch (e) {
-        console.error("Failed to parse Gemini response:", text);
-        throw new Error("Failed to parse fallback AI response");
-      }
+      return {
+        success: false,
+        error: 'Unknown Entity',
+        data: { imageUrl: publicUrl },
+      };
     }
 
-    const entity_slug = aiResult.prediction;
-    const confidence = aiResult.confidence;
-    const top_3 = aiResult.top_3;
+    /* ---------------- DB LOOKUP ---------------- */
+    const entity = await getEntityBySlug(finalAI.prediction);
+    if (!entity.success) throw new Error('Entity missing in DB');
 
-    // 3. Lookup Entity in DB
-    const entityResult = await getEntityBySlug(entity_slug);
-
-    let entityId = null;
-    let entityData = null;
-
-    if (entityResult.success && entityResult.data) {
-      entityId = entityResult.data.id;
-      entityData = entityResult.data;
-    }
-
-    // 4. Record in Scan History
+    /* ---------------- HISTORY ---------------- */
     await db.insert(scanHistory).values({
       userId: user.id,
-      entityId: entityId, // Can be null if not found in DB
+      entityId: entity?.data?.id,
       imageUrl: publicUrl,
     });
 
-    if (!entityData) {
-      return { success: false, error: 'Unknown Entity. Please provide a better image and try again.', data: { imageUrl: publicUrl } };
-    }
+    await saveSearchEntry(entity?.data?.name || '');
 
+    console.log({
+      success: true,
+      data: {
+        entity: entity.data,
+        confidence: finalAI.confidence,
+        top_3: finalAI.top_3,
+        source: finalAI.source,
+      },
+    });
+
+    /* ---------------- SUCCESS ---------------- */
     return {
       success: true,
       data: {
-        entity: entityData,
-        confidence,
-        top_3,
-        imageUrl: publicUrl
-      }
+        entity: entity.data,
+        confidence: finalAI.confidence,
+        top_3: finalAI.top_3,
+        source: finalAI.source,
+      },
     };
-
-  } catch (error: any) {
-    console.error('Scan Action Error:', error);
-    return { success: false, error: error.message || 'Failed to process scan' };
+  } catch (err: any) {
+    console.error(err);
+    return { success: false, error: err.message };
   }
 }

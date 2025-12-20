@@ -40,7 +40,7 @@ export const CameraCapture: React.FC<CameraCaptureProps> = ({
 
   return (
     <div className="flex flex-col items-center w-full max-w-md mx-auto relative">
-      <div className="relative w-full aspect-[3/4] bg-black rounded-lg overflow-hidden border border-gray-800 shadow-2xl">
+      <div className="relative h-[calc(100vh-10rem)] w-full aspect-[3/4] bg-black rounded-lg overflow-hidden border border-gray-800 shadow-2xl">
         {imageSrc ? (
           <div className="relative w-full h-full">
             {/* Captured Image */}

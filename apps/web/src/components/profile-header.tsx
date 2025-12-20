@@ -34,14 +34,14 @@ export function ProfileHeader({ userEmail, memberSince, className }: { userEmail
                 </div>
             </div>
 
-            <div className="flex items-center gap-3 md:ml-auto">
+            <div className="flex items-center justify-end gap-3 md:ml-auto">
                 <Button
                     onClick={handleLogout}
                     variant="outline"
                     className="gap-2 text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/20"
                 >
                     <LogOut className="h-4 w-4" />
-                    <span className="hidden sm:inline">Logout</span>
+                    <span className="inline">Logout</span>
                 </Button>
             </div>
         </div>

@@ -14,6 +14,7 @@ export const productFormSchema = z.object({
   imageUrl: z.string().url('Product image is required'),
   status: z.enum(['draft', 'active', 'sold', 'archived']),
   entityId: z.string().min(1, 'Entity is required'),
+  categoryId: z.string().optional(),
 });
 
 export type ProductFormValues = z.infer<typeof productFormSchema>;

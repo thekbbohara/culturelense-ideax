@@ -34,11 +34,22 @@ export async function getVendorByUserId() {
 
 export async function getVendorListings(vendorId: string) {
   try {
-    const items = await db
-      .select()
-      .from(listings)
-      .where(eq(listings.vendorId, vendorId))
-      .orderBy(desc(listings.createdAt));
+    const items = await db.query.listings.findMany({
+      where: (listings, { eq }) => eq(listings.vendorId, vendorId),
+      with: {
+        entity: {
+          columns: {
+            name: true,
+          },
+        },
+        category: {
+          columns: {
+            name: true,
+          },
+        },
+      },
+      orderBy: (listings, { desc }) => [desc(listings.createdAt)],
+    });
 
     return { success: true, data: items };
   } catch (error) {
@@ -62,6 +73,7 @@ export async function createVendorListing(data: any) {
       quantity: data.quantity,
       imageUrl: data.imageUrl,
       entityId: data.entityId || null,
+      categoryId: data.categoryId || null,
       status: data.status || 'active',
     });
 
@@ -102,8 +114,9 @@ export async function updateVendorListing(listingId: string, data: any) {
         price: data.price,
         imageUrl: data.imageUrl,
         entityId: data.entityId || null,
+        categoryId: data.categoryId || null,
         status: data.status,
-        quantity: data.quantity, // Ensure quantity is updated too if strictly typed, or rely on pass-through
+        quantity: data.quantity,
       })
       .where(eq(listings.id, listingId));
 

@@ -46,7 +46,7 @@ export function Dock() {
   const [hoveredTab, setHoveredTab] = React.useState<string | null>(null);
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] w-auto max-w-[95vw]">
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[999] w-auto max-w-[95vw]">
       {/* Ambient Glow behind the dock */}
       <div className="absolute -inset-4 bg-gradient-to-t from-primary/20 to-transparent blur-3xl rounded-full opacity-50 pointer-events-none" />
 
@@ -82,7 +82,7 @@ export function Dock() {
                     whileTap={{ scale: 0.9 }}
                     transition={{ type: "spring", stiffness: 400, damping: 17 }}
                     className={cn(
-                      "w-16 h-16 md:w-14 md:h-14", // Bigger on mobile
+                      "w-12 h-12 md:w-14 md:h-14", // Bigger on mobile
                       "bg-gradient-to-br from-primary to-primary/80",
                       "rounded-full flex items-center justify-center",
                       "shadow-lg shadow-primary/30",
@@ -110,7 +110,7 @@ export function Dock() {
             >
               <div className={cn(
                 "relative flex flex-col items-center justify-center",
-                "w-14 h-14 md:w-12 md:h-12", // Touch targets larger on mobile
+                "w-10 h-10 md:w-12 md:h-12", // Touch targets larger on mobile
                 "rounded-full transition-all duration-300",
                 "cursor-pointer"
               )}>
@@ -139,7 +139,7 @@ export function Dock() {
                   <Icon
                     className={cn(
                       "w-6 h-6 md:w-5 md:h-5 transition-all duration-300",
-                      isActive ? "text-primary fill-current" : "text-stxt group-hover:text-txt",
+                      isActive ? "text-primary" : "text-stxt group-hover:text-txt",
                       isActive && "scale-110"
                     )}
                     strokeWidth={isActive ? 2.5 : 2}
