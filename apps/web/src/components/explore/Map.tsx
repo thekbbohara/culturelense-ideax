@@ -281,11 +281,20 @@ export default function Map() {
         ? [temples[0].lat, temples[0].lng]
         : [27.7172, 85.3240];
 
+    // Nepal geographical boundaries
+    const nepalBounds: [[number, number], [number, number]] = [
+        [26.3, 80.0],  // Southwest corner
+        [30.4, 88.2]   // Northeast corner
+    ];
+
     return (
         <div className="relative h-full w-full overflow-hidden group bg-neutral-100">
             <MapContainer
                 center={center}
                 zoom={13}
+                minZoom={7}
+                maxBounds={nepalBounds}
+                maxBoundsViscosity={1.0}
                 style={{ height: "100%", width: "100%", padding: 0, margin: 0 }}
             >
                 <TileLayer
