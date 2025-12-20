@@ -17,7 +17,7 @@ import { getRecentListings } from '@/actions/marketplace';
 
 export default function WishlistPage() {
   const dispatch = useAppDispatch();
-  const { userId } = useAppSelector((state) => state.auth);
+  const { userId, vendorId: currentVendorId } = useAppSelector((state) => state.auth);
   const effectiveUserId = userId || 'guest';
 
   const wishlistItems = useAppSelector(
@@ -33,6 +33,13 @@ export default function WishlistPage() {
 
   const moveToCart = (item: any) => {
     const existingCartItem = cartItems.find((ci) => ci.id === item.id);
+
+    const isOwner = currentVendorId && item.vendorId && currentVendorId === item.vendorId;
+
+    if (isOwner) {
+      toast.error('You cannot add your own product to the cart');
+      return;
+    }
 
     if (item.availableQuantity === 0) {
       toast.error('This item is out of stock');
@@ -192,16 +199,24 @@ export default function WishlistPage() {
                     <div className="flex gap-2">
                       <Button
                         onClick={() => moveToCart(item)}
-                        disabled={item.availableQuantity === 0}
+                        disabled={
+                          item.availableQuantity === 0 ||
+                          !!(currentVendorId && item.vendorId && currentVendorId === item.vendorId)
+                        }
                         className={cn(
                           'flex-1 font-bold h-10 rounded-full transition-all',
-                          item.availableQuantity > 0
+                          item.availableQuantity > 0 &&
+                            !(currentVendorId && item.vendorId && currentVendorId === item.vendorId)
                             ? 'bg-primary hover:bg-primary/90 text-white'
                             : 'bg-muted text-muted-foreground cursor-not-allowed opacity-50',
                         )}
                       >
                         <ShoppingCart className="w-4 h-4 mr-2" />
-                        {item.availableQuantity > 0 ? 'Add to Cart' : 'Out of Stock'}
+                        {currentVendorId && item.vendorId && currentVendorId === item.vendorId
+                          ? 'Your Product'
+                          : item.availableQuantity > 0
+                            ? 'Add to Cart'
+                            : 'Out of Stock'}
                       </Button>
                     </div>
                   </div>

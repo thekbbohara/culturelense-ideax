@@ -261,6 +261,7 @@ export default function MarketplacePage() {
                       <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-3xl blur-xl group-hover:blur-2xl transition-all opacity-0 group-hover:opacity-100" />
                       <ProductCard
                         id={item.id}
+                        vendorId={item.vendorId}
                         title={item.title}
                         artist={item.artist || 'Culture Lense Artist'}
                         price={item.price}
@@ -326,6 +327,7 @@ export default function MarketplacePage() {
                         >
                           <ProductCard
                             id={item.id}
+                            vendorId={item.vendorId}
                             title={item.title}
                             artist={item.artist || 'Culture Lense Artist'}
                             price={item.price}

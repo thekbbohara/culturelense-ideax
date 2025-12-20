@@ -38,8 +38,15 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
   const cartItems = useAppSelector((state) => state.cart?.itemsByUserId?.[effectiveUserId] || []);
   const existingCartItem = cartItems.find((item) => item.id === params.id);
 
+  const isOwner = currentVendorId && product?.vendorId && currentVendorId === product.vendorId;
+
   const handleAddToCart = () => {
     if (product) {
+      if (isOwner) {
+        toast.error('You cannot add your own product to the cart');
+        return;
+      }
+
       if (product.quantity === 0) {
         toast.error('This item is out of stock');
         return;
@@ -54,6 +61,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
         addItem({
           item: {
             id: product.id,
+            vendorId: product.vendorId,
             title: product.title,
             price: product.price,
             imageUrl: product.imageUrl,
@@ -69,10 +77,16 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
 
   const handleToggleWishlist = () => {
     if (product) {
+      if (isOwner) {
+        toast.error('You cannot add your own product to the wishlist');
+        return;
+      }
+
       dispatch(
         toggleWishlist({
           item: {
             id: product.id,
+            vendorId: product.vendorId,
             title: product.title,
             price: product.price,
             availableQuantity: product.quantity,
@@ -202,7 +216,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                 <img
                   src={product.imageUrl}
                   alt={product.title}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  className="w-full object-cover transition-transform duration-700 group-hover:scale-105 h-[600px]"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </div>
@@ -256,37 +270,39 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
               <Button
                 size="lg"
                 onClick={handleAddToCart}
-                disabled={product.quantity === 0}
+                disabled={product.quantity === 0 || !!isOwner}
                 className={cn(
                   'flex-1 h-14 text-base font-bold shadow-lg rounded-full transition-all',
-                  product.quantity > 0
+                  product.quantity > 0 && !isOwner
                     ? 'bg-primary hover:bg-primary/90 shadow-primary/30'
                     : 'bg-muted text-muted-foreground cursor-not-allowed opacity-50',
                 )}
               >
                 <ShoppingCart className="w-5 h-5 mr-2" />
-                {product.quantity > 0 ? 'Add to Cart' : 'Out of Stock'}
+                {isOwner ? 'Your Product' : product.quantity > 0 ? 'Add to Cart' : 'Out of Stock'}
               </Button>
               <Button
                 size="lg"
                 variant="outline"
                 onClick={handleToggleWishlist}
+                disabled={!!isOwner}
                 className={cn(
                   'h-14 aspect-square p-0 rounded-full border-2 transition-all',
                   isInWishlist
                     ? 'bg-red-50 border-red-200 text-red-500 hover:bg-red-100'
                     : 'border-primary/20 hover:bg-primary/10 hover:border-primary text-foreground',
+                  isOwner && 'cursor-not-allowed opacity-50',
                 )}
               >
                 <Heart className={cn('w-5 h-5', isInWishlist && 'fill-current')} />
               </Button>
-              <Button
+              {/* <Button
                 size="lg"
                 variant="outline"
                 className="h-14 aspect-square p-0 rounded-full border-2 border-primary/20 hover:bg-primary/10 hover:border-primary"
               >
                 <Share2 className="w-5 h-5" />
-              </Button>
+              </Button> */}
             </div>
 
             <Separator className="bg-primary/10" />
@@ -387,6 +403,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                   <ProductCard
                     key={item.id}
                     id={item.id}
+                    vendorId={item.vendorId}
                     title={item.title}
                     artist={item.artist || 'Culture Lense Artist'}
                     price={item.price}
