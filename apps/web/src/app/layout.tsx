@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/sonner';
 import { QueryProvider } from '@/components/query-provider';
 import { PWAInstallPrompt } from '@/components/pwa-install-prompt';
 import { PWAProvider } from '@/components/pwa-provider';
+import { GoogleTranslateScript } from '@/components/google-translate-script';
 
 export const metadata: Metadata = {
   title: 'CultureLense',
@@ -29,25 +30,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       style={{ scrollbarWidth: 'none', scrollBehavior: 'smooth' }}
     >
       <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                window.pwaEvent = e;
-              });
-              
-              function googleTranslateElementInit() {
-                new google.translate.TranslateElement({
-                  pageLanguage: 'en',
-                  layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-                  autoDisplay: false
-                }, 'google_translate_element');
-              }
-            `,
-          }}
-        />
-        <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
         <style>{`
           .goog-te-banner-frame { display: none !important; }
           body { top: 0px !important; }
@@ -67,6 +49,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <div id="google_translate_element" className="hidden" suppressHydrationWarning></div>
                 {children}
               </div>
+              <GoogleTranslateScript />
               <Toaster position="top-right" richColors />
               <PWAInstallPrompt />
             </ThemeProvider>

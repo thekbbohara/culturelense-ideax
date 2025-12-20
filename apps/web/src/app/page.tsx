@@ -5,15 +5,10 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Scan,
-  Camera,
   ShoppingBag,
   Palette,
   ChevronRight,
-  Globe,
-  History,
   ArrowRight,
-  Menu,
-  X,
   ScanFace,
   Network,
   ShieldCheck
@@ -24,15 +19,11 @@ import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/lib/supabase/client";
 import { usePWAInstall } from "@/components/pwa-provider";
 
+import { LanguageSelector } from "@/components/language-selector";
+
 export default function LandingPage() {
-  // const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [isScanning, setIsScanning] = React.useState(false);
   const { install } = usePWAInstall();
-
-  const toggleScan = () => {
-    setIsScanning(true);
-    setTimeout(() => setIsScanning(false), 3000);
-  };
 
   const handleLogin = async () => {
     const supabase = createClient();
@@ -56,9 +47,12 @@ export default function LandingPage() {
             <span className="font-serif text-2xl font-black tracking-tighter uppercase">CultureLense</span>
           </div>
 
-          <Button onClick={handleLogin} className="rounded-full border-neutral-black font-bold uppercase tracking-widest text-[10px] px-6 hover:bg-neutral-black/80 hover:text-white transition-all">
-            Login
-          </Button>
+          <div className="flex items-center gap-4">
+            <LanguageSelector variant="minimal" />
+            <Button onClick={handleLogin} className="rounded-full border-neutral-black font-bold uppercase tracking-widest text-[10px] px-6 hover:bg-neutral-black/80 hover:text-white transition-all">
+              Login
+            </Button>
+          </div>
         </div>
       </nav>
 
