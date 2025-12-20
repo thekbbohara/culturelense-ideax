@@ -10,12 +10,14 @@ import Link from 'next/link';
 import { dummyProducts } from '@/data/dummy-products';
 import { cn } from '@/lib/utils';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { updateQuantity, removeItem } from '@/store/slices/cartSlice';
+import { updateQuantity, removeItem, CartItem } from '@/store/slices/cartSlice';
+import { toggleWishlist } from '@/store/slices/wishlistSlice';
 import { toast } from 'sonner';
 
 export default function CartPage() {
   const dispatch = useAppDispatch();
   const cartItems = useAppSelector((state) => state.cart.items);
+  const wishlistItems = useAppSelector((state) => state.wishlist.items);
   const subtotal = useAppSelector((state) => state.cart.totalAmount);
 
   const handleUpdateQuantity = (id: string, currentQty: number, delta: number) => {
@@ -24,6 +26,15 @@ export default function CartPage() {
 
   const handleRemoveItem = (id: string) => {
     dispatch(removeItem(id));
+  };
+
+  const handleSaveToWishlist = (items: CartItem[]) => {
+    items.map((item) => {
+      const isInWishlist = wishlistItems.some((i) => i.id === item.id);
+      if (!isInWishlist) {
+        dispatch(toggleWishlist(item));
+      }
+    });
   };
 
   const shipping = subtotal > 5000 || subtotal === 0 ? 0 : 50;
@@ -105,12 +116,30 @@ export default function CartPage() {
                           </h3>
                           <p className="text-sm text-neutral-black/60">{item.artist}</p>
                         </div>
-                        <button
-                          onClick={() => handleRemoveItem(item.id)}
-                          className="p-2 rounded-full hover:bg-red-50 text-neutral-black/40 hover:text-red-600 transition-all"
-                        >
-                          <Trash2 className="w-5 h-5" />
-                        </button>
+                        <div className="flex gap-2">
+                          {/* <button
+                            onClick={() => handleSaveToWishlist(item)}
+                            className={cn(
+                              'p-2 rounded-full transition-all',
+                              wishlistItems.some((i) => i.id === item.id)
+                                ? 'bg-red-50 text-red-600 hover:bg-red-100'
+                                : 'hover:bg-primary/10 text-neutral-black/40 hover:text-primary',
+                            )}
+                          >
+                            <Heart
+                              className={cn(
+                                'w-5 h-5',
+                                wishlistItems.some((i) => i.id === item.id) && 'fill-current',
+                              )}
+                            />
+                          </button> */}
+                          <button
+                            onClick={() => handleRemoveItem(item.id)}
+                            className="p-2 rounded-full hover:bg-red-50 text-neutral-black/40 hover:text-red-600 transition-all"
+                          >
+                            <Trash2 className="w-5 h-5" />
+                          </button>
+                        </div>
                       </div>
 
                       <div className="flex items-center justify-between mt-4">
@@ -239,6 +268,7 @@ export default function CartPage() {
 
                 <Button
                   variant="outline"
+                  onClick={() => handleSaveToWishlist(cartItems)}
                   className="w-full border-2 border-primary/20 hover:bg-primary/5 font-bold h-12 rounded-full"
                 >
                   <Heart className="w-5 h-5 mr-2" />

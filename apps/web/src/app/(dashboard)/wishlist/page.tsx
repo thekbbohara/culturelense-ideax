@@ -1,23 +1,25 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Heart, ShoppingCart, Trash2, ArrowRight, Sparkles } from 'lucide-react';
 import Link from 'next/link';
-import { dummyProducts } from '@/data/dummy-products';
 
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { toggleWishlist } from '@/store/slices/wishlistSlice';
 import { addItem } from '@/store/slices/cartSlice';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { Product } from '../marketplace/page';
+import { getRecentListings } from '@/actions/marketplace';
 
 export default function WishlistPage() {
   const dispatch = useAppDispatch();
   const wishlistItems = useAppSelector((state) => state.wishlist.items);
   const cartItems = useAppSelector((state) => state.cart.items);
+  const [listings, setListings] = useState<Product[]>([]);
 
   const handleRemoveItem = (item: any) => {
     dispatch(toggleWishlist(item));
@@ -68,6 +70,17 @@ export default function WishlistPage() {
     );
   }
 
+  const fetchListings = async () => {
+    const res = await getRecentListings();
+    if (res.success && res.data) {
+      setListings(res.data?.map((item) => ({ ...item, price: parseFloat(item.price) })));
+    }
+  };
+
+  useEffect(() => {
+    fetchListings();
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-neutral-white via-neutral-white to-primary/5">
       {/* Header */}
@@ -96,14 +109,14 @@ export default function WishlistPage() {
               {wishlistItems.filter((i) => i.availableQuantity > 0).length} Available
             </Badge>
           </div>
-          <div className="flex gap-3">
+          {/* <div className="flex gap-3">
             <Button
               variant="outline"
               className="border-2 border-primary/20 hover:bg-primary/5 font-bold rounded-full"
             >
               Share Wishlist
             </Button>
-          </div>
+          </div> */}
         </div>
 
         {/* Wishlist Grid */}
@@ -117,9 +130,9 @@ export default function WishlistPage() {
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.3, delay: index * 0.05 }}
                 layout
-                className="group"
+                className="group max-h-[450px]"
               >
-                <div className="bg-white rounded-2xl overflow-hidden border border-primary/10 hover:border-primary/20 transition-all shadow-sm hover:shadow-lg">
+                <div className="bg-white rounded-2xl overflow-hidden border border-primary/10 hover:border-primary/20 transition-all shadow-sm hover:shadow-lg flex flex-col h-full">
                   {/* Image */}
                   <div className="relative aspect-[3/4] bg-gradient-to-br from-neutral-white to-primary/5 overflow-hidden">
                     {item.isNew && (
@@ -208,7 +221,7 @@ export default function WishlistPage() {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {dummyProducts.slice(4, 8).map((item) => (
+            {listings.slice(0, 4).map((item) => (
               <Link key={item.id} href={`/marketplace/${item.id}`}>
                 <div className="group bg-white rounded-xl overflow-hidden border border-primary/10 hover:border-primary/20 transition-all">
                   <div className="aspect-square bg-gradient-to-br from-neutral-white to-primary/5 overflow-hidden">
