@@ -26,6 +26,8 @@ import {
 import Link from 'next/link';
 import { ProfileSettings } from '@/components/profile-settings';
 
+export const dynamic = 'force-dynamic';
+
 export default async function ProfilePage() {
     let user = null;
     let fullUserData = null;
