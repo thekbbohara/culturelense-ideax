@@ -1,18 +1,16 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, Heart, Tag } from 'lucide-react';
 import Link from 'next/link';
-import { dummyProducts } from '@/data/dummy-products';
 import { cn } from '@/lib/utils';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { updateQuantity, removeItem, CartItem } from '@/store/slices/cartSlice';
 import { toggleWishlist } from '@/store/slices/wishlistSlice';
-import { toast } from 'sonner';
 
 export default function CartPage() {
   const dispatch = useAppDispatch();
@@ -38,8 +36,7 @@ export default function CartPage() {
   };
 
   const shipping = subtotal > 5000 || subtotal === 0 ? 0 : 50;
-  const tax = subtotal * 0.1;
-  const total = subtotal + shipping + tax;
+  const total = subtotal + shipping;
 
   if (cartItems.length === 0) {
     return (
@@ -230,10 +227,10 @@ export default function CartPage() {
                       )}
                     </span>
                   </div>
-                  <div className="flex justify-between text-neutral-black/70">
+                  {/* <div className="flex justify-between text-neutral-black/70">
                     <span>Tax (10%)</span>
                     <span className="font-semibold">Rs.{tax.toFixed(2)}</span>
-                  </div>
+                  </div> */}
 
                   <Separator className="bg-primary/10" />
 
@@ -261,9 +258,14 @@ export default function CartPage() {
                   </div>
                 )}
 
-                <Button className="w-full bg-primary hover:bg-primary/90 text-white font-bold h-14 rounded-full shadow-lg shadow-primary/30 mb-3">
-                  Proceed to Checkout
-                  <ArrowRight className="w-5 h-5 ml-2" />
+                <Button
+                  asChild
+                  className="w-full bg-primary hover:bg-primary/90 text-white font-bold h-14 rounded-full shadow-lg shadow-primary/30 mb-3"
+                >
+                  <Link href="/checkout">
+                    Proceed to Checkout
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </Link>
                 </Button>
 
                 <Button
