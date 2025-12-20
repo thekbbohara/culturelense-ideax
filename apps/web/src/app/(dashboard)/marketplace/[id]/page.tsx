@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { FeedbackForm } from '@/components/marketplace/FeedbackForm';
 import { ReviewsList } from '@/components/marketplace/ReviewsList';
 import { Button } from '@/components/ui/button';
@@ -16,13 +16,28 @@ import { toggleWishlist } from '@/store/slices/wishlistSlice';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
-import { Product } from '../page';
+import { createClient } from '@/lib/supabase/client';
+
+export type Product = {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  imageUrl: string;
+  quantity: number;
+  vendorId: string;
+  vendorUserId?: string | null;
+  artist?: string | null;
+  isNew?: boolean;
+};
 
 export default function ProductDetailPage({ params }: { params: { id: string } }) {
   const [product, setProduct] = React.useState<Product | null>(null);
   const [similarProducts, setSimilarProducts] = React.useState<Product[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
+  const [userId, setUserId] = React.useState<string | undefined>(undefined);
+  const [reviewsKey, setReviewsKey] = useState(0); // Trigger for refreshing ReviewsList
 
   const dispatch = useAppDispatch();
   const isInWishlist = useAppSelector((state) =>
@@ -76,10 +91,22 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
     }
   };
 
+  const handleReviewSuccess = () => {
+    setReviewsKey((prev) => prev + 1);
+  };
+
   React.useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       setError(null);
+
+      // Get current user
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      setUserId(user?.id);
+
       const res = await getListingById(params.id);
 
       if (res.success && res.data) {
@@ -327,12 +354,17 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
               </h3>
 
               {/* Existing Reviews */}
-              <ReviewsList />
+              <ReviewsList key={reviewsKey} listingId={params.id} />
 
               {/* Feedback Form */}
               <div>
                 <h4 className="text-xl font-bold text-neutral-black mb-4">Write a Review</h4>
-                <FeedbackForm />
+                <FeedbackForm
+                  listingId={params.id}
+                  userId={userId}
+                  vendorUserId={product.vendorUserId}
+                  onSuccess={handleReviewSuccess}
+                />
               </div>
             </div>
           </motion.div>

@@ -258,7 +258,7 @@ export const reviews = pgTable('reviews', {
   listingId: uuid('listing_id')
     .references(() => listings.id)
     .notNull(),
-  buyerId: uuid('buyer_id')
+  userId: uuid('user_id')
     .references(() => users.id)
     .notNull(),
   rating: text('rating').notNull(), // 1-5 stored as text
@@ -409,8 +409,8 @@ export const reviewsRelations = relations(reviews, ({ one }) => ({
     fields: [reviews.listingId],
     references: [listings.id],
   }),
-  buyer: one(users, {
-    fields: [reviews.buyerId],
+  user: one(users, {
+    fields: [reviews.userId],
     references: [users.id],
   }),
 }));
