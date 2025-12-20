@@ -2,7 +2,7 @@
 
 import { db } from "@/db";
 import { culturalEntities, searchHistory } from "@/db/schema";
-import { ilike, or, sql, asc } from "drizzle-orm";
+import { ilike, or, sql, asc, and, eq } from "drizzle-orm";
 import { createClient } from "@/lib/supabase/server";
 
 export type SearchResult = {
@@ -17,6 +17,15 @@ export type SearchResult = {
 export async function searchEntities(query: string): Promise<SearchResult[]> {
   if (!query || query.length < 2) return [];
 
+  const relevance = sql<number>`
+    CASE
+      WHEN ${culturalEntities.name} ILIKE ${query + '%'} THEN 1
+      WHEN ${culturalEntities.name} ILIKE ${'%' + query + '%'} THEN 2
+      WHEN ${culturalEntities.description} ILIKE ${'%' + query + '%'} THEN 3
+      ELSE 4
+    END
+  `;
+
   try {
     const results = await db
       .select({
@@ -25,26 +34,19 @@ export async function searchEntities(query: string): Promise<SearchResult[]> {
         slug: culturalEntities.slug,
         type: culturalEntities.type,
         imageUrl: culturalEntities.imageUrl,
-        // Calculate relevance score:
-        // 1: Starts effectively with query (high priority)
-        // 2: Contains query in name
-        // 3: Contains query in description
-        relevance: sql<number>`
-          CASE 
-            WHEN ${culturalEntities.name} ILIKE ${query + '%'} THEN 1
-            WHEN ${culturalEntities.name} ILIKE ${'%' + query + '%'} THEN 2
-            ELSE 3
-          END
-        `.as('relevance')
+        relevance
       })
       .from(culturalEntities)
       .where(
-        or(
-          ilike(culturalEntities.name, `%${query}%`),
-          ilike(culturalEntities.description, `%${query}%`)
+        and(
+          eq(culturalEntities.type, "deity"),
+          or(
+            ilike(culturalEntities.name, `%${query}%`), 
+            ilike(culturalEntities.description, `%${query}%`)
+          )
         )
       )
-      .orderBy(asc(sql`relevance`), asc(culturalEntities.name))
+      .orderBy(asc(relevance), asc(culturalEntities.name))
       .limit(5);
 
     return results;
@@ -53,6 +55,7 @@ export async function searchEntities(query: string): Promise<SearchResult[]> {
     return [];
   }
 }
+
 
 export async function addToSearchHistory(term: string) {
   try {

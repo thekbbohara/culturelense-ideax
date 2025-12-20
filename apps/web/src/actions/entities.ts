@@ -139,7 +139,7 @@ export async function getRelatedEntities(entityId: string) {
         eq(culturalEntities.type, current.type),
         ne(culturalEntities.id, entityId)
       ),
-      limit: 3,
+      limit: 5,
     });
     
     return related;

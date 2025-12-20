@@ -20,11 +20,14 @@ export default async function ExplorePage() {
   });
 
   return (
-    <div className="h-screen flex flex-col px-4 md:px-6 gap-4 overflow-hidden">
-      <div className="flex-1 min-h-0 pb-6">
-        <div className="">
+    <div className="h-[calc(100vh-4rem)] flex flex-col overflow-hidden">
+      <div className="px-6 flex items-center gap-3 py-3">
+        <div className="w-2 h-8 rounded-full bg-secondary" />
+        <h2 className="text-2xl lg:text-3xl font-serif font-black italic text-txt">
           Places you have been to:
-        </div>
+        </h2>
+      </div>
+      <div className="flex-1 min-h-0 relative pb-20">
         <HydrationBoundary state={dehydrate(queryClient)}>
           <Map />
         </HydrationBoundary>
