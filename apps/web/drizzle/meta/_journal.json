@@ -22,6 +22,20 @@
       "when": 1766163130124,
       "tag": "0002_low_wolfsbane",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1766228904246,
+      "tag": "0003_superb_omega_red",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1766234577962,
+      "tag": "0004_elite_sebastian_shaw",
+      "breakpoints": true
     }
   ]
 }
