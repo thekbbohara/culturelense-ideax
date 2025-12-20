@@ -5,9 +5,18 @@ import { motion } from 'framer-motion';
 interface MarketplaceHeaderProps {
   selectedSort: string;
   onSortChange: (sort: string) => void;
+  search: string;
+  onSearchChange: (value: string) => void;
+  onSearchSubmit: () => void;
 }
 
-export const MarketplaceHeader = ({ selectedSort, onSortChange }: MarketplaceHeaderProps) => {
+export const MarketplaceHeader = ({
+  selectedSort,
+  onSortChange,
+  search,
+  onSearchChange,
+  onSearchSubmit,
+}: MarketplaceHeaderProps) => {
   const sortOptions = [
     'All',
     'New Arrivals',
@@ -24,6 +33,9 @@ export const MarketplaceHeader = ({ selectedSort, onSortChange }: MarketplaceHea
           <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           <input
             type="text"
+            value={search}
+            onChange={(e) => onSearchChange(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && onSearchSubmit()}
             placeholder="Search sculptures, artists, or styles..."
             className="w-full h-14 pl-14 pr-6 rounded-full border-2 border-border bg-card focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 transition-all text-foreground placeholder:text-muted-foreground font-medium shadow-sm"
           />

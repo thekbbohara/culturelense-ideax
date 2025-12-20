@@ -6,11 +6,13 @@ import {
   getCategories,
   getMaxPrice,
   getFeaturedListings,
+  recordSearch,
   ListingFilters,
 } from '@/actions/marketplace';
 import { ProductCard } from '@/components/marketplace/ProductCard';
 import { FilterSidebar } from '@/components/marketplace/FilterSidebar';
 import { MarketplaceHeader } from '@/components/marketplace/MarketplaceHeader';
+import { createClient } from '@/lib/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, TrendingUp, PackageSearch, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -42,6 +44,7 @@ export default function MarketplacePage() {
   const [priceRange, setPriceRange] = useState<number[]>([0, 10000]);
   const [dynamicMaxPrice, setDynamicMaxPrice] = useState<number>(10000);
   const [selectedSort, setSelectedSort] = useState<string>('All');
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -56,6 +59,7 @@ export default function MarketplacePage() {
         minPrice: priceRange[0],
         maxPrice: priceRange[1],
         sortBy: selectedSort,
+        search: searchQuery || undefined,
         page: currentPage,
         limit: 9,
         ...filters,
@@ -74,7 +78,46 @@ export default function MarketplacePage() {
       }
       setIsLoading(false);
     },
-    [currentPage, selectedCategory, selectedSort, priceRange],
+    [currentPage, selectedCategory, selectedSort, priceRange, searchQuery],
+  );
+
+  const handleSearchSubmit = async () => {
+    setCurrentPage(1);
+    fetchItems({ search: searchQuery, page: 1 });
+    fetchFeaturedItemsData({ search: searchQuery });
+
+    // Record search history for logged in user
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (user) {
+      await recordSearch(user.id, searchQuery);
+    }
+  };
+
+  const fetchFeaturedItemsData = useCallback(
+    async (filters: ListingFilters = {}) => {
+      const res = await getFeaturedListings({
+        categoryId: selectedCategory === 'all' ? undefined : selectedCategory,
+        minPrice: priceRange[0],
+        maxPrice: priceRange[1],
+        search: searchQuery || undefined,
+        ...filters,
+      });
+
+      if (res.success && res.data) {
+        setFeaturedItems(
+          res.data.map((item: any) => ({
+            ...item,
+            price: parseFloat(item.price) || 0,
+            isNew:
+              new Date().getTime() - new Date(item.createdAt).getTime() < 7 * 24 * 60 * 60 * 1000,
+          })),
+        );
+      }
+    },
+    [selectedCategory, priceRange, searchQuery],
   );
 
   useEffect(() => {
@@ -91,25 +134,14 @@ export default function MarketplacePage() {
         setPriceRange([0, res.data]);
       }
     });
-
-    // Fetch Featured Items (cached/static for this session)
-    getFeaturedListings().then((res) => {
-      if (res.success && res.data) {
-        setFeaturedItems(
-          res.data.map((item: any) => ({
-            ...item,
-            price: parseFloat(item.price) || 0,
-            isNew:
-              new Date().getTime() - new Date(item.createdAt).getTime() < 7 * 24 * 60 * 60 * 1000,
-          })),
-        );
-      }
-    });
   }, []);
 
   useEffect(() => {
     fetchItems();
-  }, [currentPage, fetchItems]);
+    if (currentPage === 1) {
+      fetchFeaturedItemsData();
+    }
+  }, [currentPage, fetchItems, fetchFeaturedItemsData]);
 
   const handleApplyFilters = () => {
     setCurrentPage(1);
@@ -119,10 +151,23 @@ export default function MarketplacePage() {
   const handleClearFilters = () => {
     setSelectedCategory('all');
     setPriceRange([0, dynamicMaxPrice]);
+    setSearchQuery('');
     setCurrentPage(1);
     // fetchItems will be triggered by handleApplyFilters or useEffect if we change these,
     // but for clear we manually reset and fetch.
-    fetchItems({ categoryId: undefined, minPrice: 0, maxPrice: dynamicMaxPrice, page: 1 });
+    fetchItems({
+      categoryId: undefined,
+      minPrice: 0,
+      maxPrice: dynamicMaxPrice,
+      search: undefined,
+      page: 1,
+    });
+    fetchFeaturedItemsData({
+      categoryId: undefined,
+      minPrice: 0,
+      maxPrice: dynamicMaxPrice,
+      search: undefined,
+    });
   };
 
   const handleSortChange = (sort: string) => {
@@ -167,7 +212,13 @@ export default function MarketplacePage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12">
-        <MarketplaceHeader selectedSort={selectedSort} onSortChange={handleSortChange} />
+        <MarketplaceHeader
+          selectedSort={selectedSort}
+          onSortChange={handleSortChange}
+          search={searchQuery}
+          onSearchChange={setSearchQuery}
+          onSearchSubmit={handleSearchSubmit}
+        />
 
         <div className="flex flex-col lg:flex-row gap-8 mt-8">
           {/* Filter Sidebar */}
@@ -188,21 +239,21 @@ export default function MarketplacePage() {
 
           {/* Main Content */}
           <main className="flex-1 space-y-16">
-            {/* Featured Section - Only when no filters/sort applied or as a pinned section */}
-            {featuredItems.length > 0 && currentPage === 1 && selectedCategory === 'all' && (
+            {/* Featured Section - Always visible on first page if items exist */}
+            {featuredItems.length > 0 && currentPage === 1 && (
               <section>
                 <div className="flex items-center gap-3 mb-6">
                   <TrendingUp className="w-5 h-5 text-primary" />
                   <h2 className="text-2xl font-serif font-black italic">Featured Masterpieces</h2>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {featuredItems.map((item: Product) => (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {featuredItems?.slice(0, 2)?.map((item: Product) => (
                     <motion.div
                       key={item.id}
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ duration: 0.4 }}
-                      className="relative group"
+                      className="relative group max-h-[600px]"
                     >
                       <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-3xl blur-xl group-hover:blur-2xl transition-all opacity-0 group-hover:opacity-100" />
                       <ProductCard
@@ -267,6 +318,7 @@ export default function MarketplacePage() {
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.4, delay: index * 0.05 }}
+                          className="max-h-[400px]"
                         >
                           <ProductCard
                             id={item.id}

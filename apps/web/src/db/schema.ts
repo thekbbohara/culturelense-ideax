@@ -182,7 +182,6 @@ export const listings = pgTable('listings', {
   price: text('price').notNull(),
   quantity: integer('quantity').notNull(),
   imageUrl: text('image_url').notNull(),
-  isFeatured: boolean('is_featured').default(false).notNull(),
   status: listingStatusEnum('status').default('active').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });

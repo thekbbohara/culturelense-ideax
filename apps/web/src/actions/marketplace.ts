@@ -1,7 +1,23 @@
 'use server';
 
 import { db } from '@/lib/db';
-import { listings, vendors, categories, eq, desc, asc, and, gte, lte, sql } from '@/db';
+import {
+  listings,
+  vendors,
+  categories,
+  searchHistory,
+  culturalEntities,
+  eq,
+  desc,
+  asc,
+  and,
+  gte,
+  lte,
+  sql,
+  ilike,
+  or,
+  inArray,
+} from '@/db';
 
 export async function getCategories() {
   try {
@@ -26,8 +42,115 @@ export async function getMaxPrice() {
   }
 }
 
-export async function getFeaturedListings() {
+export async function recordSearch(userId: string, query: string) {
+  if (!query.trim()) return;
   try {
+    await db.insert(searchHistory).values({
+      userId,
+      query: query.trim(),
+    });
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to record search:', error);
+    return { success: false };
+  }
+}
+
+export async function getFeaturedListings(filters: ListingFilters = {}) {
+  try {
+    // 1. Get most searched queries
+    const topSearches = await db
+      .select({
+        query: searchHistory.query,
+        count: sql<number>`count(*)`,
+      })
+      .from(searchHistory)
+      .groupBy(searchHistory.query)
+      .orderBy(desc(sql`count(*)`))
+      .limit(5);
+
+    const whereConditions: any[] = [eq(listings.status, 'active')];
+
+    if (filters.categoryId && filters.categoryId !== 'all') {
+      whereConditions.push(eq(listings.categoryId, filters.categoryId));
+    }
+
+    if (filters.search) {
+      whereConditions.push(
+        or(
+          ilike(listings.title, `%${filters.search}%`),
+          ilike(listings.description, `%${filters.search}%`),
+        ),
+      );
+    }
+
+    if (filters.minPrice !== undefined) {
+      whereConditions.push(gte(sql`CAST(${listings.price} AS DECIMAL)`, filters.minPrice));
+    }
+
+    if (filters.maxPrice !== undefined) {
+      whereConditions.push(lte(sql`CAST(${listings.price} AS DECIMAL)`, filters.maxPrice));
+    }
+
+    if (topSearches.length === 0) {
+      const fallbackItems = await db
+        .select({
+          id: listings.id,
+          vendorId: listings.vendorId,
+          entityId: listings.entityId,
+          categoryId: listings.categoryId,
+          title: listings.title,
+          description: listings.description,
+          price: listings.price,
+          quantity: listings.quantity,
+          imageUrl: listings.imageUrl,
+          status: listings.status,
+          createdAt: listings.createdAt,
+          artist: vendors.businessName,
+        })
+        .from(listings)
+        .leftJoin(vendors, eq(listings.vendorId, vendors.id))
+        .where(and(...whereConditions))
+        .orderBy(desc(listings.createdAt))
+        .limit(6);
+      return { success: true, data: fallbackItems };
+    }
+
+    const queries = topSearches.map((s) => s.query);
+
+    // 2. Find entities matching these queries
+    const matchingEntities = await db
+      .select({ id: culturalEntities.id })
+      .from(culturalEntities)
+      .where(or(...queries.map((q) => ilike(culturalEntities.name, `%${q}%`))));
+
+    const entityIds = matchingEntities.map((e) => e.id);
+
+    if (entityIds.length === 0) {
+      const fallbackItems = await db
+        .select({
+          id: listings.id,
+          vendorId: listings.vendorId,
+          entityId: listings.entityId,
+          categoryId: listings.categoryId,
+          title: listings.title,
+          description: listings.description,
+          price: listings.price,
+          quantity: listings.quantity,
+          imageUrl: listings.imageUrl,
+          status: listings.status,
+          createdAt: listings.createdAt,
+          artist: vendors.businessName,
+        })
+        .from(listings)
+        .leftJoin(vendors, eq(listings.vendorId, vendors.id))
+        .where(and(...whereConditions))
+        .orderBy(desc(listings.createdAt))
+        .limit(6);
+      return { success: true, data: fallbackItems };
+    }
+
+    // 3. Get listings for these entities with filters applied
     const items = await db
       .select({
         id: listings.id,
@@ -45,7 +168,7 @@ export async function getFeaturedListings() {
       })
       .from(listings)
       .leftJoin(vendors, eq(listings.vendorId, vendors.id))
-      .where(and(eq(listings.status, 'active'), eq(listings.isFeatured, true)))
+      .where(and(...whereConditions, inArray(listings.entityId, entityIds as string[])))
       .limit(6);
 
     return { success: true, data: items };
@@ -61,6 +184,7 @@ export interface ListingFilters {
   maxPrice?: number;
   status?: string;
   sortBy?: string;
+  search?: string;
   page?: number;
   limit?: number;
 }
@@ -71,12 +195,21 @@ export async function getRecentListings(filters: ListingFilters = {}) {
     const limit = filters.limit || 9;
     const offset = (page - 1) * limit;
 
-    const whereConditions = [
+    const whereConditions: any[] = [
       eq(listings.status, (filters.status as 'active' | 'draft' | 'sold' | 'archived') || 'active'),
     ];
 
     if (filters.categoryId && filters.categoryId !== 'all') {
       whereConditions.push(eq(listings.categoryId, filters.categoryId));
+    }
+
+    if (filters.search) {
+      whereConditions.push(
+        or(
+          ilike(listings.title, `%${filters.search}%`),
+          ilike(listings.description, `%${filters.search}%`),
+        ),
+      );
     }
 
     if (filters.minPrice !== undefined) {
