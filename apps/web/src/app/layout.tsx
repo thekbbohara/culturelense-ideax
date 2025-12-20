@@ -33,9 +33,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 e.preventDefault();
                 window.pwaEvent = e;
               });
+              
+              function googleTranslateElementInit() {
+                new google.translate.TranslateElement({
+                  pageLanguage: 'en',
+                  includedLanguages: 'en,es,fr,hi,ne',
+                  layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                  autoDisplay: false
+                }, 'google_translate_element');
+              }
             `,
           }}
         />
+        <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
       </head>
       <body>
         <QueryProvider>
