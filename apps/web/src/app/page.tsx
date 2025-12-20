@@ -22,7 +22,7 @@ import { usePWAInstall } from "@/components/pwa-provider";
 import { LanguageSelector } from "@/components/language-selector";
 
 export default function LandingPage() {
-  const [isScanning, setIsScanning] = React.useState(false);
+  const [isScanning] = React.useState(false);
   const { install } = usePWAInstall();
 
   const handleLogin = async () => {
@@ -40,13 +40,13 @@ export default function LandingPage() {
       {/* Navigation */}
       <nav className="fixed top-0 w-full z-50 bg-neutral-white/90 backdrop-blur-xl border-b border-primary/10">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-              <span className="text-white font-serif text-xl font-bold italic">C</span>
-            </div>
-            <span className="font-serif text-2xl font-black tracking-tighter uppercase">CultureLense</span>
-          </div>
-
+          <Image
+            src="/cultureLense.png"
+            alt="CultureLense Logo"
+            width={50}
+            height={50}
+            className="w-12 h-12 object-cover rounded-full"
+          />
           <div className="flex items-center gap-4">
             <LanguageSelector variant="minimal" />
             <Button onClick={handleLogin} className="rounded-full border-neutral-black font-bold uppercase tracking-widest text-[10px] px-6 hover:bg-neutral-black/80 hover:text-white transition-all">
@@ -148,16 +148,16 @@ export default function LandingPage() {
         {/* Mission Section */}
         {/* Mission Section */}
         <section className="relative overflow-hidden bg-neutral-950 text-white">
-           {/* Background Decoration */}
-           <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-secondary/5 rounded-full blur-[120px] pointer-events-none" />
-           
-           {/* Fade Transitions - Extended for smoothness */}
-           <div className="absolute top-0 inset-x-0 h-64 bg-gradient-to-b from-white via-white/40 to-transparent z-10 pointer-events-none" />
-           <div className="absolute bottom-0 inset-x-0 h-64 bg-gradient-to-t from-white via-white/40 to-transparent z-10 pointer-events-none" />
+          {/* Background Decoration */}
+          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-secondary/5 rounded-full blur-[120px] pointer-events-none" />
+
+          {/* Fade Transitions - Extended for smoothness */}
+          <div className="absolute top-0 inset-x-0 h-64 bg-gradient-to-b from-white via-white/40 to-transparent z-10 pointer-events-none" />
+          <div className="absolute bottom-0 inset-x-0 h-64 bg-gradient-to-t from-white via-white/40 to-transparent z-10 pointer-events-none" />
 
           <div className="max-w-7xl mx-auto px-6 relative z-20 py-48">
             <div className="flex flex-col lg:flex-row gap-16 items-center">
-              
+
               {/* Left Content */}
               <div className="flex-1 space-y-10">
                 <div>
@@ -165,8 +165,8 @@ export default function LandingPage() {
                     Our Mission
                   </Badge>
                   <h2 className="text-4xl md:text-5xl font-serif font-black leading-tight text-white italic tracking-tighter drop-shadow-2xl">
-                    Preserve. <br/>
-                    Promote. <br/>
+                    Preserve. <br />
+                    Promote. <br />
                     <span className="text-secondary not-italic">Prosper.</span>
                   </h2>
                 </div>
@@ -176,7 +176,7 @@ export default function LandingPage() {
                     {
                       title: "Awaken History",
                       desc: "Decoding iconography with AI to reveal myths behind the marble.",
-                      color: "bg-blue-500/20 text-blue-300" 
+                      color: "bg-blue-500/20 text-blue-300"
                     },
                     {
                       title: "Preserve Legacy",
@@ -191,10 +191,10 @@ export default function LandingPage() {
                     {
                       title: "Democratize Access",
                       desc: "Making cultural wisdom universally accessible across language barriers.",
-                       color: "bg-purple-500/20 text-purple-300"
+                      color: "bg-purple-500/20 text-purple-300"
                     }
                   ].map((goal, i) => (
-                    <motion.div 
+                    <motion.div
                       key={i}
                       whileHover={{ y: -5 }}
                       className="p-6 rounded-3xl bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all shadow-xl"
@@ -209,20 +209,20 @@ export default function LandingPage() {
 
               {/* Right Image */}
               <div className="flex-1 relative w-full aspect-[4/5] lg:aspect-square max-w-lg lg:max-w-none mx-auto">
-                 <div className="absolute inset-0 bg-gradient-to-tr from-secondary/20 to-primary/20 rounded-[3rem] rotate-3 blur-2xl" />
-                 <div className="relative h-full w-full rounded-[2.5rem] overflow-hidden border border-white/10 shadow-2xl">
-                    <Image
-                      src="/sclupture/shiva.webp"
-                      alt="Cultural preservation"
-                      fill
-                      className="object-cover scale-110"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-neutral-black/80 via-transparent to-transparent" />
-                    <div className="absolute bottom-8 left-8 right-8">
-                       <p className="text-xs font-mono text-white/60 uppercase tracking-widest mb-2">Figure 01</p>
-                       <p className="text-2xl font-serif italic text-white">The Guardian of Lineage</p>
-                    </div>
-                 </div>
+                <div className="absolute inset-0 bg-gradient-to-tr from-secondary/20 to-primary/20 rounded-[3rem] rotate-3 blur-2xl" />
+                <div className="relative h-full w-full rounded-[2.5rem] overflow-hidden border border-white/10 shadow-2xl">
+                  <Image
+                    src="/sclupture/shiva.webp"
+                    alt="Cultural preservation"
+                    fill
+                    className="object-cover scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-neutral-black/80 via-transparent to-transparent" />
+                  <div className="absolute bottom-8 left-8 right-8">
+                    <p className="text-xs font-mono text-white/60 uppercase tracking-widest mb-2">Figure 01</p>
+                    <p className="text-2xl font-serif italic text-white">The Guardian of Lineage</p>
+                  </div>
+                </div>
               </div>
 
             </div>
@@ -318,12 +318,12 @@ export default function LandingPage() {
                 {
                   title: 'The Knowledge Web',
                   desc: 'We are mapping the "DNA" of our mythology. Our proprietary Cultural Graph links every deity to their lineage, temples, and legends, turning isolated facts into a living tapestry of knowledge.',
-                   icon: <Network className="w-8 h-8" />
+                  icon: <Network className="w-8 h-8" />
                 },
                 {
                   title: 'Trust-Based Commerce',
                   desc: 'We enable culture to sustain itself. Our verified vendor system and secure escrow transactions ensure that every purchase is authentic, transparent, and directly supports the preservation of the art form.',
-                   icon: <ShieldCheck className="w-8 h-8" />
+                  icon: <ShieldCheck className="w-8 h-8" />
                 }
               ].map((item, i) => (
                 <div key={i} className="group p-10 rounded-[2.5rem] bg-neutral-50 border border-neutral-200 hover:border-neutral-300 transition-all hover:shadow-2xl hover:shadow-neutral-black/5">
@@ -385,7 +385,7 @@ export default function LandingPage() {
                 <motion.div
                   animate={{ y: [0, -20, 0] }}
                   transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute -bottom-16 sm:-bottom-8 sm:-left-10 z-[20] p-4 sm:p-8 max-w-xs rounded-3xl bg-white/20 backdrop-blur-md shadow-2xl border border-white/30"
+                  className="absolute -bottom-16 sm:-bottom-8 sm:-left-6 z-[20] p-4 sm:p-8 sm:max-w-xs rounded-3xl bg-white/20 backdrop-blur-md shadow-2xl border border-white/30"
 
                 >
                   <div className="flex items-center gap-4 mb-4">
@@ -440,16 +440,21 @@ export default function LandingPage() {
       <footer className="bg-neutral-white border-t border-primary/10 py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-20">
-            <div className="md:col-span-2">
-              <div className="flex items-center gap-2 mb-8">
-                <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-                  <span className="text-white font-serif text-xl font-bold italic">C</span>
-                </div>
-                <span className="font-serif text-2xl font-black tracking-tighter uppercase">CultureLense</span>
+            <div className="flex gap-10 md:col-span-2">
+              <Image
+                src="/cultureLense.png"
+                alt="CultureLense Logo"
+                width={50}
+                height={50}
+                className="w-20 h-20 object-cover rounded-full"
+              />
+              <div className="flex flex-col gap-6 leading-relaxed">
+                <p className="text-neutral-black/60 max-w-sm text-lg font-semibold ">
+                  The world&apos;s leading platform for sculpture identification, promotion, and collection. Bridging 5,000 years of art with modern spatial AI.
+                </p>
+                <p className="text-stxt max-w-sm text-base ">
+                  Give it a try and explore the rich history and depth of every sculpture.                </p>
               </div>
-              <p className="text-neutral-black/60 max-w-sm text-lg font-light leading-relaxed">
-                The world&apos;s leading platform for sculpture identification, promotion, and collection. Bridging 5,000 years of art with modern spatial AI.
-              </p>
             </div>
 
             <div>

@@ -40,8 +40,11 @@ export default function CheckoutPage() {
 
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const cartItems = useAppSelector((state) => state.cart.items);
-  const subtotal = useAppSelector((state) => state.cart.totalAmount);
+  const { userId } = useAppSelector((state) => state.auth);
+  const effectiveUserId = userId || 'guest';
+
+  const cartItems = useAppSelector((state) => state.cart.itemsByUserId[effectiveUserId] || []);
+  const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   const shipping = subtotal > 5000 || subtotal === 0 ? 0 : 50;
   const total = subtotal + shipping;
@@ -90,7 +93,7 @@ export default function CheckoutPage() {
       const result = await createOrders(orderData);
 
       if (result.success) {
-        dispatch(clearCart());
+        dispatch(clearCart(effectiveUserId));
         setStep('success');
         toast.success('Order placed successfully!');
       } else {

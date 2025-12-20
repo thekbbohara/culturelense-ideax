@@ -102,7 +102,8 @@ export async function getEntitiesSlugs(): Promise<{ success: boolean; data: stri
   try {
     const result = await db
       .select({ slug: culturalEntities.slug })
-      .from(culturalEntities);
+      .from(culturalEntities)
+      .where(eq(culturalEntities.type, "deity")); // remove this to get the type "temples" too
 
     return { success: true, data: result.map(row => row.slug) };
   } catch (error) {
@@ -141,7 +142,7 @@ export async function getRelatedEntities(entityId: string) {
       ),
       limit: 5,
     });
-    
+
     return related;
   } catch (error) {
     console.error("Failed to fetch related entities:", error);

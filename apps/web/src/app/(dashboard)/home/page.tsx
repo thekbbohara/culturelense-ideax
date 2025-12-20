@@ -146,14 +146,14 @@ export default function HomePage() {
           // POPULATED STATE
           <div className="space-y-12 lg:space-y-20 px-0 lg:px-6 max-w-7xl mx-auto pt-8 lg:pt-16 w-full">
             {/* =======================================================
-                            FEATURED SECTION
+                             RECENTLY Watched 
                            ======================================================= */}
             <section>
               <div className="px-6 flex items-center justify-between mb-6 lg:mb-8">
                 <div className="px-6 flex items-center gap-3 mb-6 lg:mb-8">
                   <div className="w-2 h-8 rounded-full bg-secondary" />
                   <h2 className="text-2xl lg:text-3xl font-serif font-black italic text-txt">
-                    Featuerd Today
+                    Recently Watched
                   </h2>
                 </div>
               </div>

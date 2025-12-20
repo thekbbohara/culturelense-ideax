@@ -648,3 +648,78 @@ export async function getVendorEarnings() {
         return { success: false, error: 'Failed to fetch earnings' };
     }
 }
+
+/**
+ * Get current user's balance
+ */
+export async function getUserBalance() {
+    try {
+        const supabase = await createClient();
+        const {
+            data: { user },
+        } = await supabase.auth.getUser();
+
+        if (!user) {
+            return { success: false, error: 'Not authenticated' };
+        }
+
+        const balance = await db.query.userBalances.findFirst({
+            where: eq(userBalances.userId, user.id),
+        });
+
+        return {
+            success: true,
+            data: {
+                balance: balance?.balance || '0',
+                currency: balance?.currency || 'USD',
+            },
+        };
+    } catch (error: any) {
+        console.error('[Payment] getUserBalance error:', error);
+        return { success: false, error: 'Failed to fetch balance' };
+    }
+}
+
+/**
+ * Add funds to user balance (Demo/Simulation)
+ */
+export async function addBalance(amount: number) {
+    try {
+        const supabase = await createClient();
+        const {
+            data: { user },
+        } = await supabase.auth.getUser();
+
+        if (!user) {
+            return { success: false, error: 'Not authenticated' };
+        }
+
+        const balanceRecord = await db.query.userBalances.findFirst({
+            where: eq(userBalances.userId, user.id),
+        });
+
+        if (balanceRecord) {
+            await db
+                .update(userBalances)
+                .set({
+                    balance: sql`CAST(${userBalances.balance} AS NUMERIC) + ${amount}`,
+                    updatedAt: new Date(),
+                })
+                .where(eq(userBalances.userId, user.id));
+        } else {
+            await db.insert(userBalances).values({
+                userId: user.id,
+                balance: amount.toString(),
+                currency: 'USD',
+            });
+        }
+
+        revalidatePath('/profile');
+        revalidatePath('/marketplace');
+
+        return { success: true };
+    } catch (error: any) {
+        console.error('[Payment] addBalance error:', error);
+        return { success: false, error: 'Failed to add balance' };
+    }
+}

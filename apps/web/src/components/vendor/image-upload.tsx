@@ -60,7 +60,7 @@ export function ImageUpload({ value, onChange, onFileChange, disabled }: ImageUp
       />
 
       {value ? (
-        <div className="relative w-full aspect-square md:aspect-video max-h-[500px] rounded-lg overflow-hidden border border-border shadow-sm group">
+        <div className="relative w-full aspect-square md:aspect-[5/4] rounded-lg overflow-hidden border border-border shadow-sm group">
           <Image
             src={value}
             alt="Product image"

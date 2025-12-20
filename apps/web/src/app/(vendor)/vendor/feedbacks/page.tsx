@@ -49,17 +49,17 @@ export default function FeedbacksPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-serif font-black italic text-foreground">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-black italic text-foreground">
             Customer Feedbacks
           </h1>
-          <p className="text-muted-foreground mt-2">
+          <p className="text-sm sm:text-base text-muted-foreground mt-1 sm:mt-2">
             View and manage customer reviews for your products
           </p>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="text-right">
+        <div className="flex items-center gap-4 self-start sm:self-auto">
+          <div className="text-left sm:text-right">
             <div className="flex items-center gap-1 text-primary">
               <Star className="w-5 h-5 fill-primary" />
               <span className="text-2xl font-bold">{averageRating}</span>
@@ -70,10 +70,10 @@ export default function FeedbacksPage() {
       </div>
 
       {/* Filter */}
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
         <label className="text-sm font-medium text-foreground">Filter by rating:</label>
         <Select value={ratingFilter} onValueChange={setRatingFilter}>
-          <SelectTrigger className="w-[180px] focus:ring-primary">
+          <SelectTrigger className="w-full sm:w-[180px] focus:ring-primary">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

@@ -48,10 +48,17 @@ export default function AddProductPage() {
     <div className="mx-auto space-y-6">
       {/* ... header ... */}
 
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-semibold">Add New Product</h2>
-        <Button variant="outline" onClick={() => router.push('/vendor/products')} className="flex items-center gap-3 border-primary text-primary hover:bg-primary hover:text-white ease-linear duration-200">
-          <MoveLeft />
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h2 className="text-2xl sm:text-3xl font-semibold">Add New Product</h2>
+          <p className="text-sm text-muted-foreground mt-1">Create a new listing for your store</p>
+        </div>
+        <Button
+          variant="outline"
+          onClick={() => router.push('/vendor/products')}
+          className="w-full sm:w-auto flex items-center justify-center gap-2 border-primary text-primary hover:bg-primary hover:text-white px-4 h-11 sm:h-10"
+        >
+          <MoveLeft className="w-4 h-4" />
           Back to Products
         </Button>
       </div>
