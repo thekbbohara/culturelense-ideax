@@ -1,7 +1,8 @@
 import React from 'react';
-import { SidebarProvider } from '@/components/ui/sidebar';
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { VendorSidebarNav } from '@/components/vendor/vendor-sidebar-nav';
-import { VendorMobileNav } from '@/components/vendor/vendor-mobile-nav';
+import { Nav } from '@/components/nav';
+import { Dock } from '@/components/dock';
 
 interface VenderLayoutProps {
   children: React.ReactNode;
@@ -9,25 +10,26 @@ interface VenderLayoutProps {
 
 const VendorLayout: React.FC<VenderLayoutProps> = ({ children }) => {
   return (
-    <SidebarProvider className="flex w-full h-screen">
-      <div className="min-h-[calc(100vh-5rem)] w-full bg-gradient-to-br from-background via-background to-primary/5 flex">
-        {/* Desktop Sidebar - hidden on mobile */}
-        <div className="hidden lg:block">
+    <>
+      <Nav />
+      <SidebarProvider className="flex w-full h-[calc(100vh-4rem)] mt-16">
+        <div className="h-full w-full bg-gradient-to-br from-background via-background to-primary/5 flex">
           <VendorSidebarNav />
+
+          {/* Main Content */}
+          <main
+            className="flex-1 p-4 sm:p-6 lg:p-8 pb-32 overflow-y-auto relative"
+            style={{ scrollbarWidth: 'none' }}
+          >
+            <div className="lg:hidden mb-4">
+              <SidebarTrigger />
+            </div>
+            {children}
+          </main>
         </div>
-
-        {/* Main Content */}
-        <main
-          className="flex-1 p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8 overflow-y-auto"
-          style={{ scrollbarWidth: 'none' }}
-        >
-          {children}
-        </main>
-
-        {/* Mobile Bottom Navigation - visible only on mobile */}
-        <VendorMobileNav />
-      </div>
-    </SidebarProvider>
+      </SidebarProvider>
+      <Dock className="bottom-6" />
+    </>
   );
 };
 
