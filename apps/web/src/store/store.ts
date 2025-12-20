@@ -12,16 +12,19 @@ import {
 import storage from 'redux-persist/lib/storage';
 import cartReducer from './slices/cartSlice';
 import wishlistReducer from './slices/wishlistSlice';
+import authReducer from './slices/authSlice';
 
 const persistConfig = {
   key: 'root',
   version: 1,
   storage,
+  whitelist: ['cart', 'wishlist', 'auth'], // Explicitly whitelist slices to persist
 };
 
 const rootReducer = combineReducers({
   cart: cartReducer,
   wishlist: wishlistReducer,
+  auth: authReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

@@ -2,7 +2,6 @@
 
 import { Star } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Avatar } from '@/components/ui/avatar';
 
 interface Review {
   id: string;
@@ -13,7 +12,7 @@ interface Review {
     title: string;
     imageUrl: string;
   };
-  buyer: {
+  user: {
     email: string;
   };
 }
@@ -24,7 +23,7 @@ interface FeedbackCardProps {
 
 export function FeedbackCard({ review }: FeedbackCardProps) {
   const rating = parseInt(review.rating);
-  const buyerInitial = review.buyer.email.charAt(0).toUpperCase();
+  const buyerInitial = review?.user?.email.charAt(0).toUpperCase();
 
   return (
     <Card className="hover:shadow-md transition-shadow border-border">
@@ -59,7 +58,7 @@ export function FeedbackCard({ review }: FeedbackCardProps) {
             <div className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-semibold">
               {buyerInitial}
             </div>
-            <span>{review.buyer.email}</span>
+            <span>{review.user?.email}</span>
           </div>
           <span>{new Date(review.createdAt).toLocaleDateString()}</span>
         </div>

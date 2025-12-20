@@ -7,6 +7,7 @@ import { PWAInstallPrompt } from '@/components/pwa-install-prompt';
 import { PWAProvider } from '@/components/pwa-provider';
 import { GoogleTranslateScript } from '@/components/google-translate-script';
 import { ReduxProvider } from '@/components/providers/ReduxProvider';
+import { AuthInitializer } from '@/components/providers/AuthInitializer';
 
 export const metadata: Metadata = {
   title: 'CultureLense',
@@ -39,6 +40,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <ReduxProvider>
+          <AuthInitializer />
           <QueryProvider>
             <PWAProvider>
               <ThemeProvider

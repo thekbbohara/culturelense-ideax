@@ -29,6 +29,7 @@ import { cn } from '@/lib/utils';
 
 export type Product = {
   id: string;
+  vendorId: string;
   title: string;
   description: string;
   price: number;

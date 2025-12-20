@@ -11,59 +11,69 @@ export interface CartItem {
 }
 
 interface CartState {
-  items: CartItem[];
-  totalAmount: number;
+  // Keyed by userId. Guest cart can use 'guest' as key.
+  itemsByUserId: Record<string, CartItem[]>;
 }
 
 const initialState: CartState = {
-  items: [],
-  totalAmount: 0,
+  itemsByUserId: {},
 };
 
 const cartSlice = createSlice({
   name: 'cart',
   initialState,
   reducers: {
-    addItem: (state, action: PayloadAction<Omit<CartItem, 'quantity'>>) => {
-      const existingItem = state.items.find((item) => item.id === action.payload.id);
+    addItem: (
+      state,
+      action: PayloadAction<{ item: Omit<CartItem, 'quantity'>; userId: string }>,
+    ) => {
+      const { item: newItem, userId } = action.payload;
+      if (!state.itemsByUserId) {
+        state.itemsByUserId = {};
+      }
+      if (!state.itemsByUserId[userId]) {
+        state.itemsByUserId[userId] = [];
+      }
+
+      const existingItem = state.itemsByUserId[userId].find((item) => item.id === newItem.id);
       if (existingItem) {
-        if (existingItem.quantity < action.payload.availableQuantity) {
+        if (existingItem.quantity < newItem.availableQuantity) {
           existingItem.quantity++;
         }
       } else {
-        if (action.payload.availableQuantity > 0) {
-          state.items.push({ ...action.payload, quantity: 1 });
+        if (newItem.availableQuantity > 0) {
+          state.itemsByUserId[userId].push({ ...newItem, quantity: 1 });
         }
       }
-      state.totalAmount = state.items.reduce(
-        (total, item) => total + item.price * item.quantity,
-        0,
-      );
     },
-    removeItem: (state, action: PayloadAction<string>) => {
-      state.items = state.items.filter((item) => item.id !== action.payload);
-      state.totalAmount = state.items.reduce(
-        (total, item) => total + item.price * item.quantity,
-        0,
-      );
+    removeItem: (state, action: PayloadAction<{ id: string; userId: string }>) => {
+      const { id, userId } = action.payload;
+      if (state.itemsByUserId && state.itemsByUserId[userId]) {
+        state.itemsByUserId[userId] = state.itemsByUserId[userId].filter((item) => item.id !== id);
+      }
     },
-    updateQuantity: (state, action: PayloadAction<{ id: string; quantity: number }>) => {
-      const item = state.items.find((item) => item.id === action.payload.id);
-      if (item) {
-        if (action.payload.quantity > 0 && action.payload.quantity <= item.availableQuantity) {
-          item.quantity = action.payload.quantity;
-        } else if (action.payload.quantity > item.availableQuantity) {
-          item.quantity = item.availableQuantity;
+    updateQuantity: (
+      state,
+      action: PayloadAction<{ id: string; quantity: number; userId: string }>,
+    ) => {
+      const { id, quantity, userId } = action.payload;
+      const userItems = state.itemsByUserId?.[userId];
+      if (userItems) {
+        const item = userItems.find((item) => item.id === id);
+        if (item) {
+          if (quantity > 0 && quantity <= item.availableQuantity) {
+            item.quantity = quantity;
+          } else if (quantity > item.availableQuantity) {
+            item.quantity = item.availableQuantity;
+          }
         }
       }
-      state.totalAmount = state.items.reduce(
-        (total, item) => total + item.price * item.quantity,
-        0,
-      );
     },
-    clearCart: (state) => {
-      state.items = [];
-      state.totalAmount = 0;
+    clearCart: (state, action: PayloadAction<string>) => {
+      if (!state.itemsByUserId) {
+        state.itemsByUserId = {};
+      }
+      state.itemsByUserId[action.payload] = [];
     },
   },
 });

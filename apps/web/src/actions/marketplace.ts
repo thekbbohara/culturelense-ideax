@@ -436,3 +436,21 @@ export async function createReview(
     return { success: false, error: 'Failed to submit review' };
   }
 }
+
+export async function getVendorByUserId(userId: string) {
+  try {
+    const item = await db
+      .select({ id: vendors.id })
+      .from(vendors)
+      .where(eq(vendors.userId, userId))
+      .limit(1);
+
+    if (item && item.length > 0) {
+      return { success: true, data: item[0] };
+    }
+    return { success: false, error: 'Vendor not found' };
+  } catch (error) {
+    console.error('Failed to fetch vendor by user id:', error);
+    return { success: false, error: 'Failed to fetch vendor' };
+  }
+}

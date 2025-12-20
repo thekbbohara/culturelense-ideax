@@ -33,11 +33,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   className,
 }) => {
   const dispatch = useAppDispatch();
+  const { userId } = useAppSelector((state) => state.auth);
+  const effectiveUserId = userId || 'guest';
+
   const isInWishlist = useAppSelector((state) =>
-    state.wishlist.items.some((item) => item.id === id),
+    (state.wishlist?.itemsByUserId?.[effectiveUserId] || []).some((item) => item.id === id),
   );
 
-  const cartItems = useAppSelector((state) => state.cart.items);
+  const cartItems = useAppSelector((state) => state.cart?.itemsByUserId?.[effectiveUserId] || []);
   const existingCartItem = cartItems.find((item) => item.id === id);
 
   const handleAddToCart = (e: React.MouseEvent) => {
@@ -56,12 +59,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
     dispatch(
       addItem({
-        id,
-        title,
-        price,
-        imageUrl,
-        availableQuantity: quantity,
-        artist: artist || 'Culture Lense Artist',
+        item: {
+          id,
+          title,
+          price,
+          imageUrl,
+          availableQuantity: quantity,
+          artist: artist || 'Culture Lense Artist',
+        },
+        userId: effectiveUserId,
       }),
     );
     toast.success('Added to cart');
@@ -72,12 +78,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     e.stopPropagation();
     dispatch(
       toggleWishlist({
-        id,
-        title,
-        price,
-        imageUrl,
-        availableQuantity: quantity,
-        artist: artist || 'Culture Lense Artist',
+        item: {
+          id,
+          title,
+          price,
+          imageUrl,
+          availableQuantity: quantity,
+          artist: artist || 'Culture Lense Artist',
+        },
+        userId: effectiveUserId,
       }),
     );
     if (!isInWishlist) {

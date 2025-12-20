@@ -17,12 +17,17 @@ import { getRecentListings } from '@/actions/marketplace';
 
 export default function WishlistPage() {
   const dispatch = useAppDispatch();
-  const wishlistItems = useAppSelector((state) => state.wishlist.items);
-  const cartItems = useAppSelector((state) => state.cart.items);
+  const { userId } = useAppSelector((state) => state.auth);
+  const effectiveUserId = userId || 'guest';
+
+  const wishlistItems = useAppSelector(
+    (state) => state.wishlist?.itemsByUserId?.[effectiveUserId] || [],
+  );
+  const cartItems = useAppSelector((state) => state.cart?.itemsByUserId?.[effectiveUserId] || []);
   const [listings, setListings] = useState<Product[]>([]);
 
   const handleRemoveItem = (item: any) => {
-    dispatch(toggleWishlist(item));
+    dispatch(toggleWishlist({ item, userId: effectiveUserId }));
     toast.success('Removed from wishlist');
   };
 
@@ -39,10 +44,21 @@ export default function WishlistPage() {
       return;
     }
 
-    dispatch(addItem({ ...item, quantity: 1 }));
-    dispatch(toggleWishlist(item));
+    dispatch(addItem({ item, userId: effectiveUserId }));
+    dispatch(toggleWishlist({ item, userId: effectiveUserId }));
     toast.success('Moved to cart');
   };
+
+  const fetchListings = async () => {
+    const res = await getRecentListings();
+    if (res.success && res.data) {
+      setListings(res.data?.map((item) => ({ ...item, price: parseFloat(item.price) })));
+    }
+  };
+
+  useEffect(() => {
+    fetchListings();
+  }, []);
 
   if (wishlistItems.length === 0) {
     return (
@@ -69,17 +85,6 @@ export default function WishlistPage() {
       </div>
     );
   }
-
-  const fetchListings = async () => {
-    const res = await getRecentListings();
-    if (res.success && res.data) {
-      setListings(res.data?.map((item) => ({ ...item, price: parseFloat(item.price) })));
-    }
-  };
-
-  useEffect(() => {
-    fetchListings();
-  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-neutral-white via-neutral-white to-primary/5">

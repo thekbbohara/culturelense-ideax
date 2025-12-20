@@ -17,34 +17,25 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { createClient } from '@/lib/supabase/client';
-
-export type Product = {
-  id: string;
-  title: string;
-  description: string;
-  price: number;
-  imageUrl: string;
-  quantity: number;
-  vendorId: string;
-  vendorUserId?: string | null;
-  artist?: string | null;
-  isNew?: boolean;
-};
+import { Product } from '../page';
 
 export default function ProductDetailPage({ params }: { params: { id: string } }) {
-  const [product, setProduct] = React.useState<Product | null>(null);
-  const [similarProducts, setSimilarProducts] = React.useState<Product[]>([]);
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
-  const [userId, setUserId] = React.useState<string | undefined>(undefined);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [similarProducts, setSimilarProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [reviewsKey, setReviewsKey] = useState(0); // Trigger for refreshing ReviewsList
 
   const dispatch = useAppDispatch();
+  const { userId, vendorId: currentVendorId } = useAppSelector((state) => state.auth);
+
+  const effectiveUserId = userId || 'guest';
+
   const isInWishlist = useAppSelector((state) =>
-    state.wishlist.items.some((item) => item.id === params.id),
+    (state.wishlist?.itemsByUserId?.[effectiveUserId] || []).some((item) => item.id === params.id),
   );
 
-  const cartItems = useAppSelector((state) => state.cart.items);
+  const cartItems = useAppSelector((state) => state.cart?.itemsByUserId?.[effectiveUserId] || []);
   const existingCartItem = cartItems.find((item) => item.id === params.id);
 
   const handleAddToCart = () => {
@@ -61,12 +52,15 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
 
       dispatch(
         addItem({
-          id: product.id,
-          title: product.title,
-          price: product.price,
-          imageUrl: product.imageUrl,
-          availableQuantity: product.quantity,
-          artist: product.artist || 'Culture Lense Artist',
+          item: {
+            id: product.id,
+            title: product.title,
+            price: product.price,
+            imageUrl: product.imageUrl,
+            availableQuantity: product.quantity,
+            artist: product.artist || 'Culture Lense Artist',
+          },
+          userId: effectiveUserId,
         }),
       );
       toast.success('Added to cart');
@@ -77,12 +71,15 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
     if (product) {
       dispatch(
         toggleWishlist({
-          id: product.id,
-          title: product.title,
-          price: product.price,
-          availableQuantity: product.quantity,
-          imageUrl: product.imageUrl,
-          artist: product.artist || 'Culture Lense Artist',
+          item: {
+            id: product.id,
+            title: product.title,
+            price: product.price,
+            availableQuantity: product.quantity,
+            imageUrl: product.imageUrl,
+            artist: product.artist || 'Culture Lense Artist',
+          },
+          userId: effectiveUserId,
         }),
       );
       if (!isInWishlist) {
@@ -99,13 +96,6 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
     const fetchData = async () => {
       setIsLoading(true);
       setError(null);
-
-      // Get current user
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      setUserId(user?.id);
 
       const res = await getListingById(params.id);
 
@@ -361,8 +351,9 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                 <h4 className="text-xl font-bold text-neutral-black mb-4">Write a Review</h4>
                 <FeedbackForm
                   listingId={params.id}
-                  userId={userId}
-                  vendorUserId={product.vendorUserId}
+                  userId={userId || undefined}
+                  currentVendorId={currentVendorId}
+                  listingVendorId={product.vendorId}
                   onSuccess={handleReviewSuccess}
                 />
               </div>

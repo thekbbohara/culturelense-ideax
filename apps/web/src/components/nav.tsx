@@ -10,8 +10,15 @@ export function Nav() {
   const [isVisible, setIsVisible] = React.useState(true);
   const [lastScrollY, setLastScrollY] = React.useState(0);
 
-  const cartItemsCount = useAppSelector((state) => state.cart.items.length);
-  const wishlistItemsCount = useAppSelector((state) => state.wishlist.items.length);
+  const { userId } = useAppSelector((state) => state.auth);
+  const effectiveUserId = userId || 'guest';
+
+  const cartItemsCount = useAppSelector(
+    (state) => (state.cart?.itemsByUserId?.[effectiveUserId as string] || []).length,
+  );
+  const wishlistItemsCount = useAppSelector(
+    (state) => (state.wishlist?.itemsByUserId?.[effectiveUserId as string] || []).length,
+  );
 
   React.useEffect(() => {
     const handleScroll = () => {

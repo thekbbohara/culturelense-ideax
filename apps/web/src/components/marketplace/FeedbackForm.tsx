@@ -11,20 +11,27 @@ import { toast } from 'sonner';
 interface FeedbackFormProps {
   listingId: string;
   userId?: string;
-  vendorUserId?: string | null; // The user ID of the vendor who owns the listing
+  currentVendorId?: string | null; // The vendor ID of the logged-in user
+  listingVendorId?: string | null; // The vendor ID of the vendor who owns the listing
   onSuccess?: () => void;
 }
 
-export const FeedbackForm = ({ listingId, userId, vendorUserId, onSuccess }: FeedbackFormProps) => {
+export const FeedbackForm = ({
+  listingId,
+  userId,
+  currentVendorId,
+  listingVendorId,
+  onSuccess,
+}: FeedbackFormProps) => {
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [comment, setComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  // Requirement: only allow to post if vendor id and user id are same
-  // Note: Usually it's the opposite, but following exact instructions.
-  const canReview = userId === vendorUserId;
+  // Requirement: if the current user is the owner (vendor) of the listing, they CANNOT review.
+  const isOwner = currentVendorId && listingVendorId && currentVendorId === listingVendorId;
+  const canReview = userId && !isOwner;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,7 +82,9 @@ export const FeedbackForm = ({ listingId, userId, vendorUserId, onSuccess }: Fee
       <div className="bg-primary/5 p-8 rounded-2xl border border-primary/10 text-center">
         <h4 className="text-lg font-bold text-neutral-black mb-2">Review Restricted</h4>
         <p className="text-neutral-black/60 italic">
-          Reviews are currently restricted to authorized members only.
+          {isOwner
+            ? 'You cannot review your own product.'
+            : 'Reviews are currently restricted to authorized members only.'}
         </p>
       </div>
     );

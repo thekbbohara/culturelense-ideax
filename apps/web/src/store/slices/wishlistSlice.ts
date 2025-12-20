@@ -12,29 +12,41 @@ export interface WishlistItem {
 }
 
 interface WishlistState {
-  items: WishlistItem[];
+  // Keyed by userId
+  itemsByUserId: Record<string, WishlistItem[]>;
 }
 
 const initialState: WishlistState = {
-  items: [],
+  itemsByUserId: {},
 };
 
 const wishlistSlice = createSlice({
   name: 'wishlist',
   initialState,
   reducers: {
-    toggleWishlist: (state, action: PayloadAction<WishlistItem>) => {
-      const index = state.items.findIndex((item) => item.id === action.payload.id);
+    toggleWishlist: (state, action: PayloadAction<{ item: WishlistItem; userId: string }>) => {
+      const { item: newItem, userId } = action.payload;
+      if (!state.itemsByUserId) {
+        state.itemsByUserId = {};
+      }
+      if (!state.itemsByUserId[userId]) {
+        state.itemsByUserId[userId] = [];
+      }
+
+      const index = state.itemsByUserId[userId].findIndex((item) => item.id === newItem.id);
       if (index >= 0) {
         // Remove if exists
-        state.items.splice(index, 1);
+        state.itemsByUserId[userId].splice(index, 1);
       } else {
         // Add if doesn't exist
-        state.items.push(action.payload);
+        state.itemsByUserId[userId].push(newItem);
       }
     },
-    clearWishlist: (state) => {
-      state.items = [];
+    clearWishlist: (state, action: PayloadAction<string>) => {
+      if (!state.itemsByUserId) {
+        state.itemsByUserId = {};
+      }
+      state.itemsByUserId[action.payload] = [];
     },
   },
 });
