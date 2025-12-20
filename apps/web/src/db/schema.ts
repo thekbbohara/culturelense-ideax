@@ -35,9 +35,20 @@ export const orderStatusEnum = pgEnum('order_status', [
   'delivered',
   'cancelled',
 ]);
-export const paymentStatusEnum = pgEnum('payment_status', ['pending', 'paid', 'escrowed', 'failed', 'refunded']);
+export const paymentStatusEnum = pgEnum('payment_status', [
+  'pending',
+  'paid',
+  'escrowed',
+  'failed',
+  'refunded',
+]);
 export const paymentMethodEnum = pgEnum('payment_method', ['cod', 'escrow']);
-export const deliveryStatusEnum = pgEnum('delivery_status', ['pending', 'shipped', 'delivered', 'failed']);
+export const deliveryStatusEnum = pgEnum('delivery_status', [
+  'pending',
+  'shipped',
+  'delivered',
+  'failed',
+]);
 
 // Users Table
 export const users = pgTable('users', {
@@ -312,6 +323,23 @@ export const reviews = pgTable('reviews', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
+
+// Review Likes - tracks which users liked which reviews
+export const reviewLikes = pgTable(
+  'review_likes',
+  {
+    reviewId: uuid('review_id')
+      .references(() => reviews.id, { onDelete: 'cascade' })
+      .notNull(),
+    userId: uuid('user_id')
+      .references(() => users.id)
+      .notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.reviewId, t.userId] }),
+  }),
+);
 
 // RELATIONS
 

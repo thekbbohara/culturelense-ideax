@@ -155,31 +155,28 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             </div>
 
             {/* Gradient Overlay on Hover */}
-            <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
             {/* Quick View Button */}
             <div className="absolute inset-x-0 bottom-0 p-6 translate-y-full group-hover:translate-y-0 transition-transform duration-500">
-              <Button className="w-full bg-card text-primary hover:bg-card/90 font-bold shadow-xl transform active:scale-95 transition-all h-12 rounded-full">
-                <Eye className="w-4 h-4 mr-2" />
-                Quick View
-              </Button>
+              <div className="w-full text-white font-bold shadow-xl transform active:scale-95 transition-all text-center rounded-full">
+                View Details
+              </div>
             </div>
           </div>
 
           {/* Content */}
-          <CardContent className="p-6">
-            <div className="space-y-3">
+          <CardContent className="p-4">
+            <div className="space-y-2">
               <div>
-                <h3 className="font-bold text-foreground text-lg mb-1 line-clamp-1 group-hover:text-primary transition-colors">
+                <h3 className="font-bold text-foreground text-lg line-clamp-1 group-hover:text-primary transition-colors">
                   {title}
                 </h3>
                 {artist && <p className="text-sm text-muted-foreground font-medium">{artist}</p>}
               </div>
 
-              <div className="flex items-center justify-between pt-2 border-t border-border">
-                <span className="font-black text-2xl text-primary">
-                  Rs.{price.toLocaleString()}
-                </span>
+              <div className="flex items-center justify-between pt-1 border-t border-border">
+                <span className="font-black text-xl text-primary">Rs.{price.toLocaleString()}</span>
                 <motion.button
                   whileHover={quantity > 0 && !isOwner ? { scale: 1.05 } : {}}
                   whileTap={quantity > 0 && !isOwner ? { scale: 0.95 } : {}}

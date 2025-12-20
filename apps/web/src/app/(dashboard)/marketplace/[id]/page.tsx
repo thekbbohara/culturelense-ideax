@@ -107,6 +107,11 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
     setReviewsKey((prev) => prev + 1);
   };
 
+  // Scroll to top when navigating to this page
+  React.useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [params.id]);
+
   React.useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
@@ -364,7 +369,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
               </h3>
 
               {/* Existing Reviews */}
-              <ReviewsList key={reviewsKey} listingId={params.id} />
+              <ReviewsList key={reviewsKey} listingId={params.id} currentUserId={userId} />
 
               {/* Feedback Form */}
               <div>
@@ -394,7 +399,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
               You Might Also Like
             </h2>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="flex overflow-x-auto no-scrollbar snap-x snap-mandatory gap-4 pb-4 lg:grid lg:grid-cols-3 sm:gap-6 sm:pb-0 lg:overflow-visible">
             {similarProducts.length > 0 ? (
               similarProducts.map((item) => (
                 <motion.div
