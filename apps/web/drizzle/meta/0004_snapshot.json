@@ -1,6 +1,6 @@
 {
-  "id": "216dd8d7-2c71-4989-adb9-fe92c169673b",
-  "prevId": "c7382927-1819-4259-8c3d-493e3022d8b0",
+  "id": "c4ea14f8-5668-40c3-bfcf-3cbdf0706073",
+  "prevId": "216dd8d7-2c71-4989-adb9-fe92c169673b",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -1030,8 +1030,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "buyer_id": {
-          "name": "buyer_id",
+        "user_id": {
+          "name": "user_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
@@ -1078,12 +1078,12 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "reviews_buyer_id_users_id_fk": {
-          "name": "reviews_buyer_id_users_id_fk",
+        "reviews_user_id_users_id_fk": {
+          "name": "reviews_user_id_users_id_fk",
           "tableFrom": "reviews",
           "tableTo": "users",
           "columnsFrom": [
-            "buyer_id"
+            "user_id"
           ],
           "columnsTo": [
             "id"

@@ -14,23 +14,31 @@ import { toggleWishlist } from '@/store/slices/wishlistSlice';
 
 export default function CartPage() {
   const dispatch = useAppDispatch();
-  const cartItems = useAppSelector((state) => state.cart.items);
-  const wishlistItems = useAppSelector((state) => state.wishlist.items);
-  const subtotal = useAppSelector((state) => state.cart.totalAmount);
+  const { userId } = useAppSelector((state) => state.auth);
+  const effectiveUserId = userId || 'guest';
+
+  const cartItems = useAppSelector((state) => state.cart?.itemsByUserId?.[effectiveUserId] || []);
+  const wishlistItems = useAppSelector(
+    (state) => state.wishlist?.itemsByUserId?.[effectiveUserId] || [],
+  );
+
+  const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   const handleUpdateQuantity = (id: string, currentQty: number, delta: number) => {
-    dispatch(updateQuantity({ id, quantity: Math.max(1, currentQty + delta) }));
+    dispatch(
+      updateQuantity({ id, quantity: Math.max(1, currentQty + delta), userId: effectiveUserId }),
+    );
   };
 
   const handleRemoveItem = (id: string) => {
-    dispatch(removeItem(id));
+    dispatch(removeItem({ id, userId: effectiveUserId }));
   };
 
   const handleSaveToWishlist = (items: CartItem[]) => {
-    items.map((item) => {
+    items.forEach((item) => {
       const isInWishlist = wishlistItems.some((i) => i.id === item.id);
       if (!isInWishlist) {
-        dispatch(toggleWishlist(item));
+        dispatch(toggleWishlist({ item, userId: effectiveUserId }));
       }
     });
   };

@@ -17,17 +17,29 @@ import { getRecentListings } from '@/actions/marketplace';
 
 export default function WishlistPage() {
   const dispatch = useAppDispatch();
-  const wishlistItems = useAppSelector((state) => state.wishlist.items);
-  const cartItems = useAppSelector((state) => state.cart.items);
+  const { userId, vendorId: currentVendorId } = useAppSelector((state) => state.auth);
+  const effectiveUserId = userId || 'guest';
+
+  const wishlistItems = useAppSelector(
+    (state) => state.wishlist?.itemsByUserId?.[effectiveUserId] || [],
+  );
+  const cartItems = useAppSelector((state) => state.cart?.itemsByUserId?.[effectiveUserId] || []);
   const [listings, setListings] = useState<Product[]>([]);
 
   const handleRemoveItem = (item: any) => {
-    dispatch(toggleWishlist(item));
+    dispatch(toggleWishlist({ item, userId: effectiveUserId }));
     toast.success('Removed from wishlist');
   };
 
   const moveToCart = (item: any) => {
     const existingCartItem = cartItems.find((ci) => ci.id === item.id);
+
+    const isOwner = currentVendorId && item.vendorId && currentVendorId === item.vendorId;
+
+    if (isOwner) {
+      toast.error('You cannot add your own product to the cart');
+      return;
+    }
 
     if (item.availableQuantity === 0) {
       toast.error('This item is out of stock');
@@ -39,10 +51,21 @@ export default function WishlistPage() {
       return;
     }
 
-    dispatch(addItem({ ...item, quantity: 1 }));
-    dispatch(toggleWishlist(item));
+    dispatch(addItem({ item, userId: effectiveUserId }));
+    dispatch(toggleWishlist({ item, userId: effectiveUserId }));
     toast.success('Moved to cart');
   };
+
+  const fetchListings = async () => {
+    const res = await getRecentListings();
+    if (res.success && res.data) {
+      setListings(res.data?.map((item) => ({ ...item, price: parseFloat(item.price) })));
+    }
+  };
+
+  useEffect(() => {
+    fetchListings();
+  }, []);
 
   if (wishlistItems.length === 0) {
     return (
@@ -69,17 +92,6 @@ export default function WishlistPage() {
       </div>
     );
   }
-
-  const fetchListings = async () => {
-    const res = await getRecentListings();
-    if (res.success && res.data) {
-      setListings(res.data?.map((item) => ({ ...item, price: parseFloat(item.price) })));
-    }
-  };
-
-  useEffect(() => {
-    fetchListings();
-  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-neutral-white via-neutral-white to-primary/5">
@@ -187,16 +199,24 @@ export default function WishlistPage() {
                     <div className="flex gap-2">
                       <Button
                         onClick={() => moveToCart(item)}
-                        disabled={item.availableQuantity === 0}
+                        disabled={
+                          item.availableQuantity === 0 ||
+                          !!(currentVendorId && item.vendorId && currentVendorId === item.vendorId)
+                        }
                         className={cn(
                           'flex-1 font-bold h-10 rounded-full transition-all',
-                          item.availableQuantity > 0
+                          item.availableQuantity > 0 &&
+                            !(currentVendorId && item.vendorId && currentVendorId === item.vendorId)
                             ? 'bg-primary hover:bg-primary/90 text-white'
                             : 'bg-muted text-muted-foreground cursor-not-allowed opacity-50',
                         )}
                       >
                         <ShoppingCart className="w-4 h-4 mr-2" />
-                        {item.availableQuantity > 0 ? 'Add to Cart' : 'Out of Stock'}
+                        {currentVendorId && item.vendorId && currentVendorId === item.vendorId
+                          ? 'Your Product'
+                          : item.availableQuantity > 0
+                            ? 'Add to Cart'
+                            : 'Out of Stock'}
                       </Button>
                     </div>
                   </div>

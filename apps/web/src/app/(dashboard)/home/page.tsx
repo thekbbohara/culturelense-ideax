@@ -153,7 +153,7 @@ export default function HomePage() {
                 <div className="px-6 flex items-center gap-3 mb-6 lg:mb-8">
                   <div className="w-2 h-8 rounded-full bg-secondary" />
                   <h2 className="text-2xl lg:text-3xl font-serif font-black italic text-txt">
-                     Recently Watched 
+                    Recently Watched
                   </h2>
                 </div>
               </div>

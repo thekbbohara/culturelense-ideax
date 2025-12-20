@@ -14,7 +14,7 @@ import { FilterSidebar } from '@/components/marketplace/FilterSidebar';
 import { MarketplaceHeader } from '@/components/marketplace/MarketplaceHeader';
 import { createClient } from '@/lib/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, TrendingUp, PackageSearch, Loader2 } from 'lucide-react';
+import { Sparkles, TrendingUp, PackageSearch, Loader2, ArrowRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -26,9 +26,13 @@ import {
   PaginationPrevious,
 } from '@/components/ui/pagination';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { formatText } from '@/utils/re-usables';
 
 export type Product = {
   id: string;
+  vendorId: string;
   title: string;
   description: string;
   price: number;
@@ -39,6 +43,7 @@ export type Product = {
 };
 
 export default function MarketplacePage() {
+  const router = useRouter();
   const [items, setItems] = useState<Product[]>([]);
   const [featuredItems, setFeaturedItems] = useState<Product[]>([]);
   const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
@@ -248,28 +253,103 @@ export default function MarketplacePage() {
                   <TrendingUp className="w-5 h-5 text-primary" />
                   <h2 className="text-2xl font-serif font-black italic">Featured Masterpieces</h2>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {featuredItems?.slice(0, 2)?.map((item: Product) => (
+                {/* Mobile: Horizontal scroll with individual cards */}
+                <div className="lg:hidden flex gap-4 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-4">
+                  {featuredItems.slice(0, 3).map((item: Product, i: number) => (
                     <motion.div
                       key={item.id}
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.4 }}
-                      className="relative group max-h-[600px]"
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.1 }}
+                      onClick={() => router.push(`/marketplace/${item.id}`)}
+                      className="min-w-[280px] max-w-[300px] h-[350px] flex-shrink-0 snap-center relative rounded-2xl overflow-hidden group cursor-pointer border border-border bg-card shadow-sm"
                     >
-                      <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-3xl blur-xl group-hover:blur-2xl transition-all opacity-0 group-hover:opacity-100" />
-                      <ProductCard
-                        id={item.id}
-                        title={item.title}
-                        artist={item.artist || 'Culture Lense Artist'}
-                        price={item.price}
-                        imageUrl={item.imageUrl}
-                        quantity={item.quantity}
-                        isNew={item.isNew}
-                        className="h-full w-full"
-                      />
+                      {item.imageUrl && (
+                        <Image
+                          src={item.imageUrl}
+                          alt={item.title}
+                          fill
+                          className="object-cover transition-transform duration-700 group-hover:scale-105"
+                        />
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                      <div className="absolute bottom-0 left-0 p-6 w-full">
+                        <span className="px-2 py-0.5 bg-primary/90 text-primary-foreground text-[10px] font-bold uppercase tracking-widest rounded-full mb-2 inline-block">
+                          {item.artist || 'Featured'}
+                        </span>
+                        <h3 className="text-xl font-serif font-bold text-white mb-2 line-clamp-2">
+                          {formatText(item.title)}
+                        </h3>
+                        <div className="flex items-center gap-2 text-white/80">
+                          <span className="text-sm font-medium">View Details</span>
+                          <ArrowRight className="w-3 h-3" />
+                        </div>
+                      </div>
                     </motion.div>
                   ))}
+                </div>
+
+                {/* Desktop: Grid layout */}
+                <div className="hidden lg:grid lg:grid-cols-12 gap-6 h-[600px]">
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    onClick={() => router.push(`/marketplace/${featuredItems[0]?.id}`)}
+                    className="col-span-6 h-full relative rounded-[2rem] overflow-hidden group cursor-pointer border border-border bg-card shadow-sm hover:shadow-xl hover:shadow-primary/5 transition-all duration-500"
+                  >
+                    {featuredItems[0]?.imageUrl && (
+                      <Image
+                        src={featuredItems[0]?.imageUrl}
+                        alt={featuredItems[0]?.title}
+                        fill
+                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    <div className="absolute bottom-0 left-0 p-10 w-full">
+                      <span className="px-3 py-1 bg-primary/90 text-primary-foreground text-[10px] font-bold uppercase tracking-widest rounded-full mb-4 inline-block">
+                        {featuredItems[0]?.artist}
+                      </span>
+                      <h3 className="text-4xl font-serif font-bold text-white mb-3">
+                        {featuredItems[0]?.title}
+                      </h3>
+                      <div className="flex items-center gap-2 text-white/80 group-hover:text-white transition-colors">
+                        <span className="text-base font-medium">View Details</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  <div className="col-span-6 h-full flex flex-col gap-6">
+                    {featuredItems.slice(1, 3).map((item: any, i: number) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: i * 0.1 }}
+                        onClick={() => router.push(`/marketplace/${item.id}`)}
+                        className="flex-1 relative rounded-[2rem] overflow-hidden group cursor-pointer border border-border bg-card shadow-sm hover:shadow-lg transition-all"
+                      >
+                        {item.imageUrl && (
+                          <Image
+                            src={item.imageUrl}
+                            alt={item.title}
+                            fill
+                            className="object-cover transition-transform duration-700 group-hover:scale-110"
+                          />
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                        <div className="absolute bottom-6 left-6 right-6">
+                          <h3 className="font-serif font-bold text-xl text-white truncate">
+                            {formatText(item.title)}
+                          </h3>
+                          <p className="text-white/70 text-xs font-medium uppercase tracking-widest mt-1">
+                            {item.artist}
+                          </p>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
                 </div>
               </section>
             )}
@@ -314,17 +394,18 @@ export default function MarketplacePage() {
                   </div>
                 ) : (
                   <div key="content" className="space-y-12">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="flex overflow-x-auto no-scrollbar snap-x snap-mandatory gap-4 pb-4 lg:grid lg:grid-cols-3 sm:gap-6 sm:pb-0 lg:overflow-visible">
                       {items.map((item: Product, index: number) => (
                         <motion.div
                           key={item.id}
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.4, delay: index * 0.05 }}
-                          className="max-h-[400px]"
+                          className="min-w-[280px] max-w-[320px] flex-shrink-0 snap-center sm:min-w-0 sm:max-w-none sm:max-h-[400px]"
                         >
                           <ProductCard
                             id={item.id}
+                            vendorId={item.vendorId}
                             title={item.title}
                             artist={item.artist || 'Culture Lense Artist'}
                             price={item.price}

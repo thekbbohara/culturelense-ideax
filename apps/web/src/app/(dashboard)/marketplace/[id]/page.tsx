@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { FeedbackForm } from '@/components/marketplace/FeedbackForm';
 import { ReviewsList } from '@/components/marketplace/ReviewsList';
 import { Button } from '@/components/ui/button';
@@ -16,24 +16,38 @@ import { toggleWishlist } from '@/store/slices/wishlistSlice';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { createClient } from '@/lib/supabase/client';
 import { Product } from '../page';
+import Image from 'next/image';
 
 export default function ProductDetailPage({ params }: { params: { id: string } }) {
-  const [product, setProduct] = React.useState<Product | null>(null);
-  const [similarProducts, setSimilarProducts] = React.useState<Product[]>([]);
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [similarProducts, setSimilarProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [reviewsKey, setReviewsKey] = useState(0); // Trigger for refreshing ReviewsList
 
   const dispatch = useAppDispatch();
+  const { userId, vendorId: currentVendorId } = useAppSelector((state) => state.auth);
+
+  const effectiveUserId = userId || 'guest';
+
   const isInWishlist = useAppSelector((state) =>
-    state.wishlist.items.some((item) => item.id === params.id),
+    (state.wishlist?.itemsByUserId?.[effectiveUserId] || []).some((item) => item.id === params.id),
   );
 
-  const cartItems = useAppSelector((state) => state.cart.items);
+  const cartItems = useAppSelector((state) => state.cart?.itemsByUserId?.[effectiveUserId] || []);
   const existingCartItem = cartItems.find((item) => item.id === params.id);
+
+  const isOwner = currentVendorId && product?.vendorId && currentVendorId === product.vendorId;
 
   const handleAddToCart = () => {
     if (product) {
+      if (isOwner) {
+        toast.error('You cannot add your own product to the cart');
+        return;
+      }
+
       if (product.quantity === 0) {
         toast.error('This item is out of stock');
         return;
@@ -46,12 +60,16 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
 
       dispatch(
         addItem({
-          id: product.id,
-          title: product.title,
-          price: product.price,
-          imageUrl: product.imageUrl,
-          availableQuantity: product.quantity,
-          artist: product.artist || 'Culture Lense Artist',
+          item: {
+            id: product.id,
+            vendorId: product.vendorId,
+            title: product.title,
+            price: product.price,
+            imageUrl: product.imageUrl,
+            availableQuantity: product.quantity,
+            artist: product.artist || 'Culture Lense Artist',
+          },
+          userId: effectiveUserId,
         }),
       );
       toast.success('Added to cart');
@@ -60,14 +78,23 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
 
   const handleToggleWishlist = () => {
     if (product) {
+      if (isOwner) {
+        toast.error('You cannot add your own product to the wishlist');
+        return;
+      }
+
       dispatch(
         toggleWishlist({
-          id: product.id,
-          title: product.title,
-          price: product.price,
-          availableQuantity: product.quantity,
-          imageUrl: product.imageUrl,
-          artist: product.artist || 'Culture Lense Artist',
+          item: {
+            id: product.id,
+            vendorId: product.vendorId,
+            title: product.title,
+            price: product.price,
+            availableQuantity: product.quantity,
+            imageUrl: product.imageUrl,
+            artist: product.artist || 'Culture Lense Artist',
+          },
+          userId: effectiveUserId,
         }),
       );
       if (!isInWishlist) {
@@ -76,10 +103,15 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
     }
   };
 
+  const handleReviewSuccess = () => {
+    setReviewsKey((prev) => prev + 1);
+  };
+
   React.useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       setError(null);
+
       const res = await getListingById(params.id);
 
       if (res.success && res.data) {
@@ -182,11 +214,14 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                     <span className="text-xs font-black uppercase tracking-wider">New Arrival</span>
                   </Badge>
                 )}
-                <img
-                  src={product.imageUrl}
-                  alt={product.title}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
+                <div className="h-full w-full aspect-[4/5]">
+                  <Image
+                    src={product.imageUrl}
+                    alt={product.title}
+                    fill
+                    className="w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </div>
             </div>
@@ -239,37 +274,39 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
               <Button
                 size="lg"
                 onClick={handleAddToCart}
-                disabled={product.quantity === 0}
+                disabled={product.quantity === 0 || !!isOwner}
                 className={cn(
                   'flex-1 h-14 text-base font-bold shadow-lg rounded-full transition-all',
-                  product.quantity > 0
+                  product.quantity > 0 && !isOwner
                     ? 'bg-primary hover:bg-primary/90 shadow-primary/30'
                     : 'bg-muted text-muted-foreground cursor-not-allowed opacity-50',
                 )}
               >
                 <ShoppingCart className="w-5 h-5 mr-2" />
-                {product.quantity > 0 ? 'Add to Cart' : 'Out of Stock'}
+                {isOwner ? 'Your Product' : product.quantity > 0 ? 'Add to Cart' : 'Out of Stock'}
               </Button>
               <Button
                 size="lg"
                 variant="outline"
                 onClick={handleToggleWishlist}
+                disabled={!!isOwner}
                 className={cn(
                   'h-14 aspect-square p-0 rounded-full border-2 transition-all',
                   isInWishlist
                     ? 'bg-red-50 border-red-200 text-red-500 hover:bg-red-100'
                     : 'border-primary/20 hover:bg-primary/10 hover:border-primary text-foreground',
+                  isOwner && 'cursor-not-allowed opacity-50',
                 )}
               >
                 <Heart className={cn('w-5 h-5', isInWishlist && 'fill-current')} />
               </Button>
-              <Button
+              {/* <Button
                 size="lg"
                 variant="outline"
                 className="h-14 aspect-square p-0 rounded-full border-2 border-primary/20 hover:bg-primary/10 hover:border-primary"
               >
                 <Share2 className="w-5 h-5" />
-              </Button>
+              </Button> */}
             </div>
 
             <Separator className="bg-primary/10" />
@@ -327,12 +364,18 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
               </h3>
 
               {/* Existing Reviews */}
-              <ReviewsList />
+              <ReviewsList key={reviewsKey} listingId={params.id} />
 
               {/* Feedback Form */}
               <div>
                 <h4 className="text-xl font-bold text-neutral-black mb-4">Write a Review</h4>
-                <FeedbackForm />
+                <FeedbackForm
+                  listingId={params.id}
+                  userId={userId || undefined}
+                  currentVendorId={currentVendorId}
+                  listingVendorId={product.vendorId}
+                  onSuccess={handleReviewSuccess}
+                />
               </div>
             </div>
           </motion.div>
@@ -364,6 +407,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                   <ProductCard
                     key={item.id}
                     id={item.id}
+                    vendorId={item.vendorId}
                     title={item.title}
                     artist={item.artist || 'Culture Lense Artist'}
                     price={item.price}

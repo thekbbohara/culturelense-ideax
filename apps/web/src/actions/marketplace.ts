@@ -7,6 +7,8 @@ import {
   categories,
   searchHistory,
   culturalEntities,
+  reviews,
+  users,
   eq,
   desc,
   asc,
@@ -298,6 +300,7 @@ export async function getListingById(id: string) {
       .select({
         id: listings.id,
         vendorId: listings.vendorId,
+        vendorUserId: vendors.userId,
         entityId: listings.entityId,
         categoryId: listings.categoryId,
         title: listings.title,
@@ -372,5 +375,82 @@ export async function getListingsByEntityId(entityId: string) {
   } catch (error) {
     console.error('Failed to fetch listings by entity:', error);
     return { success: false, data: [] };
+  }
+}
+
+export async function getReviews(listingId: string, page: number = 1, limit: number = 5) {
+  try {
+    const offset = (page - 1) * limit;
+
+    const items = await db
+      .select({
+        id: reviews.id,
+        rating: reviews.rating,
+        comment: reviews.comment,
+        createdAt: reviews.createdAt,
+        userName: users.email, // Using email as name if profile name isn't available
+      })
+      .from(reviews)
+      .leftJoin(users, eq(reviews.userId, users.id))
+      .where(eq(reviews.listingId, listingId))
+      .orderBy(desc(reviews.createdAt))
+      .limit(limit)
+      .offset(offset);
+
+    const totalResult = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(reviews)
+      .where(eq(reviews.listingId, listingId));
+
+    const total = Number(totalResult[0]?.count || 0);
+
+    return {
+      success: true,
+      data: items,
+      total,
+      totalPages: Math.ceil(total / limit),
+      currentPage: page,
+    };
+  } catch (error) {
+    console.error('Failed to fetch reviews:', error);
+    return { success: false, error: 'Failed to fetch reviews' };
+  }
+}
+
+export async function createReview(
+  listingId: string,
+  userId: string,
+  rating: number,
+  comment: string,
+) {
+  try {
+    await db.insert(reviews).values({
+      listingId,
+      userId,
+      rating: rating.toString(),
+      comment,
+    });
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to create review:', error);
+    return { success: false, error: 'Failed to submit review' };
+  }
+}
+
+export async function getVendorByUserId(userId: string) {
+  try {
+    const item = await db
+      .select({ id: vendors.id })
+      .from(vendors)
+      .where(eq(vendors.userId, userId))
+      .limit(1);
+
+    if (item && item.length > 0) {
+      return { success: true, data: item[0] };
+    }
+    return { success: false, error: 'Vendor not found' };
+  } catch (error) {
+    console.error('Failed to fetch vendor by user id:', error);
+    return { success: false, error: 'Failed to fetch vendor' };
   }
 }

@@ -36,7 +36,7 @@ export function PWAInstallPrompt() {
                 </Button>
                 <button 
                     onClick={() => setIsVisible(false)}
-                    className="p-1.5 rounded-full hover:bg-accent text-muted-foreground transition-colors"
+                    className="p-1.5 rounded-full hover:bg-black/5 text-muted-foreground transition-colors"
                 >
                     <X className="w-4 h-4" />
                 </button>

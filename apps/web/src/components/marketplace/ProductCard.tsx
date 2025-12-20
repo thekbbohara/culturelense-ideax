@@ -10,9 +10,11 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { addItem } from '@/store/slices/cartSlice';
 import { toggleWishlist } from '@/store/slices/wishlistSlice';
 import { toast } from 'sonner';
+import Image from 'next/image';
 
 interface ProductCardProps {
   id: string;
+  vendorId: string;
   title: string;
   price: number;
   imageUrl: string;
@@ -24,6 +26,7 @@ interface ProductCardProps {
 
 export const ProductCard: React.FC<ProductCardProps> = ({
   id,
+  vendorId,
   title,
   price,
   quantity,
@@ -33,16 +36,26 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   className,
 }) => {
   const dispatch = useAppDispatch();
+  const { userId, vendorId: currentVendorId } = useAppSelector((state) => state.auth);
+  const effectiveUserId = userId || 'guest';
+
+  const isOwner = currentVendorId && vendorId && currentVendorId === vendorId;
+
   const isInWishlist = useAppSelector((state) =>
-    state.wishlist.items.some((item) => item.id === id),
+    (state.wishlist?.itemsByUserId?.[effectiveUserId] || []).some((item) => item.id === id),
   );
 
-  const cartItems = useAppSelector((state) => state.cart.items);
+  const cartItems = useAppSelector((state) => state.cart?.itemsByUserId?.[effectiveUserId] || []);
   const existingCartItem = cartItems.find((item) => item.id === id);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    if (isOwner) {
+      toast.error('You cannot add your own product to the cart');
+      return;
+    }
 
     if (quantity === 0) {
       toast.error('This item is out of stock');
@@ -56,12 +69,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
     dispatch(
       addItem({
-        id,
-        title,
-        price,
-        imageUrl,
-        availableQuantity: quantity,
-        artist: artist || 'Culture Lense Artist',
+        item: {
+          id,
+          vendorId,
+          title,
+          price,
+          imageUrl,
+          availableQuantity: quantity,
+          artist: artist || 'Culture Lense Artist',
+        },
+        userId: effectiveUserId,
       }),
     );
     toast.success('Added to cart');
@@ -70,14 +87,24 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   const handleToggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    if (isOwner) {
+      toast.error('You cannot add your own product to the wishlist');
+      return;
+    }
+
     dispatch(
       toggleWishlist({
-        id,
-        title,
-        price,
-        imageUrl,
-        availableQuantity: quantity,
-        artist: artist || 'Culture Lense Artist',
+        item: {
+          id,
+          vendorId,
+          title,
+          price,
+          imageUrl,
+          availableQuantity: quantity,
+          artist: artist || 'Culture Lense Artist',
+        },
+        userId: effectiveUserId,
       }),
     );
     if (!isInWishlist) {
@@ -94,7 +121,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       <Link href={`/marketplace/${id}`} className="inline-block h-full w-full">
         <Card className="relative flex flex-col h-full overflow-hidden border-none bg-card shadow-lg hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 rounded-3xl">
           {/* Image Container */}
-          <div className="relative aspect-[3/4] overflow-hidden bg-muted">
+          <div className="relative overflow-hidden bg-muted">
             {isNew && (
               <Badge className="absolute top-4 left-4 z-10 bg-primary text-white border-none px-3 py-1.5 shadow-lg">
                 <span className="text-[10px] font-black uppercase tracking-wider">New</span>
@@ -103,24 +130,29 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
             {/* Wishlist Button */}
             <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
+              whileHover={!isOwner ? { scale: 1.1 } : {}}
+              whileTap={!isOwner ? { scale: 0.9 } : {}}
               onClick={handleToggleWishlist}
+              disabled={!!isOwner}
               className={cn(
                 'absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-card/90 backdrop-blur-sm transition-all duration-300 shadow-lg flex items-center justify-center hover:bg-card',
                 isInWishlist
                   ? 'text-red-500 opacity-100'
                   : 'text-foreground opacity-0 group-hover:opacity-100 hover:text-primary',
+                isOwner && 'cursor-not-allowed opacity-50',
               )}
             >
               <Heart className={cn('w-4 h-4', isInWishlist && 'fill-current')} />
             </motion.button>
 
-            <img
-              src={imageUrl}
-              alt={title}
-              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-            />
+            <div className="h-full w-full aspect-[4/5]">
+              <Image
+                src={imageUrl}
+                alt={title}
+                fill
+                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+              />
+            </div>
 
             {/* Gradient Overlay on Hover */}
             <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -149,13 +181,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                   Rs.{price.toLocaleString()}
                 </span>
                 <motion.button
-                  whileHover={quantity > 0 ? { scale: 1.05 } : {}}
-                  whileTap={quantity > 0 ? { scale: 0.95 } : {}}
+                  whileHover={quantity > 0 && !isOwner ? { scale: 1.05 } : {}}
+                  whileTap={quantity > 0 && !isOwner ? { scale: 0.95 } : {}}
                   onClick={handleAddToCart}
-                  disabled={quantity === 0}
+                  disabled={quantity === 0 || !!isOwner}
                   className={cn(
                     'w-10 h-10 rounded-full flex items-center justify-center transition-all',
-                    quantity > 0
+                    quantity > 0 && !isOwner
                       ? 'bg-primary/10 text-primary hover:bg-primary hover:text-white'
                       : 'bg-muted text-muted-foreground cursor-not-allowed opacity-50',
                   )}

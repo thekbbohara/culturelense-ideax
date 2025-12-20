@@ -244,7 +244,7 @@ export async function getVendorReviews(vendorId: string) {
             imageUrl: true,
           },
         },
-        buyer: {
+        user: {
           columns: {
             id: true,
             email: true,
