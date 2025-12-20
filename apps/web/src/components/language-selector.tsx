@@ -34,29 +34,29 @@ export function LanguageSelector({ userId, variant = "default", initialValue }: 
   };
 
   if (variant === "minimal") {
-      return (
-        <div className="relative group">
-            <button className="p-2 hover:bg-accent rounded-full text-muted-foreground hover:text-foreground transition-colors">
-                <Globe className="w-5 h-5" />
-            </button>
-            <div className="absolute right-0 top-full mt-2 w-48 bg-card border rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 max-h-[300px] overflow-y-auto">
-                <div className="p-2 grid gap-1">
-                    {LANGUAGES.map((lang) => (
-                         <button
-                            key={lang.code}
-                            onClick={() => handleLanguageChange(lang.code)}
-                            className={cn(
-                                "text-left px-3 py-2 rounded-lg text-sm hover:bg-muted transition-colors truncate w-full",
-                                currentLang === lang.code && "bg-muted font-medium text-primary"
-                            )}
-                        >
-                            {lang.name}
-                        </button>
-                    ))}
-                </div>
-            </div>
+    return (
+      <div className="relative group">
+        <button className="p-2 bg-stxt shadow-xl hover:bg-accent rounded-full text-muted-foreground hover:text-foreground transition-colors">
+          <Globe className="w-6 h-6" />
+        </button>
+        <div className="absolute right-0 top-full mt-2 w-48 bg-card border rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 max-h-[300px] overflow-y-auto">
+          <div className="p-2 grid gap-1">
+            {LANGUAGES.map((lang) => (
+              <button
+                key={lang.code}
+                onClick={() => handleLanguageChange(lang.code)}
+                className={cn(
+                  "text-left px-3 py-2 rounded-lg text-sm hover:bg-muted transition-colors truncate w-full",
+                  currentLang === lang.code && "bg-muted font-medium text-primary"
+                )}
+              >
+                {lang.name}
+              </button>
+            ))}
+          </div>
         </div>
-      )
+      </div>
+    )
   }
 
   return (

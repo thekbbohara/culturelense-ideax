@@ -5,6 +5,8 @@ import { NavSearch } from '@/components/search/nav-search';
 import { ShoppingCart, Heart } from 'lucide-react';
 import Link from 'next/link';
 import { useAppSelector } from '@/store/hooks';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 export function Nav() {
   const [isVisible, setIsVisible] = React.useState(true);
@@ -19,6 +21,8 @@ export function Nav() {
   const wishlistItemsCount = useAppSelector(
     (state) => (state.wishlist?.itemsByUserId?.[effectiveUserId as string] || []).length,
   );
+
+  const router = useRouter();
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -50,14 +54,14 @@ export function Nav() {
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 md:h-16 flex items-center justify-between">
-        <Link href="/home" className="flex items-center gap-2 shrink-0 group">
-          <div className="w-8 h-8 md:w-10 md:h-10 bg-white rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-            <span className="text-primary font-serif text-lg md:text-xl font-bold italic">C</span>
-          </div>
-          <span className="font-serif text-xl md:text-2xl font-black tracking-tighter uppercase hidden lg:block text-white">
-            CultureLense
-          </span>
-        </Link>
+        <Image
+          src="/cultureLense.png"
+          alt="CultureLense Logo"
+          width={50}
+          height={50}
+          className="w-12 h-12 object-cover rounded-full"
+          onClick={() => router.push('/home')}
+        />
 
         <div className="flex items-center gap-4 md:gap-8 shrink-0 grow justify-end ml-4">
           <div className="w-full max-w-xs lg:w-80 transition-all hidden sm:block">
