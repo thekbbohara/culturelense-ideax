@@ -30,6 +30,14 @@ export const FilterSidebar = () => {
     setPriceRange(value);
   };
 
+  useEffect(() => {
+    if (!isMobileFilterOpen) return;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [isMobileFilterOpen]);
+
   const FilterContent = () => (
     <div className="space-y-6">
       {/* Category */}
@@ -154,7 +162,7 @@ export const FilterSidebar = () => {
                 animate={{ y: 0 }}
                 exit={{ y: '100%' }}
                 transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-                className="fixed bottom-0 left-0 right-0 bg-card text-card-foreground rounded-t-3xl shadow-2xl z-50 max-h-[85vh] overflow-hidden"
+                className="fixed bottom-0 left-0 right-0 bg-card text-card-foreground rounded-t-3xl shadow-2xl z-[9999] max-h-[85vh]"
               >
                 {/* Handle Bar */}
                 <div className="flex justify-center pt-3 pb-2">

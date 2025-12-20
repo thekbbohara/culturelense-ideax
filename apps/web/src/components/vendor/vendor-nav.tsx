@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Package, ShoppingCart, MessageSquare, LayoutDashboard, LogOut } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   Sidebar,
@@ -16,36 +16,13 @@ import {
 } from '../ui/sidebar';
 import { createClient } from '@/lib/supabase/client';
 
-interface NavItem {
+export interface NavItem {
   title: string;
   href: string;
   icon: React.ComponentType<{ className?: string }>;
 }
 
-const navItems: NavItem[] = [
-  {
-    title: 'Dashboard',
-    href: '/vendor',
-    icon: LayoutDashboard,
-  },
-  {
-    title: 'Products',
-    href: '/vendor/products',
-    icon: Package,
-  },
-  {
-    title: 'Orders',
-    href: '/vendor/orders',
-    icon: ShoppingCart,
-  },
-  {
-    title: 'Feedbacks',
-    href: '/vendor/feedbacks',
-    icon: MessageSquare,
-  },
-];
-
-export function VendorNav() {
+export function VendorNav({ navItems, isAdmin }: { navItems: NavItem[]; isAdmin?: boolean }) {
   const pathname = usePathname();
 
   const handleLogout = async () => {
@@ -66,9 +43,11 @@ export function VendorNav() {
             <SidebarMenu>
               {navItems.map((tab: NavItem) => {
                 const isActive =
-                  tab.href === '/vendor'
-                    ? pathname === '/vendor'
-                    : pathname === tab.href || pathname.startsWith(tab.href + '/');
+                  tab.href === '/admin'
+                    ? pathname === '/admin'
+                    : tab.href === '/vendor'
+                      ? pathname === '/vendor'
+                      : pathname === tab.href || pathname.startsWith(tab.href + '/');
                 return (
                   <SidebarMenuItem
                     key={tab.title}
