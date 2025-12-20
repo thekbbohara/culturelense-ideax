@@ -18,6 +18,7 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { createClient } from '@/lib/supabase/client';
 import { Product } from '../page';
+import Image from 'next/image';
 
 export default function ProductDetailPage({ params }: { params: { id: string } }) {
   const [product, setProduct] = useState<Product | null>(null);
@@ -213,11 +214,14 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                     <span className="text-xs font-black uppercase tracking-wider">New Arrival</span>
                   </Badge>
                 )}
-                <img
-                  src={product.imageUrl}
-                  alt={product.title}
-                  className="w-full object-cover transition-transform duration-700 group-hover:scale-105 h-[600px]"
-                />
+                <div className="h-full w-full aspect-[4/5]">
+                  <Image
+                    src={product.imageUrl}
+                    alt={product.title}
+                    fill
+                    className="w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </div>
             </div>

@@ -10,6 +10,7 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { addItem } from '@/store/slices/cartSlice';
 import { toggleWishlist } from '@/store/slices/wishlistSlice';
 import { toast } from 'sonner';
+import Image from 'next/image';
 
 interface ProductCardProps {
   id: string;
@@ -120,7 +121,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       <Link href={`/marketplace/${id}`} className="inline-block h-full w-full">
         <Card className="relative flex flex-col h-full overflow-hidden border-none bg-card shadow-lg hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 rounded-3xl">
           {/* Image Container */}
-          <div className="relative aspect-[3/4] overflow-hidden bg-muted">
+          <div className="relative overflow-hidden bg-muted">
             {isNew && (
               <Badge className="absolute top-4 left-4 z-10 bg-primary text-white border-none px-3 py-1.5 shadow-lg">
                 <span className="text-[10px] font-black uppercase tracking-wider">New</span>
@@ -144,11 +145,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               <Heart className={cn('w-4 h-4', isInWishlist && 'fill-current')} />
             </motion.button>
 
-            <img
-              src={imageUrl}
-              alt={title}
-              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-            />
+            <div className="h-full w-full aspect-[4/5]">
+              <Image
+                src={imageUrl}
+                alt={title}
+                fill
+                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+              />
+            </div>
 
             {/* Gradient Overlay on Hover */}
             <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
