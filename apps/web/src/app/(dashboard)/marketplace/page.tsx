@@ -25,6 +25,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination';
+import { cn } from '@/lib/utils';
 
 type Product = {
   id: string;
@@ -334,59 +335,62 @@ export default function MarketplacePage() {
                     </div>
 
                     {/* Pagination */}
-                    {totalPages > 1 && (
-                      <div className="pt-8 border-t">
-                        <Pagination>
-                          <PaginationContent>
-                            <PaginationItem>
-                              <PaginationPrevious
+                    <div className="pt-8 border-t">
+                      <Pagination className="flex justify-end">
+                        <PaginationContent>
+                          <PaginationItem>
+                            <PaginationPrevious
+                              href="#"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                if (currentPage > 1) handlePageChange(currentPage - 1);
+                              }}
+                              className={
+                                currentPage <= 1
+                                  ? 'pointer-events-none opacity-50'
+                                  : 'cursor-pointer'
+                              }
+                            />
+                          </PaginationItem>
+
+                          {Array.from({ length: totalPages }).map((_, i) => (
+                            <PaginationItem key={i}>
+                              <PaginationLink
                                 href="#"
                                 onClick={(e) => {
                                   e.preventDefault();
-                                  if (currentPage > 1) handlePageChange(currentPage - 1);
+                                  handlePageChange(i + 1);
                                 }}
-                                className={
-                                  currentPage <= 1
-                                    ? 'pointer-events-none opacity-50'
-                                    : 'cursor-pointer'
-                                }
-                              />
+                                isActive={currentPage === i + 1}
+                                className={cn(
+                                  `cursor-pointer`,
+                                  currentPage === i + 1
+                                    ? 'bg-primary text-white hover:text-white'
+                                    : 'bg-card border text-foreground hover:text-primary hover:border-primary',
+                                )}
+                              >
+                                {i + 1}
+                              </PaginationLink>
                             </PaginationItem>
+                          ))}
 
-                            {Array.from({ length: totalPages }).map((_, i) => (
-                              <PaginationItem key={i}>
-                                <PaginationLink
-                                  href="#"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    handlePageChange(i + 1);
-                                  }}
-                                  isActive={currentPage === i + 1}
-                                  className="cursor-pointer"
-                                >
-                                  {i + 1}
-                                </PaginationLink>
-                              </PaginationItem>
-                            ))}
-
-                            <PaginationItem>
-                              <PaginationNext
-                                href="#"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  if (currentPage < totalPages) handlePageChange(currentPage + 1);
-                                }}
-                                className={
-                                  currentPage >= totalPages
-                                    ? 'pointer-events-none opacity-50'
-                                    : 'cursor-pointer'
-                                }
-                              />
-                            </PaginationItem>
-                          </PaginationContent>
-                        </Pagination>
-                      </div>
-                    )}
+                          <PaginationItem>
+                            <PaginationNext
+                              href="#"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                if (currentPage < totalPages) handlePageChange(currentPage + 1);
+                              }}
+                              className={
+                                currentPage >= totalPages
+                                  ? 'pointer-events-none opacity-50'
+                                  : 'cursor-pointer'
+                              }
+                            />
+                          </PaginationItem>
+                        </PaginationContent>
+                      </Pagination>
+                    </div>
                   </div>
                 )}
               </AnimatePresence>
