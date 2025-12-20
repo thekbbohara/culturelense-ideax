@@ -379,10 +379,8 @@ export async function getListingsByEntityId(entityId: string) {
   }
 }
 
-export async function getReviews(listingId: string, page: number = 1, limit: number = 5) {
+export async function getReviews(listingId: string, offset: number = 0, limit: number = 5) {
   try {
-    const offset = (page - 1) * limit;
-
     const items = await db
       .select({
         id: reviews.id,
@@ -410,8 +408,6 @@ export async function getReviews(listingId: string, page: number = 1, limit: num
       success: true,
       data: items,
       total,
-      totalPages: Math.ceil(total / limit),
-      currentPage: page,
     };
   } catch (error) {
     console.error('Failed to fetch reviews:', error);

@@ -92,9 +92,8 @@ export const ReviewsList = ({ listingId, currentUserId }: ReviewsListProps) => {
       }
 
       try {
-        // Calculate page from offset
-        const page = Math.floor(offset / limit) + 1;
-        const res = await getReviews(listingId, page, limit);
+        // Pass offset directly to getReviews (offset-based pagination)
+        const res = await getReviews(listingId, offset, limit);
 
         if (res.success && res.data) {
           const validatedData: Review[] = res.data.map((r: any) => ({
@@ -344,10 +343,13 @@ export const ReviewsList = ({ listingId, currentUserId }: ReviewsListProps) => {
       <div className="space-y-4 sm:space-y-6">
         <h3 className="text-lg sm:text-xl font-bold text-neutral-black">Customer Reviews</h3>
 
-        <div className="space-y-3 sm:space-y-4">
+        <div
+          className={cn(`space-y-3 sm:space-y-4`, reviews?.length === 4 ? '' : 'overflow-y-auto max-h-[800px]')}
+          style={{ scrollbarWidth: 'thin' }}
+        >
           {reviews.length > 0 ? (
             <AnimatePresence mode="popLayout">
-              {reviews.map((review) => (
+              {reviews?.map((review) => (
                 <motion.div
                   key={review.id}
                   initial={{ opacity: 0, y: 20 }}

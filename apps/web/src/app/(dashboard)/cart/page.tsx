@@ -76,7 +76,7 @@ export default function CartPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-white via-neutral-white to-primary/5 pb-32 lg:pb-12">
+    <div className="min-h-screen bg-gradient-to-br from-neutral-white via-neutral-white to-primary/5 pb-24 lg:pb-12">
       {/* Header */}
       <div className="bg-gradient-to-r from-primary/10 to-secondary/10 border-b border-primary/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">

@@ -186,7 +186,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-white via-neutral-white to-primary/5">
+    <div className="min-h-screen bg-gradient-to-br from-neutral-white via-neutral-white to-primary/5 lg:pb-12 pb-24">
       {/* Hero Section with Breadcrumb */}
       <div className="bg-gradient-to-r from-primary/10 to-secondary/10 border-b border-primary/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -241,7 +241,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
           >
             {/* Title & Artist */}
             <div>
-              <h1 className="text-5xl font-serif font-black italic text-neutral-black mb-3 leading-tight">
+              <h1 className="sm:text-5xl text-4xl font-serif font-black italic text-neutral-black mb-3 leading-tight">
                 {product.title}
               </h1>
               <p className="text-2xl text-neutral-black/60 font-medium">
@@ -250,7 +250,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
             </div>
 
             {/* Price & Status */}
-            <div className="flex items-center gap-6 p-6 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-2xl border border-primary/10">
+            <div className="flex sm:flex-row flex-col sm:items-center sm:gap-6 gap-2 sm:p-6 p-4 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-2xl border border-primary/10">
               <div>
                 <p className="text-sm text-neutral-black/50 font-medium uppercase tracking-wider mb-1">
                   Price
@@ -259,13 +259,13 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                   Rs. {product.price.toLocaleString()}
                 </span>
               </div>
-              <Separator orientation="vertical" className="h-12" />
+              <Separator orientation="vertical" className="h-12 sm:inline-block hidden" />
               <Badge
                 className={cn(
                   'px-4 py-2',
                   product.quantity > 0
-                    ? 'bg-green-500/10 text-green-700 border-green-200'
-                    : 'bg-red-500/10 text-red-700 border-red-200',
+                    ? 'bg-green-500/10 hover:bg-green-500/20 text-green-700 border-green-200'
+                    : 'bg-red-500/10 hover:bg-red-500/20 text-red-700 border-red-200',
                 )}
               >
                 <span className="font-bold">
