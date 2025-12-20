@@ -20,11 +20,9 @@ import { createClient } from "@/lib/supabase/client";
 import { usePWAInstall } from "@/components/pwa-provider";
 
 import { LanguageSelector } from "@/components/language-selector";
-import { useRouter } from "next/navigation";
 
 export default function LandingPage() {
-  const router = useRouter();
-  const [isScanning, setIsScanning] = React.useState(false);
+  const [isScanning] = React.useState(false);
   const { install } = usePWAInstall();
 
   const handleLogin = async () => {
@@ -48,7 +46,6 @@ export default function LandingPage() {
             width={50}
             height={50}
             className="w-12 h-12 object-cover rounded-full"
-            onClick={() => router.push('/home')}
           />
           <div className="flex items-center gap-4">
             <LanguageSelector variant="minimal" />
@@ -450,7 +447,6 @@ export default function LandingPage() {
                 width={50}
                 height={50}
                 className="w-20 h-20 object-cover rounded-full"
-                onClick={() => router.push('/home')}
               />
               <div className="flex flex-col gap-6 leading-relaxed">
                 <p className="text-neutral-black/60 max-w-sm text-lg font-semibold ">
