@@ -65,15 +65,19 @@ export default function EditProductPage() {
   return (
     <div className="mx-auto space-y-6">
       {/* Back Button */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-serif font-black italic text-foreground">Edit Product</h1>
-          <p className="text-muted-foreground mt-2">Update your product listing details</p>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-black italic text-foreground">
+            Edit Product
+          </h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-1 sm:mt-2">
+            Update your product listing details
+          </p>
         </div>
-        <Link href="/vendor/products">
+        <Link href="/vendor/products" className="w-full sm:w-auto">
           <Button
             variant="outline"
-            className="gap-2 border-primary text-primary hover:bg-primary hover:text-white ease-linear duration-200"
+            className="w-full sm:w-auto gap-2 border-primary text-primary hover:bg-primary hover:text-white ease-linear duration-200 h-11 sm:h-10"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Products

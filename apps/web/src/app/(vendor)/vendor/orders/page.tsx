@@ -27,8 +27,12 @@ export default function OrdersPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-4xl font-serif font-black italic text-foreground">Orders</h1>
-        <p className="text-muted-foreground mt-2">Manage and track your product orders</p>
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-black italic text-foreground">
+          Orders
+        </h1>
+        <p className="text-sm sm:text-base text-muted-foreground mt-1 sm:mt-2">
+          Manage and track your product orders
+        </p>
       </div>
 
       {/* Orders Table */}
