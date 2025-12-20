@@ -281,11 +281,10 @@ export default function LandingPage() {
                   className="group cursor-pointer"
                 >
                   <div className="relative aspect-[3/4] rounded-2xl overflow-hidden mb-6">
-                    <Image
+                    <img
                       src={item.img}
                       alt={item.title}
-                      fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-110"
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
                   </div>
                   <div className="flex justify-between items-start">

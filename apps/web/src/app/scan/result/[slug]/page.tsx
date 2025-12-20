@@ -3,6 +3,7 @@ import { Button } from '@culturelense/ui';
 import Link from 'next/link';
 import { ArrowLeft, Share2 } from 'lucide-react';
 import { AnimatedButton } from '@/components/animated-button';
+import { RecordVisit } from '@/components/history/RecordVisit';
 
 export default async function ResultPage({
   params,
@@ -51,6 +52,7 @@ export default async function ResultPage({
 
   return (
     <div className="min-h-screen bg-[#1A1A1A] text-[#FDFBF7] font-sans selection:bg-[#DAA520] selection:text-black">
+      <RecordVisit entityName={entity.name} />
 
       {/* Floating Navigation (Mobile & Desktop) */}
       <nav className="fixed top-0 left-0 right-0 z-50 p-6 flex justify-between items-start ">

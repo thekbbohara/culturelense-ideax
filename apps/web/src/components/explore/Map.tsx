@@ -200,6 +200,9 @@ export default function Map() {
         },
         onSettled: () => {
             queryClient.invalidateQueries({ queryKey: ['explore-data'] });
+            queryClient.invalidateQueries({ queryKey: ['user-history'] });
+            queryClient.invalidateQueries({ queryKey: ['recent-entities'] });
+            queryClient.invalidateQueries({ queryKey: ['recommended-entities'] });
         },
     });
 
