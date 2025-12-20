@@ -11,6 +11,7 @@ export interface CheckoutData {
     quantity: number;
     price: number;
   }[];
+  paymentMethod: 'cod' | 'escrow';
   shippingAddress: string;
 }
 
@@ -30,13 +31,21 @@ export async function createOrders(data: CheckoutData) {
       const orderResults = [];
 
       for (const item of data.items) {
-        // 1. Check stock again inside transaction
+        // 1. Check stock and fetch listing with vendor info
         const listing = await tx.query.listings.findFirst({
           where: eq(listings.id, item.listingId),
+          with: {
+            vendor: true,
+          },
         });
 
         if (!listing) {
           throw new Error(`Listing ${item.listingId} not found`);
+        }
+
+        // 2. CRITICAL: Vendor self-purchase prevention
+        if (listing.vendor.userId === user.id) {
+          throw new Error(`Cannot purchase your own product: ${listing.title}`);
         }
 
         const currentQuantity = listing.quantity;
@@ -53,6 +62,7 @@ export async function createOrders(data: CheckoutData) {
             listingId: item.listingId,
             quantity: item.quantity.toString(),
             totalAmount,
+            paymentMethod: data.paymentMethod, // 'cod' or 'escrow'
             shippingAddress: data.shippingAddress,
             status: 'pending',
           })
