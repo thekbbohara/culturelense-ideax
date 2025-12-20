@@ -1,4 +1,13 @@
-import { pgTable, uuid, text, timestamp, boolean, pgEnum, primaryKey, integer } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  uuid,
+  text,
+  timestamp,
+  boolean,
+  pgEnum,
+  primaryKey,
+  integer,
+} from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 // Enums
@@ -167,6 +176,7 @@ export const listings = pgTable('listings', {
     .references(() => vendors.id)
     .notNull(),
   entityId: uuid('entity_id').references(() => culturalEntities.id), // Optional linking to specific deity
+  categoryId: uuid('category_id').references(() => categories.id), // Link to category
   title: text('title').notNull(),
   description: text('description').notNull(),
   price: text('price').notNull(),
@@ -208,7 +218,7 @@ export const scanHistory = pgTable('scan_history', {
     .notNull(),
   entityId: uuid('entity_id').references(() => culturalEntities.id), // Nullable if not identified
   imageUrl: text('image_url').notNull(),
-  timestamp: timestamp('timestamp'                          ).defaultNow().notNull(),
+  timestamp: timestamp('timestamp').defaultNow().notNull(),
 });
 
 export const visitedLocations = pgTable('visited_locations', {
@@ -305,6 +315,10 @@ export const listingsRelations = relations(listings, ({ one, many }) => ({
     fields: [listings.entityId],
     references: [culturalEntities.id],
   }),
+  category: one(categories, {
+    fields: [listings.categoryId],
+    references: [categories.id],
+  }),
   reviews: many(reviews),
 }));
 
@@ -399,4 +413,19 @@ export const reviewsRelations = relations(reviews, ({ one }) => ({
     fields: [reviews.buyerId],
     references: [users.id],
   }),
+}));
+
+// Categories
+export const categories = pgTable('categories', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  name: text('name').notNull(),
+  slug: text('slug').notNull().unique(),
+  description: text('description'),
+  imageUrl: text('image_url'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+export const categoriesRelations = relations(categories, ({ many }) => ({
+  listings: many(listings),
 }));
