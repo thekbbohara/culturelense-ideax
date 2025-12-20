@@ -27,12 +27,13 @@ import {
 } from '@/components/ui/pagination';
 import { cn } from '@/lib/utils';
 
-type Product = {
+export type Product = {
   id: string;
   title: string;
   description: string;
   price: number;
   imageUrl: string;
+  quantity: number;
   artist?: string | null;
   isNew?: boolean;
 };
@@ -263,6 +264,7 @@ export default function MarketplacePage() {
                         artist={item.artist || 'Culture Lense Artist'}
                         price={item.price}
                         imageUrl={item.imageUrl}
+                        quantity={item.quantity}
                         isNew={item.isNew}
                         className="h-full w-full"
                       />
@@ -327,6 +329,7 @@ export default function MarketplacePage() {
                             artist={item.artist || 'Culture Lense Artist'}
                             price={item.price}
                             imageUrl={item.imageUrl}
+                            quantity={item.quantity}
                             isNew={item.isNew}
                             className="h-full w-full"
                           />

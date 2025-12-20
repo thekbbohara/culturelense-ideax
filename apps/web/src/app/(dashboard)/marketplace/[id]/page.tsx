@@ -11,22 +11,70 @@ import { getListingById, getSimilarListingsByTitle } from '@/actions/marketplace
 import { ShoppingCart, Heart, Share2, Shield, Award, TrendingUp, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-type Product = {
-  id: string;
-  title: string;
-  description: string;
-  price: number;
-  imageUrl: string;
-  artist?: string | null;
-  isNew?: boolean;
-  category?: string;
-};
+import { addItem } from '@/store/slices/cartSlice';
+import { toggleWishlist } from '@/store/slices/wishlistSlice';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
+import { Product } from '../page';
 
 export default function ProductDetailPage({ params }: { params: { id: string } }) {
   const [product, setProduct] = React.useState<Product | null>(null);
   const [similarProducts, setSimilarProducts] = React.useState<Product[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
+
+  const dispatch = useAppDispatch();
+  const isInWishlist = useAppSelector((state) =>
+    state.wishlist.items.some((item) => item.id === params.id),
+  );
+
+  const cartItems = useAppSelector((state) => state.cart.items);
+  const existingCartItem = cartItems.find((item) => item.id === params.id);
+
+  const handleAddToCart = () => {
+    if (product) {
+      if (product.quantity === 0) {
+        toast.error('This item is out of stock');
+        return;
+      }
+
+      if (existingCartItem && existingCartItem.quantity >= product.quantity) {
+        toast.warning(`You've reached the maximum available quantity (${product.quantity})`);
+        return;
+      }
+
+      dispatch(
+        addItem({
+          id: product.id,
+          title: product.title,
+          price: product.price,
+          imageUrl: product.imageUrl,
+          availableQuantity: product.quantity,
+          artist: product.artist || 'Culture Lense Artist',
+        }),
+      );
+      toast.success('Added to cart');
+    }
+  };
+
+  const handleToggleWishlist = () => {
+    if (product) {
+      dispatch(
+        toggleWishlist({
+          id: product.id,
+          title: product.title,
+          price: product.price,
+          availableQuantity: product.quantity,
+          imageUrl: product.imageUrl,
+          artist: product.artist || 'Culture Lense Artist',
+        }),
+      );
+      if (!isInWishlist) {
+        toast.success('Added to wishlist');
+      }
+    }
+  };
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -172,8 +220,17 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                 </span>
               </div>
               <Separator orientation="vertical" className="h-12" />
-              <Badge className="bg-green-500/10 text-green-700 border-green-200 px-4 py-2">
-                <span className="font-bold">In Stock</span>
+              <Badge
+                className={cn(
+                  'px-4 py-2',
+                  product.quantity > 0
+                    ? 'bg-green-500/10 text-green-700 border-green-200'
+                    : 'bg-red-500/10 text-red-700 border-red-200',
+                )}
+              >
+                <span className="font-bold">
+                  {product.quantity > 0 ? `In Stock (${product.quantity})` : 'Out of Stock'}
+                </span>
               </Badge>
             </div>
 
@@ -181,17 +238,30 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
             <div className="flex gap-4">
               <Button
                 size="lg"
-                className="flex-1 h-14 text-base font-bold bg-primary hover:bg-primary/90 shadow-lg shadow-primary/30 rounded-full"
+                onClick={handleAddToCart}
+                disabled={product.quantity === 0}
+                className={cn(
+                  'flex-1 h-14 text-base font-bold shadow-lg rounded-full transition-all',
+                  product.quantity > 0
+                    ? 'bg-primary hover:bg-primary/90 shadow-primary/30'
+                    : 'bg-muted text-muted-foreground cursor-not-allowed opacity-50',
+                )}
               >
                 <ShoppingCart className="w-5 h-5 mr-2" />
-                Add to Cart
+                {product.quantity > 0 ? 'Add to Cart' : 'Out of Stock'}
               </Button>
               <Button
                 size="lg"
                 variant="outline"
-                className="h-14 aspect-square p-0 rounded-full border-2 border-primary/20 hover:bg-primary/10 hover:border-primary"
+                onClick={handleToggleWishlist}
+                className={cn(
+                  'h-14 aspect-square p-0 rounded-full border-2 transition-all',
+                  isInWishlist
+                    ? 'bg-red-50 border-red-200 text-red-500 hover:bg-red-100'
+                    : 'border-primary/20 hover:bg-primary/10 hover:border-primary text-foreground',
+                )}
               >
-                <Heart className="w-5 h-5" />
+                <Heart className={cn('w-5 h-5', isInWishlist && 'fill-current')} />
               </Button>
               <Button
                 size="lg"
@@ -297,6 +367,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                     title={item.title}
                     artist={item.artist || 'Culture Lense Artist'}
                     price={item.price}
+                    quantity={item.quantity}
                     imageUrl={item.imageUrl}
                     isNew={item.isNew}
                     className="h-full w-full"

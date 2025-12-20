@@ -8,32 +8,38 @@ import { Heart, ShoppingCart, Trash2, ArrowRight, Sparkles } from 'lucide-react'
 import Link from 'next/link';
 import { dummyProducts } from '@/data/dummy-products';
 
-interface WishlistItem {
-  id: string;
-  title: string;
-  artist: string;
-  price: number;
-  imageUrl: string;
-  isNew?: boolean;
-  inStock: boolean;
-}
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { toggleWishlist } from '@/store/slices/wishlistSlice';
+import { addItem } from '@/store/slices/cartSlice';
+import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 export default function WishlistPage() {
-  // Using dummy products as wishlist items
-  const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>(
-    dummyProducts.slice(0, 4).map((item) => ({
-      ...item,
-      inStock: Math.random() > 0.3,
-    })),
-  );
+  const dispatch = useAppDispatch();
+  const wishlistItems = useAppSelector((state) => state.wishlist.items);
+  const cartItems = useAppSelector((state) => state.cart.items);
 
-  const removeItem = (id: string) => {
-    setWishlistItems((items) => items.filter((item) => item.id !== id));
+  const handleRemoveItem = (item: any) => {
+    dispatch(toggleWishlist(item));
+    toast.success('Removed from wishlist');
   };
 
-  const moveToCart = (id: string) => {
-    // In real app, this would add to cart and remove from wishlist
-    removeItem(id);
+  const moveToCart = (item: any) => {
+    const existingCartItem = cartItems.find((ci) => ci.id === item.id);
+
+    if (item.availableQuantity === 0) {
+      toast.error('This item is out of stock');
+      return;
+    }
+
+    if (existingCartItem && existingCartItem.quantity >= item.availableQuantity) {
+      toast.warning(`Maximum available quantity (${item.availableQuantity}) reached in cart`);
+      return;
+    }
+
+    dispatch(addItem({ ...item, quantity: 1 }));
+    dispatch(toggleWishlist(item));
+    toast.success('Moved to cart');
   };
 
   if (wishlistItems.length === 0) {
@@ -87,7 +93,7 @@ export default function WishlistPage() {
           <div className="flex items-center gap-3">
             <Badge className="bg-primary/10 text-primary border-primary/20 px-3 py-1">
               <Sparkles className="w-3 h-3 mr-1" />
-              {wishlistItems.filter((i) => i.inStock).length} Available
+              {wishlistItems.filter((i) => i.availableQuantity > 0).length} Available
             </Badge>
           </div>
           <div className="flex gap-3">
@@ -122,7 +128,7 @@ export default function WishlistPage() {
                       </Badge>
                     )}
 
-                    {!item.inStock && (
+                    {item.availableQuantity === 0 && (
                       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm z-10 flex items-center justify-center">
                         <Badge className="bg-white text-neutral-black border-none px-4 py-2">
                           Out of Stock
@@ -142,7 +148,7 @@ export default function WishlistPage() {
                     <motion.button
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
-                      onClick={() => removeItem(item.id)}
+                      onClick={() => handleRemoveItem(item)}
                       className="absolute top-3 right-3 z-20 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm text-neutral-black opacity-0 group-hover:opacity-100 transition-all hover:text-red-600 shadow-lg flex items-center justify-center"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -160,19 +166,24 @@ export default function WishlistPage() {
 
                     <div className="flex items-center justify-between mb-3">
                       <span className="text-2xl font-black text-primary">
-                        ${item.price.toLocaleString()}
+                        Rs.{item.price.toLocaleString()}
                       </span>
                     </div>
 
                     {/* Actions */}
                     <div className="flex gap-2">
                       <Button
-                        onClick={() => moveToCart(item.id)}
-                        disabled={!item.inStock}
-                        className="flex-1 bg-primary hover:bg-primary/90 text-white font-bold h-10 rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
+                        onClick={() => moveToCart(item)}
+                        disabled={item.availableQuantity === 0}
+                        className={cn(
+                          'flex-1 font-bold h-10 rounded-full transition-all',
+                          item.availableQuantity > 0
+                            ? 'bg-primary hover:bg-primary/90 text-white'
+                            : 'bg-muted text-muted-foreground cursor-not-allowed opacity-50',
+                        )}
                       >
                         <ShoppingCart className="w-4 h-4 mr-2" />
-                        Add to Cart
+                        {item.availableQuantity > 0 ? 'Add to Cart' : 'Out of Stock'}
                       </Button>
                     </div>
                   </div>
@@ -212,7 +223,7 @@ export default function WishlistPage() {
                       {item.title}
                     </h4>
                     <p className="text-primary font-black text-lg">
-                      ${item.price.toLocaleString()}
+                      Rs.{item.price.toLocaleString()}
                     </p>
                   </div>
                 </div>

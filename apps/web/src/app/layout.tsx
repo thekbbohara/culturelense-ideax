@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/sonner';
 import { QueryProvider } from '@/components/query-provider';
 import { PWAInstallPrompt } from '@/components/pwa-install-prompt';
 import { PWAProvider } from '@/components/pwa-provider';
+import { ReduxProvider } from '@/components/providers/ReduxProvider';
 
 export const metadata: Metadata = {
   title: 'CultureLense',
@@ -50,20 +51,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body>
-        <QueryProvider>
-          <PWAProvider>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="light"
-              enableSystem
-              disableTransitionOnChange
-            >
-              <div>{children}</div>
-              <Toaster position="top-right" richColors />
-              <PWAInstallPrompt />
-            </ThemeProvider>
-          </PWAProvider>
-        </QueryProvider>
+        <ReduxProvider>
+          <QueryProvider>
+            <PWAProvider>
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="light"
+                enableSystem
+                disableTransitionOnChange
+              >
+                <div>{children}</div>
+                <Toaster position="top-right" richColors />
+                <PWAInstallPrompt />
+              </ThemeProvider>
+            </PWAProvider>
+          </QueryProvider>
+        </ReduxProvider>
       </body>
     </html>
   );
