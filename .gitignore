@@ -39,3 +39,13 @@ next-env.d.ts
 .idea
 
 package-lock.json
+*.keras
+**/*.keras
+
+god_recognizer_deploy.zip
+venv
+venv*
+.venv
+
+deploy_package/class*.json
+local_tmp
