@@ -77,7 +77,7 @@ export function ProductForm({
         setIsUploading(true);
         // Use provided vendorId or fallback (though parent should ensure it's passed)
         const uploadPath = vendorId || 'uploads';
-        const result = await uploadProductImage(imageFile, uploadPath);
+        const result = await uploadProductImage('listings',imageFile, uploadPath);
 
         if (!result.success || !result.url) {
           throw new Error(result.error || 'Failed to upload image');
