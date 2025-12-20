@@ -1,48 +1,42 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Trash2, Plus, Minus, ShoppingBag, ArrowRight, Heart, Tag } from 'lucide-react';
 import Link from 'next/link';
-import { dummyProducts } from '@/data/dummy-products';
-
-interface CartItem {
-  id: string;
-  title: string;
-  artist: string;
-  price: number;
-  imageUrl: string;
-  quantity: number;
-}
+import { cn } from '@/lib/utils';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { updateQuantity, removeItem, CartItem } from '@/store/slices/cartSlice';
+import { toggleWishlist } from '@/store/slices/wishlistSlice';
 
 export default function CartPage() {
-  // Using first 3 dummy products as cart items
-  const [cartItems, setCartItems] = useState<CartItem[]>(
-    dummyProducts.slice(0, 3).map((item) => ({
-      ...item,
-      quantity: 1,
-    })),
-  );
+  const dispatch = useAppDispatch();
+  const cartItems = useAppSelector((state) => state.cart.items);
+  const wishlistItems = useAppSelector((state) => state.wishlist.items);
+  const subtotal = useAppSelector((state) => state.cart.totalAmount);
 
-  const updateQuantity = (id: string, delta: number) => {
-    setCartItems((items) =>
-      items.map((item) =>
-        item.id === id ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item,
-      ),
-    );
+  const handleUpdateQuantity = (id: string, currentQty: number, delta: number) => {
+    dispatch(updateQuantity({ id, quantity: Math.max(1, currentQty + delta) }));
   };
 
-  const removeItem = (id: string) => {
-    setCartItems((items) => items.filter((item) => item.id !== id));
+  const handleRemoveItem = (id: string) => {
+    dispatch(removeItem(id));
   };
 
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const shipping = subtotal > 5000 ? 0 : 50;
-  const tax = subtotal * 0.1;
-  const total = subtotal + shipping + tax;
+  const handleSaveToWishlist = (items: CartItem[]) => {
+    items.map((item) => {
+      const isInWishlist = wishlistItems.some((i) => i.id === item.id);
+      if (!isInWishlist) {
+        dispatch(toggleWishlist(item));
+      }
+    });
+  };
+
+  const shipping = subtotal > 5000 || subtotal === 0 ? 0 : 50;
+  const total = subtotal + shipping;
 
   if (cartItems.length === 0) {
     return (
@@ -119,12 +113,30 @@ export default function CartPage() {
                           </h3>
                           <p className="text-sm text-neutral-black/60">{item.artist}</p>
                         </div>
-                        <button
-                          onClick={() => removeItem(item.id)}
-                          className="p-2 rounded-full hover:bg-red-50 text-neutral-black/40 hover:text-red-600 transition-all"
-                        >
-                          <Trash2 className="w-5 h-5" />
-                        </button>
+                        <div className="flex gap-2">
+                          {/* <button
+                            onClick={() => handleSaveToWishlist(item)}
+                            className={cn(
+                              'p-2 rounded-full transition-all',
+                              wishlistItems.some((i) => i.id === item.id)
+                                ? 'bg-red-50 text-red-600 hover:bg-red-100'
+                                : 'hover:bg-primary/10 text-neutral-black/40 hover:text-primary',
+                            )}
+                          >
+                            <Heart
+                              className={cn(
+                                'w-5 h-5',
+                                wishlistItems.some((i) => i.id === item.id) && 'fill-current',
+                              )}
+                            />
+                          </button> */}
+                          <button
+                            onClick={() => handleRemoveItem(item.id)}
+                            className="p-2 rounded-full hover:bg-red-50 text-neutral-black/40 hover:text-red-600 transition-all"
+                          >
+                            <Trash2 className="w-5 h-5" />
+                          </button>
+                        </div>
                       </div>
 
                       <div className="flex items-center justify-between mt-4">
@@ -133,7 +145,7 @@ export default function CartPage() {
                           <Button
                             variant="outline"
                             size="icon"
-                            onClick={() => updateQuantity(item.id, -1)}
+                            onClick={() => handleUpdateQuantity(item.id, item.quantity, -1)}
                             className="h-8 w-8 rounded-full border-primary/20 hover:bg-primary/10"
                           >
                             <Minus className="w-4 h-4" />
@@ -144,8 +156,14 @@ export default function CartPage() {
                           <Button
                             variant="outline"
                             size="icon"
-                            onClick={() => updateQuantity(item.id, 1)}
-                            className="h-8 w-8 rounded-full border-primary/20 hover:bg-primary/10"
+                            onClick={() => handleUpdateQuantity(item.id, item.quantity, 1)}
+                            disabled={item.quantity >= item.availableQuantity}
+                            className={cn(
+                              'h-8 w-8 rounded-full border-primary/20',
+                              item.quantity < item.availableQuantity
+                                ? 'hover:bg-primary/10'
+                                : 'opacity-30 cursor-not-allowed',
+                            )}
                           >
                             <Plus className="w-4 h-4" />
                           </Button>
@@ -154,11 +172,11 @@ export default function CartPage() {
                         {/* Price */}
                         <div className="text-right">
                           <p className="text-2xl font-black text-primary">
-                            ${(item.price * item.quantity).toLocaleString()}
+                            Rs.{(item.price * item.quantity).toLocaleString()}
                           </p>
                           {item.quantity > 1 && (
                             <p className="text-xs text-neutral-black/50">
-                              ${item.price.toLocaleString()} each
+                              Rs.{item.price.toLocaleString()} each
                             </p>
                           )}
                         </div>
@@ -195,7 +213,7 @@ export default function CartPage() {
                 <div className="space-y-4 mb-6">
                   <div className="flex justify-between text-neutral-black/70">
                     <span>Subtotal</span>
-                    <span className="font-semibold">${subtotal.toLocaleString()}</span>
+                    <span className="font-semibold">Rs.{subtotal.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between text-neutral-black/70">
                     <span>Shipping</span>
@@ -205,21 +223,21 @@ export default function CartPage() {
                           FREE
                         </Badge>
                       ) : (
-                        `$${shipping}`
+                        `Rs.${shipping}`
                       )}
                     </span>
                   </div>
-                  <div className="flex justify-between text-neutral-black/70">
+                  {/* <div className="flex justify-between text-neutral-black/70">
                     <span>Tax (10%)</span>
-                    <span className="font-semibold">${tax.toFixed(2)}</span>
-                  </div>
+                    <span className="font-semibold">Rs.{tax.toFixed(2)}</span>
+                  </div> */}
 
                   <Separator className="bg-primary/10" />
 
                   <div className="flex justify-between text-lg">
                     <span className="font-bold">Total</span>
                     <span className="font-black text-2xl text-primary">
-                      ${total.toLocaleString()}
+                      Rs.{total.toLocaleString()}
                     </span>
                   </div>
                 </div>
@@ -233,20 +251,26 @@ export default function CartPage() {
                           Free Shipping Available!
                         </p>
                         <p className="text-xs text-neutral-black/60">
-                          Add ${(5000 - subtotal).toLocaleString()} more to qualify
+                          Add Rs.{(5000 - subtotal).toLocaleString()} more to qualify
                         </p>
                       </div>
                     </div>
                   </div>
                 )}
 
-                <Button className="w-full bg-primary hover:bg-primary/90 text-white font-bold h-14 rounded-full shadow-lg shadow-primary/30 mb-3">
-                  Proceed to Checkout
-                  <ArrowRight className="w-5 h-5 ml-2" />
+                <Button
+                  asChild
+                  className="w-full bg-primary hover:bg-primary/90 text-white font-bold h-14 rounded-full shadow-lg shadow-primary/30 mb-3"
+                >
+                  <Link href="/checkout">
+                    Proceed to Checkout
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </Link>
                 </Button>
 
                 <Button
                   variant="outline"
+                  onClick={() => handleSaveToWishlist(cartItems)}
                   className="w-full border-2 border-primary/20 hover:bg-primary/5 font-bold h-12 rounded-full"
                 >
                   <Heart className="w-5 h-5 mr-2" />

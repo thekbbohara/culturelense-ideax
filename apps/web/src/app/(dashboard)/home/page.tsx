@@ -194,9 +194,7 @@ export default function HomePage() {
                               {item.type}
                             </span>
                           </div>
-                          <h3 className="text-3xl font-serif font-bold text-white mb-2">
-
-                          </h3>
+                          <h3 className="text-3xl font-serif font-bold text-white mb-2"></h3>
                           <div className="flex items-center gap-2 text-white/80 text-sm font-medium">
                             <span>Explore Mythology</span>
                             <ArrowRight className="w-4 h-4" />

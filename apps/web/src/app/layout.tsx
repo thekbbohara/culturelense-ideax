@@ -6,6 +6,7 @@ import { QueryProvider } from '@/components/query-provider';
 import { PWAInstallPrompt } from '@/components/pwa-install-prompt';
 import { PWAProvider } from '@/components/pwa-provider';
 import { GoogleTranslateScript } from '@/components/google-translate-script';
+import { ReduxProvider } from '@/components/providers/ReduxProvider';
 
 export const metadata: Metadata = {
   title: 'CultureLense',
@@ -37,24 +38,30 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         `}</style>
       </head>
       <body>
-        <QueryProvider>
-          <PWAProvider>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="light"
-              enableSystem
-              disableTransitionOnChange
-            >
-              <div suppressHydrationWarning>
-                <div id="google_translate_element" className="hidden" suppressHydrationWarning></div>
-                {children}
-              </div>
-              <GoogleTranslateScript />
-              <Toaster position="top-right" richColors />
-              <PWAInstallPrompt />
-            </ThemeProvider>
-          </PWAProvider>
-        </QueryProvider>
+        <ReduxProvider>
+          <QueryProvider>
+            <PWAProvider>
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="light"
+                enableSystem
+                disableTransitionOnChange
+              >
+                <div suppressHydrationWarning>
+                  <div
+                    id="google_translate_element"
+                    className="hidden"
+                    suppressHydrationWarning
+                  ></div>
+                  {children}
+                </div>
+                <GoogleTranslateScript />
+                <Toaster position="top-right" richColors />
+                <PWAInstallPrompt />
+              </ThemeProvider>
+            </PWAProvider>
+          </QueryProvider>
+        </ReduxProvider>
       </body>
     </html>
   );

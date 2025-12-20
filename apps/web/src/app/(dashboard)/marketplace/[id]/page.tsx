@@ -7,13 +7,146 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { ProductCard } from '@/components/marketplace/ProductCard';
-import { dummyProducts } from '@/data/dummy-products';
-import { ShoppingCart, Heart, Share2, Shield, Award, TrendingUp } from 'lucide-react';
+import { getListingById, getSimilarListingsByTitle } from '@/actions/marketplace';
+import { ShoppingCart, Heart, Share2, Shield, Award, TrendingUp, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+import { addItem } from '@/store/slices/cartSlice';
+import { toggleWishlist } from '@/store/slices/wishlistSlice';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
+import { Product } from '../page';
+
 export default function ProductDetailPage({ params }: { params: { id: string } }) {
-  const product = dummyProducts.find((p) => p.id === params.id) || dummyProducts[0];
-  const similarProducts = dummyProducts.filter((p) => p.id !== product.id).slice(0, 3);
+  const [product, setProduct] = React.useState<Product | null>(null);
+  const [similarProducts, setSimilarProducts] = React.useState<Product[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
+
+  const dispatch = useAppDispatch();
+  const isInWishlist = useAppSelector((state) =>
+    state.wishlist.items.some((item) => item.id === params.id),
+  );
+
+  const cartItems = useAppSelector((state) => state.cart.items);
+  const existingCartItem = cartItems.find((item) => item.id === params.id);
+
+  const handleAddToCart = () => {
+    if (product) {
+      if (product.quantity === 0) {
+        toast.error('This item is out of stock');
+        return;
+      }
+
+      if (existingCartItem && existingCartItem.quantity >= product.quantity) {
+        toast.warning(`You've reached the maximum available quantity (${product.quantity})`);
+        return;
+      }
+
+      dispatch(
+        addItem({
+          id: product.id,
+          title: product.title,
+          price: product.price,
+          imageUrl: product.imageUrl,
+          availableQuantity: product.quantity,
+          artist: product.artist || 'Culture Lense Artist',
+        }),
+      );
+      toast.success('Added to cart');
+    }
+  };
+
+  const handleToggleWishlist = () => {
+    if (product) {
+      dispatch(
+        toggleWishlist({
+          id: product.id,
+          title: product.title,
+          price: product.price,
+          availableQuantity: product.quantity,
+          imageUrl: product.imageUrl,
+          artist: product.artist || 'Culture Lense Artist',
+        }),
+      );
+      if (!isInWishlist) {
+        toast.success('Added to wishlist');
+      }
+    }
+  };
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      setError(null);
+      const res = await getListingById(params.id);
+
+      if (res.success && res.data) {
+        const item = res.data;
+        const mappedProduct: Product = {
+          ...item,
+          price: parseFloat(item.price) || 0,
+          isNew:
+            new Date().getTime() - new Date(item.createdAt).getTime() < 7 * 24 * 60 * 60 * 1000,
+        };
+        setProduct(mappedProduct);
+
+        // Fetch similar products by title
+        const similarRes = await getSimilarListingsByTitle(item.title, item.id);
+        if (similarRes.success && similarRes.data) {
+          setSimilarProducts(
+            similarRes.data.map((p: any) => ({
+              ...p,
+              price: parseFloat(p.price) || 0,
+              isNew:
+                new Date().getTime() - new Date(p.createdAt).getTime() < 7 * 24 * 60 * 60 * 1000,
+            })),
+          );
+        }
+      } else {
+        setError(res.error || 'Product not found');
+      }
+      setIsLoading(false);
+    };
+
+    fetchData();
+  }, [params.id]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
+          <p className="text-muted-foreground font-medium text-lg">
+            Loading masterpiece details...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !product) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <div className="max-w-md w-full text-center space-y-6">
+          <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+            <Shield className="w-12 h-12 text-primary opacity-50" />
+          </div>
+          <h1 className="text-3xl font-serif font-black italic text-neutral-black">
+            {error || 'Masterpiece Not Found'}
+          </h1>
+          <p className="text-neutral-black/60">
+            We couldn't find the sculpture you're looking for. It may have been moved or is no
+            longer available.
+          </p>
+          <Button size="lg" className="w-full rounded-full" asChild>
+            <a href="/marketplace">Return to Marketplace</a>
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-neutral-white via-neutral-white to-primary/5">
@@ -43,7 +176,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
             className="space-y-6"
           >
             <div className="sticky top-24">
-              <div className="relative aspect-[3/4] bg-gradient-to-br from-neutral-white to-primary/10 rounded-3xl overflow-hidden shadow-2xl shadow-primary/10 group">
+              <div className="relative aspect-1/2 bg-gradient-to-br from-neutral-white to-primary/10 rounded-3xl overflow-hidden shadow-2xl shadow-primary/10 group">
                 {product.isNew && (
                   <Badge className="absolute top-6 left-6 z-10 bg-primary text-white px-4 py-2 shadow-lg border-none">
                     <span className="text-xs font-black uppercase tracking-wider">New Arrival</span>
@@ -83,12 +216,21 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                   Price
                 </p>
                 <span className="text-4xl font-black text-primary">
-                  ${product.price.toLocaleString()}
+                  Rs. {product.price.toLocaleString()}
                 </span>
               </div>
               <Separator orientation="vertical" className="h-12" />
-              <Badge className="bg-green-500/10 text-green-700 border-green-200 px-4 py-2">
-                <span className="font-bold">In Stock</span>
+              <Badge
+                className={cn(
+                  'px-4 py-2',
+                  product.quantity > 0
+                    ? 'bg-green-500/10 text-green-700 border-green-200'
+                    : 'bg-red-500/10 text-red-700 border-red-200',
+                )}
+              >
+                <span className="font-bold">
+                  {product.quantity > 0 ? `In Stock (${product.quantity})` : 'Out of Stock'}
+                </span>
               </Badge>
             </div>
 
@@ -96,17 +238,30 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
             <div className="flex gap-4">
               <Button
                 size="lg"
-                className="flex-1 h-14 text-base font-bold bg-primary hover:bg-primary/90 shadow-lg shadow-primary/30 rounded-full"
+                onClick={handleAddToCart}
+                disabled={product.quantity === 0}
+                className={cn(
+                  'flex-1 h-14 text-base font-bold shadow-lg rounded-full transition-all',
+                  product.quantity > 0
+                    ? 'bg-primary hover:bg-primary/90 shadow-primary/30'
+                    : 'bg-muted text-muted-foreground cursor-not-allowed opacity-50',
+                )}
               >
                 <ShoppingCart className="w-5 h-5 mr-2" />
-                Add to Cart
+                {product.quantity > 0 ? 'Add to Cart' : 'Out of Stock'}
               </Button>
               <Button
                 size="lg"
                 variant="outline"
-                className="h-14 aspect-square p-0 rounded-full border-2 border-primary/20 hover:bg-primary/10 hover:border-primary"
+                onClick={handleToggleWishlist}
+                className={cn(
+                  'h-14 aspect-square p-0 rounded-full border-2 transition-all',
+                  isInWishlist
+                    ? 'bg-red-50 border-red-200 text-red-500 hover:bg-red-100'
+                    : 'border-primary/20 hover:bg-primary/10 hover:border-primary text-foreground',
+                )}
               >
-                <Heart className="w-5 h-5" />
+                <Heart className={cn('w-5 h-5', isInWishlist && 'fill-current')} />
               </Button>
               <Button
                 size="lg"
@@ -119,17 +274,13 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
 
             <Separator className="bg-primary/10" />
 
-            {/* Description */}
             <div className="prose prose-lg max-w-none">
               <h3 className="text-xl font-bold text-neutral-black mb-3 flex items-center gap-2">
                 <Award className="w-5 h-5 text-primary" />
                 Description
               </h3>
-              <p className="text-neutral-black/70 leading-relaxed">
-                This masterpiece captures the essence of {product.category} art. Meticulously
-                crafted with attention to detail, it stands as a testament to the artist's vision
-                and skill. Perfect for collectors who appreciate unique, one-of-a-kind sculptures
-                that tell a story through form and texture.
+              <p className="text-neutral-black/70 leading-relaxed whitespace-pre-wrap">
+                {product.description}
               </p>
             </div>
 
@@ -201,17 +352,31 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
             </h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {similarProducts.map((item) => (
-              <ProductCard
-                key={item.id}
-                id={item.id}
-                title={item.title}
-                artist={item.artist || 'Culture Lense Artist'}
-                price={item.price}
-                imageUrl={item.imageUrl}
-                isNew={item.isNew}
-              />
-            ))}
+            {similarProducts.length > 0 ? (
+              similarProducts.map((item) => (
+                <motion.div
+                  key={item.id}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.4 }}
+                  className="relative group max-h-[400px]"
+                >
+                  <ProductCard
+                    key={item.id}
+                    id={item.id}
+                    title={item.title}
+                    artist={item.artist || 'Culture Lense Artist'}
+                    price={item.price}
+                    quantity={item.quantity}
+                    imageUrl={item.imageUrl}
+                    isNew={item.isNew}
+                    className="h-full w-full"
+                  />
+                </motion.div>
+              ))
+            ) : (
+              <p>No similar products found.</p>
+            )}
           </div>
         </motion.div>
       </div>

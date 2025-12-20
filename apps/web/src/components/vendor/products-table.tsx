@@ -2,9 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { MoreHorizontal, Edit, Trash2, Eye } from 'lucide-react';
+import { Edit, Trash2, Eye } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import {
   Table,
   TableBody,
@@ -23,6 +22,7 @@ import {
 } from '@/components/ui/dialog';
 import { deleteVendorListing } from '@/actions/vendor-actions';
 import { toast } from 'sonner';
+import { Button } from '../ui/button';
 
 interface Product {
   id: string;
@@ -33,6 +33,12 @@ interface Product {
   imageUrl: string;
   status: string;
   createdAt: Date;
+  entity?: {
+    name: string;
+  } | null;
+  category?: {
+    name: string;
+  } | null;
 }
 
 interface ProductsTableProps {
@@ -110,7 +116,25 @@ export function ProductsTable({ products, onDelete }: ProductsTableProps) {
                   <TableCell className="font-medium">
                     <div>
                       <div className="font-semibold text-foreground">{product.title}</div>
-                      <div className="text-sm text-muted-foreground line-clamp-1">
+                      <div className="flex flex-wrap gap-2 mt-1">
+                        {product.category && (
+                          <Badge
+                            variant="secondary"
+                            className="text-[10px] py-0 px-2 h-4 bg-primary/10 text-primary border-primary/20"
+                          >
+                            {product.category.name}
+                          </Badge>
+                        )}
+                        {product.entity && (
+                          <Badge
+                            variant="outline"
+                            className="text-[10px] py-0 px-2 h-4 border-muted-foreground/30 text-muted-foreground"
+                          >
+                            {product.entity.name}
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="text-xs text-muted-foreground line-clamp-1 mt-1">
                         {product.description}
                       </div>
                     </div>
@@ -120,20 +144,24 @@ export function ProductsTable({ products, onDelete }: ProductsTableProps) {
                   <TableCell>{getStatusBadge(product.status)}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <Link href={`/marketplace/${product.id}`}>
+                      {/* <Link href={`/marketplace/${product.id}`}>
                         <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                           <Eye className="h-4 w-4" />
                         </Button>
-                      </Link>
+                      </Link> */}
                       <Link href={`/vendor/products/${product.id}/edit`}>
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="bg-transparent hover:bg-black/5 hover:text-black"
+                        >
                           <Edit className="h-4 w-4" />
                         </Button>
                       </Link>
                       <Button
-                        variant="ghost"
+                        variant="outline"
                         size="sm"
-                        className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                        className="h-8 w-8 p-0 text-destructive hover:text-white hover:bg-primary"
                         onClick={() => {
                           setSelectedProduct(product);
                           setDeleteDialogOpen(true);

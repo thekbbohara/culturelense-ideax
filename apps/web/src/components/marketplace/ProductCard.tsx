@@ -6,13 +6,18 @@ import { Badge } from '@/components/ui/badge';
 import { ShoppingCart, Heart, Eye } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { addItem } from '@/store/slices/cartSlice';
+import { toggleWishlist } from '@/store/slices/wishlistSlice';
+import { toast } from 'sonner';
 
 interface ProductCardProps {
   id: string;
   title: string;
-  artist: string;
   price: number;
   imageUrl: string;
+  quantity: number;
+  artist?: string;
   isNew?: boolean;
   className?: string;
 }
@@ -20,12 +25,66 @@ interface ProductCardProps {
 export const ProductCard: React.FC<ProductCardProps> = ({
   id,
   title,
-  artist,
   price,
+  quantity,
   imageUrl,
+  artist,
   isNew,
   className,
 }) => {
+  const dispatch = useAppDispatch();
+  const isInWishlist = useAppSelector((state) =>
+    state.wishlist.items.some((item) => item.id === id),
+  );
+
+  const cartItems = useAppSelector((state) => state.cart.items);
+  const existingCartItem = cartItems.find((item) => item.id === id);
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (quantity === 0) {
+      toast.error('This item is out of stock');
+      return;
+    }
+
+    if (existingCartItem && existingCartItem.quantity >= quantity) {
+      toast.warning(`You've reached the maximum available quantity (${quantity})`);
+      return;
+    }
+
+    dispatch(
+      addItem({
+        id,
+        title,
+        price,
+        imageUrl,
+        availableQuantity: quantity,
+        artist: artist || 'Culture Lense Artist',
+      }),
+    );
+    toast.success('Added to cart');
+  };
+
+  const handleToggleWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dispatch(
+      toggleWishlist({
+        id,
+        title,
+        price,
+        imageUrl,
+        availableQuantity: quantity,
+        artist: artist || 'Culture Lense Artist',
+      }),
+    );
+    if (!isInWishlist) {
+      toast.success('Added to wishlist');
+    }
+  };
+
   return (
     <motion.div
       whileHover={{ y: -12 }}
@@ -46,9 +105,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-card/90 backdrop-blur-sm text-foreground opacity-0 group-hover:opacity-100 transition-all duration-300 hover:text-primary hover:bg-card shadow-lg flex items-center justify-center"
+              onClick={handleToggleWishlist}
+              className={cn(
+                'absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-card/90 backdrop-blur-sm transition-all duration-300 shadow-lg flex items-center justify-center hover:bg-card',
+                isInWishlist
+                  ? 'text-red-500 opacity-100'
+                  : 'text-foreground opacity-0 group-hover:opacity-100 hover:text-primary',
+              )}
             >
-              <Heart className="w-4 h-4" />
+              <Heart className={cn('w-4 h-4', isInWishlist && 'fill-current')} />
             </motion.button>
 
             <img
@@ -76,15 +141,24 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                 <h3 className="font-bold text-foreground text-lg mb-1 line-clamp-1 group-hover:text-primary transition-colors">
                   {title}
                 </h3>
-                <p className="text-sm text-muted-foreground font-medium">{artist}</p>
+                {artist && <p className="text-sm text-muted-foreground font-medium">{artist}</p>}
               </div>
 
               <div className="flex items-center justify-between pt-2 border-t border-border">
-                <span className="font-black text-2xl text-primary">${price.toLocaleString()}</span>
+                <span className="font-black text-2xl text-primary">
+                  Rs.{price.toLocaleString()}
+                </span>
                 <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="w-10 h-10 rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all flex items-center justify-center"
+                  whileHover={quantity > 0 ? { scale: 1.05 } : {}}
+                  whileTap={quantity > 0 ? { scale: 0.95 } : {}}
+                  onClick={handleAddToCart}
+                  disabled={quantity === 0}
+                  className={cn(
+                    'w-10 h-10 rounded-full flex items-center justify-center transition-all',
+                    quantity > 0
+                      ? 'bg-primary/10 text-primary hover:bg-primary hover:text-white'
+                      : 'bg-muted text-muted-foreground cursor-not-allowed opacity-50',
+                  )}
                 >
                   <ShoppingCart className="w-4 h-4" />
                 </motion.button>
