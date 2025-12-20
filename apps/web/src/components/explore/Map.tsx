@@ -141,7 +141,7 @@ function LocationMarker() {
     };
 
     return (
-        <div className="absolute top-4 right-4 z-[1000]">
+        <div className="absolute bottom-4 right-4 z-[1000]">
             <Button
                 size="icon"
                 variant="secondary"
@@ -279,7 +279,7 @@ export default function Map() {
         : [27.7172, 85.3240];
 
     return (
-        <div className="relative h-full w-full rounded-lg overflow-hidden border border-border shadow-sm group bg-neutral-100">
+        <div className="relative h-full w-full overflow-hidden group bg-neutral-100">
             <MapContainer
                 center={center}
                 zoom={13}

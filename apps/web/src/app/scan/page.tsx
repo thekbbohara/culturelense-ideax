@@ -122,7 +122,6 @@ export default function ScanPage() {
 
       <div className="mt-8 text-sm text-gray-400 text-center">
         <p>Point at a deity or sculpture.</p>
-        <p className="text-xs mt-2 text-gray-500">Supports JPG, PNG</p>
       </div>
     </div>
   );

@@ -21,7 +21,7 @@ import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LandingPage() {
-  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+  // const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [isScanning, setIsScanning] = React.useState(false);
 
   const toggleScan = () => {
@@ -51,13 +51,9 @@ export default function LandingPage() {
             <span className="font-serif text-2xl font-black tracking-tighter uppercase">CultureLense</span>
           </div>
 
-          <Button onClick={handleLogin}  className="rounded-full border-neutral-black font-bold uppercase tracking-widest text-[10px] px-6 hover:bg-neutral-black/80 hover:text-white transition-all">
+          <Button onClick={handleLogin} className="rounded-full border-neutral-black font-bold uppercase tracking-widest text-[10px] px-6 hover:bg-neutral-black/80 hover:text-white transition-all">
             Login
           </Button>
-
-          <button className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-            {isMenuOpen ? <X /> : <Menu />}
-          </button>
         </div>
       </nav>
 
@@ -117,22 +113,21 @@ export default function LandingPage() {
                   )}
                 </AnimatePresence>
 
-                <div className="absolute bottom-10 left-10 right-10">
+                <div className="absolute bottom-1 sm:bottom-5 left-10 right-10">
                   <motion.div
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 1 }}
-                    className="p-6 bg-white/10 backdrop-blur-2xl rounded-2xl border border-white/20"
+                    className="p-4 sm:p-6 bg-white/10 backdrop-blur-2xl rounded-2xl border border-white/20"
                   >
                     <div className="flex justify-between items-start mb-4">
                       <div>
-                        <h3 className="text-white font-serif text-2xl font-bold italic">Shiva Nataraja</h3>
-                        <p className="text-white/60 text-sm">Circa 200 BC • Hellenistic Period</p>
+                        <h3 className="text-white font-serif text-2xl font-bold italic">Ganesha</h3>
+                        <p className="text-white/60 text-sm">Hindu Deity • Remover of Obstacles</p>
                       </div>
-                      <Badge className="bg-white/20 text-white border-none">AI Verified</Badge>
                     </div>
                     <p className="text-white/80 text-xs leading-relaxed line-clamp-2">
-                      A monumental marble group attributed to Athanadoros, Hagesandros, and Polydoros of Rhodes. Discovered in Rome in 1506.
+                      Ganesha, the elephant-headed son of Shiva and Parvati, is revered as the remover of obstacles and the god of wisdom, learning, and new beginnings. He is traditionally worshipped before major undertakings.
                     </p>
                   </motion.div>
                 </div>
@@ -197,7 +192,7 @@ export default function LandingPage() {
                 <Badge className="mb-4 bg-white/10 text-txt border-none px-4 py-1 uppercase tracking-widest text-[10px] font-black">
                   Curated Marketplace
                 </Badge>
-                <h2 className="text-6xl font-serif font-black tracking-tight italic">
+                <h2 className="text-4xl sm:text-6xl font-serif font-black tracking-tight italic">
                   The <span className="not-italic text-txt">Marketplace.</span>
                 </h2>
               </div>
@@ -304,7 +299,7 @@ export default function LandingPage() {
                 <motion.div
                   animate={{ y: [0, -20, 0] }}
                   transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute -bottom-8 -left-10 z-[20] p-8 max-w-xs rounded-3xl bg-white/20 backdrop-blur-md shadow-2xl border border-white/30"
+                  className="absolute -bottom-16 sm:-bottom-8 sm:-left-10 z-[20] p-4 sm:p-8 max-w-xs rounded-3xl bg-white/20 backdrop-blur-md shadow-2xl border border-white/30"
 
                 >
                   <div className="flex items-center gap-4 mb-4">
@@ -342,7 +337,7 @@ export default function LandingPage() {
                   <Button onClick={handleLogin} size="lg" className="rounded-full h-16 px-10 bg-white text-black hover:bg-zinc-200 text-base font-black uppercase tracking-widest">
                     Get the App
                   </Button>
-                  <Button size="lg"  className="rounded-full h-16 px-10 border-white/20 text-white hover:bg-white/10 text-base font-black uppercase tracking-widest">
+                  <Button size="lg" className="rounded-full h-16 px-10 border-white/20 text-white hover:bg-white/10 text-base font-black uppercase tracking-widest">
                     Create Account
                   </Button>
                 </div>
@@ -404,26 +399,6 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
-
-      {/* Mobile Menu Overlay */}
-      <AnimatePresence>
-        {isMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 z-[100] bg-white p-10 flex flex-col justify-center items-center text-center gap-12"
-          >
-            <button className="absolute top-10 right-10" onClick={() => setIsMenuOpen(false)}>
-              <X className="w-8 h-8" />
-            </button>
-            <a href="#scan" onClick={() => setIsMenuOpen(false)} className="text-4xl font-serif font-black italic">Scan</a>
-            <a href="#exhibition" onClick={() => setIsMenuOpen(false)} className="text-4xl font-serif font-black italic">Marketplace</a>
-            <a href="#creators" onClick={() => setIsMenuOpen(false)} className="text-4xl font-serif font-black italic">Vendors</a>
-            <Button onClick={handleLogin} className="w-full h-16 rounded-full bg-primary text-white font-black uppercase tracking-widest">Login</Button>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

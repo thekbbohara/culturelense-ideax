@@ -89,20 +89,25 @@ export default async function ProfilePage() {
                     backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
                 }}
             />
-
+            
             <div className="relative z-10 container mx-auto pt-16 pb-32 px-6 max-w-7xl">
                 {/* Header Section: Minimal & Editorial */}
-                <div className="mb-16 border-b flex flex-col md:flex-row justify-between items-end gap-6">
-                    <div className="space-y-2">
+                <div className="mb-8 md:mb-16 border-b pb-6 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+                    <div className="space-y-2 w-full md:w-auto">
                         <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground">Identity</span>
                         <ProfileHeader
                             userEmail={user?.email}
                             memberSince={user?.created_at}
-                            className="text-4xl md:text-5xl font-light tracking-tight text-foreground"
+                            // Adjusted text size for mobile (3xl) vs desktop (5xl) to prevent wrapping issues
+                            className="text-3xl md:text-5xl font-light tracking-tight text-foreground"
                         />
                     </div>
-                    <div className="text-right hidden md:block">
-                        <div className="text-xs font-mono text-muted-foreground mb-1">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</div>
+
+                    {/* Responsive Date & Location Block */}
+                    <div className="w-full md:w-auto flex flex-row md:flex-col justify-between md:justify-end items-center md:items-end pt-4 md:pt-0 border-t md:border-t-0 border-dashed border-border/50 md:text-right">
+                        <div className="text-xs font-mono text-muted-foreground md:mb-1">
+                            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                        </div>
                         <div className="text-sm font-medium">Nepal, Kathmandu</div>
                     </div>
                 </div>
