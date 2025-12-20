@@ -249,14 +249,14 @@ export default function MarketplacePage() {
                   <TrendingUp className="w-5 h-5 text-primary" />
                   <h2 className="text-2xl font-serif font-black italic">Featured Masterpieces</h2>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="flex overflow-x-auto no-scrollbar snap-x snap-mandatory gap-4 pb-4 md:grid md:grid-cols-2 md:gap-6 md:pb-0 md:overflow-visible">
                   {featuredItems?.slice(0, 2)?.map((item: Product) => (
                     <motion.div
                       key={item.id}
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ duration: 0.4 }}
-                      className="relative group max-h-[600px]"
+                      className="relative group min-w-[280px] max-w-[320px] flex-shrink-0 snap-center md:min-w-0 md:max-w-none md:max-h-[600px]"
                     >
                       <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-3xl blur-xl group-hover:blur-2xl transition-all opacity-0 group-hover:opacity-100" />
                       <ProductCard
@@ -316,14 +316,14 @@ export default function MarketplacePage() {
                   </div>
                 ) : (
                   <div key="content" className="space-y-12">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="flex overflow-x-auto no-scrollbar snap-x snap-mandatory gap-4 pb-4 sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:gap-6 sm:pb-0 sm:overflow-visible">
                       {items.map((item: Product, index: number) => (
                         <motion.div
                           key={item.id}
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.4, delay: index * 0.05 }}
-                          className="max-h-[400px]"
+                          className="min-w-[280px] max-w-[320px] flex-shrink-0 snap-center sm:min-w-0 sm:max-w-none sm:max-h-[400px]"
                         >
                           <ProductCard
                             id={item.id}
