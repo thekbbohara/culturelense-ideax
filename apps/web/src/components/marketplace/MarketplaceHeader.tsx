@@ -2,7 +2,20 @@ import React from 'react';
 import { Search } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-export const MarketplaceHeader = () => {
+interface MarketplaceHeaderProps {
+  selectedSort: string;
+  onSortChange: (sort: string) => void;
+}
+
+export const MarketplaceHeader = ({ selectedSort, onSortChange }: MarketplaceHeaderProps) => {
+  const sortOptions = [
+    'All',
+    'New Arrivals',
+    'Popular',
+    'Price: Low to High',
+    'Price: High to Low',
+  ];
+
   return (
     <div>
       <div className="space-y-6 static top-24">
@@ -18,22 +31,21 @@ export const MarketplaceHeader = () => {
 
         {/* Sort Options */}
         <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
-          {['All', 'New Arrivals', 'Popular', 'Price: Low to High', 'Price: High to Low'].map(
-            (option, i) => (
-              <motion.button
-                key={option}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className={`px-6 py-2.5 rounded-full font-bold text-sm whitespace-nowrap transition-all ${
-                  i === 0
-                    ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/30'
-                    : 'bg-card text-muted-foreground border-2 border-border hover:border-primary/30 hover:text-foreground'
-                }`}
-              >
-                {option}
-              </motion.button>
-            ),
-          )}
+          {sortOptions.map((option) => (
+            <motion.button
+              key={option}
+              onClick={() => onSortChange(option)}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className={`px-6 py-2.5 rounded-full font-bold text-sm whitespace-nowrap transition-all ${
+                selectedSort === option
+                  ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/30'
+                  : 'bg-card text-muted-foreground border-2 border-border hover:border-primary/30 hover:text-foreground'
+              }`}
+            >
+              {option}
+            </motion.button>
+          ))}
         </div>
       </div>
     </div>

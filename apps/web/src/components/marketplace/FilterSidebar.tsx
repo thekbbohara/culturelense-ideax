@@ -6,12 +6,37 @@ import { Button } from '@/components/ui/button';
 import { SlidersHorizontal, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Slider } from '@/components/ui/slider';
+import { cn } from '@/lib/utils';
 
 const MIN_PRICE = 0;
 const MAX_PRICE = 10000;
 
-export const FilterSidebar = () => {
-  const [priceRange, setPriceRange] = useState([MIN_PRICE, MAX_PRICE]);
+interface Category {
+  id: string;
+  name: string;
+}
+
+interface FilterSidebarProps {
+  categories: Category[];
+  selectedCategory: string;
+  onCategoryChange: (id: string) => void;
+  priceRange: number[];
+  onPriceRangeChange: (value: number[]) => void;
+  onApply: () => void;
+  onClear: () => void;
+  maxPrice: number;
+}
+
+export const FilterSidebar = ({
+  categories,
+  selectedCategory,
+  onCategoryChange,
+  priceRange,
+  onPriceRangeChange,
+  onApply,
+  onClear,
+  maxPrice,
+}: FilterSidebarProps) => {
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState<boolean>(false);
   const [isMobile, setIsMobile] = useState<boolean>(false);
 
@@ -25,10 +50,6 @@ export const FilterSidebar = () => {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
-
-  const handlePriceChange = (value: number[]) => {
-    setPriceRange(value);
-  };
 
   useEffect(() => {
     if (!isMobileFilterOpen) return;
@@ -46,14 +67,39 @@ export const FilterSidebar = () => {
           Category
         </h4>
         <div className="space-y-2">
-          {['All', 'Traditional', 'Modern', 'Abstract', 'Religious'].map((cat) => (
-            <label key={cat} className="flex items-center gap-3 cursor-pointer group">
+          <label className="flex items-center gap-3 cursor-pointer group">
+            <input
+              type="radio"
+              name="category"
+              checked={selectedCategory === 'all'}
+              onChange={() => onCategoryChange('all')}
+              className="w-5 h-5 rounded-full border-2 border-primary/20 text-primary focus:ring-2 focus:ring-primary/20 cursor-pointer bg-background"
+            />
+            <span
+              className={cn(
+                'text-sm group-hover:text-primary transition-colors font-medium',
+                selectedCategory === 'all' ? 'text-primary' : 'text-muted-foreground',
+              )}
+            >
+              All
+            </span>
+          </label>
+          {categories.map((cat) => (
+            <label key={cat.id} className="flex items-center gap-3 cursor-pointer group">
               <input
-                type="checkbox"
-                className="w-5 h-5 rounded border-2 border-primary/20 text-primary focus:ring-2 focus:ring-primary/20 cursor-pointer bg-background"
+                type="radio"
+                name="category"
+                checked={selectedCategory === cat.id}
+                onChange={() => onCategoryChange(cat.id)}
+                className="w-5 h-5 rounded-full border-2 border-primary/20 text-primary focus:ring-2 focus:ring-primary/20 cursor-pointer bg-background"
               />
-              <span className="text-sm text-muted-foreground group-hover:text-primary transition-colors font-medium">
-                {cat}
+              <span
+                className={cn(
+                  'text-sm group-hover:text-primary transition-colors font-medium',
+                  selectedCategory === cat.id ? 'text-primary' : 'text-muted-foreground',
+                )}
+              >
+                {cat.name}
               </span>
             </label>
           ))}
@@ -68,7 +114,6 @@ export const FilterSidebar = () => {
           <h4 className="font-bold text-sm text-foreground uppercase tracking-wider">
             Price Range
           </h4>
-          {/* <span className="text-xs font-bold text-primary">${priceRange[0].toLocaleString()}</span> */}
         </div>
 
         <div className="space-y-4">
@@ -76,9 +121,9 @@ export const FilterSidebar = () => {
           <div className="pt-2 pb-4">
             <Slider
               value={priceRange}
-              onValueChange={handlePriceChange}
+              onValueChange={onPriceRangeChange}
               min={MIN_PRICE}
-              max={MAX_PRICE}
+              max={maxPrice}
               step={10}
               className="w-full"
             />
@@ -86,10 +131,10 @@ export const FilterSidebar = () => {
             {/* Min/Max Labels */}
             <div className="flex justify-between mt-3">
               <span className="text-xs font-medium text-muted-foreground">
-                ${priceRange[0].toLocaleString()}
+                Rs.{priceRange[0].toLocaleString()}
               </span>
               <span className="text-xs font-medium text-muted-foreground">
-                ${priceRange[1].toLocaleString()}
+                Rs.{priceRange[1].toLocaleString()}
               </span>
             </div>
           </div>
@@ -98,27 +143,13 @@ export const FilterSidebar = () => {
 
       <Separator className="bg-border" />
 
-      {/* Availability */}
-      <div>
-        <h4 className="font-bold text-sm text-foreground mb-3 uppercase tracking-wider">
-          Availability
-        </h4>
-        <div className="space-y-2">
-          {['In Stock', 'Pre-Order', 'Coming Soon'].map((status) => (
-            <label key={status} className="flex items-center gap-3 cursor-pointer group">
-              <input
-                type="checkbox"
-                className="w-5 h-5 rounded border-2 border-primary/20 text-primary focus:ring-2 focus:ring-primary/20 cursor-pointer bg-background"
-              />
-              <span className="text-sm text-muted-foreground group-hover:text-primary transition-colors font-medium">
-                {status}
-              </span>
-            </label>
-          ))}
-        </div>
-      </div>
-
-      <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-full h-12 shadow-lg shadow-primary/30">
+      <Button
+        onClick={() => {
+          onApply();
+          if (isMobile) setIsMobileFilterOpen(false);
+        }}
+        className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-full h-12 shadow-lg shadow-primary/30"
+      >
         Apply Filters
       </Button>
     </div>
@@ -213,7 +244,11 @@ export const FilterSidebar = () => {
           <SlidersHorizontal className="w-5 h-5 text-primary" />
           Filters
         </h3>
-        <Button variant="link" className="text-primary text-sm font-bold p-0 h-auto">
+        <Button
+          variant="link"
+          onClick={onClear}
+          className="text-primary text-sm font-bold p-0 h-auto"
+        >
           Clear All
         </Button>
       </div>
