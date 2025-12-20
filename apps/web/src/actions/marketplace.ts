@@ -17,6 +17,7 @@ import {
   ilike,
   or,
   inArray,
+  ne,
 } from '@/db';
 
 export async function getCategories() {
@@ -293,14 +294,70 @@ export async function createListing(vendorId: string, data: any) {
 
 export async function getListingById(id: string) {
   try {
-    const item = await db.select().from(listings).where(eq(listings.id, id)).limit(1);
+    const item = await db
+      .select({
+        id: listings.id,
+        vendorId: listings.vendorId,
+        entityId: listings.entityId,
+        categoryId: listings.categoryId,
+        title: listings.title,
+        description: listings.description,
+        price: listings.price,
+        quantity: listings.quantity,
+        imageUrl: listings.imageUrl,
+        status: listings.status,
+        createdAt: listings.createdAt,
+        artist: vendors.businessName,
+      })
+      .from(listings)
+      .leftJoin(vendors, eq(listings.vendorId, vendors.id))
+      .where(eq(listings.id, id))
+      .limit(1);
 
     if (item && item.length > 0) {
       return { success: true, data: item[0] };
     }
     return { success: false, error: 'Listing not found' };
   } catch (error) {
+    console.error('Failed to fetch listing:', error);
     return { success: false, error: 'Failed to fetch listing' };
+  }
+}
+
+export async function getSimilarListingsByTitle(title: string, excludeId: string) {
+  try {
+    // Search for listings with exactly the same title or very similar
+    // Excluding the current product
+    const items = await db
+      .select({
+        id: listings.id,
+        vendorId: listings.vendorId,
+        entityId: listings.entityId,
+        categoryId: listings.categoryId,
+        title: listings.title,
+        description: listings.description,
+        price: listings.price,
+        quantity: listings.quantity,
+        imageUrl: listings.imageUrl,
+        status: listings.status,
+        createdAt: listings.createdAt,
+        artist: vendors.businessName,
+      })
+      .from(listings)
+      .leftJoin(vendors, eq(listings.vendorId, vendors.id))
+      .where(
+        and(
+          eq(listings.status, 'active'),
+          ne(listings.id, excludeId),
+          ilike(listings.title, `%${title}%`),
+        ),
+      )
+      .limit(6);
+
+    return { success: true, data: items };
+  } catch (error) {
+    console.error('Failed to fetch similar listings:', error);
+    return { success: false, data: [] };
   }
 }
 
