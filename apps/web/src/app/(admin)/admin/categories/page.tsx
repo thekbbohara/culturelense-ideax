@@ -18,7 +18,7 @@ export default async function CategoriesPage() {
   const categories = result.success ? result.data : [];
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Categories</h1>
         <Link href="/admin/categories/new">
@@ -78,7 +78,11 @@ export default async function CategoriesPage() {
                   <div className="flex flex-col items-center gap-2">
                     <p>No categories found.</p>
                     <Link href="/admin/categories/new">
-                      <Button variant="outline" size="sm" className='bg-primary text-primary-foreground hover:bg-primary/80'>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="bg-primary text-primary-foreground hover:bg-primary/80"
+                      >
                         Create your first category
                       </Button>
                     </Link>

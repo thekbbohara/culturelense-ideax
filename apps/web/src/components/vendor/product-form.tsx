@@ -235,7 +235,7 @@ export function ProductForm({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent className="max-h-[400px] overflow-y-auto">
-                    <SelectItem value="none">None</SelectItem>
+                    {/* <SelectItem value="none">None</SelectItem> */}
                     {entities.map((entity) => (
                       <SelectItem key={entity.id} value={entity.id}>
                         {entity.name}
@@ -264,7 +264,7 @@ export function ProductForm({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent className="max-h-[400px] overflow-y-auto">
-                    <SelectItem value="none">None</SelectItem>
+                    {/* <SelectItem value="none">None</SelectItem> */}
                     {categories.map((category) => (
                       <SelectItem key={category.id} value={category.id}>
                         {category.name}
