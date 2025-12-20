@@ -34,7 +34,7 @@ export function VendorNav({ navItems, isAdmin }: { navItems: NavItem[]; isAdmin?
 
   return (
     <Sidebar>
-      <SidebarContent className="pb-10 pt-28 px-2">
+      <SidebarContent className="sm:pb-10 pb-24 pt-28 px-2">
         <SidebarGroup>
           <SidebarGroupLabel className="text-xl font-semibold text-black">
             <h2>Vendor Dashboard</h2>

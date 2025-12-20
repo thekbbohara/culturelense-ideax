@@ -184,7 +184,7 @@ export default async function ProfilePage() {
                       </Button>
                     </Link>
                   ) : !vendorData ? (
-                    <div className="bg-background/10 backdrop-blur-sm rounded-xl inline-block">
+                    <div className="bg-background/10 backdrop-blur-sm rounded-xl inline-block relative">
                       <VendorApplicationModal
                         triggerClassName="bg-primary text-primary-foreground hover:bg-primary/80  rounded-full px-8 py-6 text-sm font-medium transition-transform active:scale-95 border-none"
                         triggerText="Apply for Vendor"

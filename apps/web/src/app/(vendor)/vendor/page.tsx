@@ -91,19 +91,19 @@ export default function VendorDashboard() {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-serif font-black italic text-foreground">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-black italic text-foreground">
             Vendor Dashboard
           </h1>
-          <p className="text-muted-foreground mt-2">
+          <p className="text-sm sm:text-base text-muted-foreground mt-1 sm:mt-2">
             Manage your products, orders, and customer feedback
           </p>
         </div>
-        <Link href="/vendor/products/add">
-          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+        <Link href="/vendor/products/add" className="w-full sm:w-auto">
+          <Button className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground">
             <Package className="w-4 h-4 mr-2" />
             Add New Product
           </Button>
@@ -111,25 +111,27 @@ export default function VendorDashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
         {statCards.map((stat) => {
           const Icon = stat.icon;
           return (
-            <Link key={stat.title} href={stat.href}>
-              <Card className="hover:shadow-lg transition-all cursor-pointer border-border group">
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
+            <Link key={stat.title} href={stat.href} className="col-span-1">
+              <Card className="hover:shadow-lg transition-all cursor-pointer border-border group h-full">
+                <CardHeader className="flex flex-row items-center justify-between p-3 sm:p-4 lg:pb-2">
+                  <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
                     {stat.title}
                   </CardTitle>
-                  <div className={`p-2 rounded-lg ${stat.bgColor}`}>
-                    <Icon className={`w-5 h-5 ${stat.color}`} />
+                  <div className={`p-1.5 sm:p-2 rounded-lg ${stat.bgColor}`}>
+                    <Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${stat.color}`} />
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold text-foreground group-hover:text-primary transition-colors">
+                <CardContent className="p-3 sm:p-4 pt-0 lg:pt-0">
+                  <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground group-hover:text-primary transition-colors">
                     {loading ? '...' : stat.value}
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">{stat.subtitle}</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1">
+                    {stat.subtitle}
+                  </p>
                 </CardContent>
               </Card>
             </Link>
@@ -139,28 +141,37 @@ export default function VendorDashboard() {
 
       {/* Quick Actions */}
       <Card className="border-border">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-primary" />
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+            <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
             Quick Actions
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <CardContent className="p-4 sm:p-6 pt-0">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             <Link href="/vendor/products/add">
-              <Button variant="outline" className="w-full justify-start hover:border-primary">
+              <Button
+                variant="outline"
+                className="w-full justify-start hover:border-primary h-11 sm:h-10"
+              >
                 <Package className="w-4 h-4 mr-2" />
                 Add New Product
               </Button>
             </Link>
             <Link href="/vendor/products">
-              <Button variant="outline" className="w-full justify-start hover:border-primary">
+              <Button
+                variant="outline"
+                className="w-full justify-start hover:border-primary h-11 sm:h-10"
+              >
                 <Package className="w-4 h-4 mr-2" />
                 Manage Products
               </Button>
             </Link>
             <Link href="/vendor/orders">
-              <Button variant="outline" className="w-full justify-start hover:border-primary">
+              <Button
+                variant="outline"
+                className="w-full justify-start hover:border-primary h-11 sm:h-10"
+              >
                 <ShoppingCart className="w-4 h-4 mr-2" />
                 View Orders
               </Button>

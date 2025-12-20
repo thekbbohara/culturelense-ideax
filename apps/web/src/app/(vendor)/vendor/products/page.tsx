@@ -26,15 +26,19 @@ export default function ProductsPage() {
   }, []);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-serif font-black italic text-foreground">My Products</h1>
-          <p className="text-muted-foreground mt-2">Manage your product listings and inventory</p>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-black italic text-foreground">
+            My Products
+          </h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-1 sm:mt-2">
+            Manage your product listings and inventory
+          </p>
         </div>
-        <Link href="/vendor/products/add">
-          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-md">
+        <Link href="/vendor/products/add" className="w-full sm:w-auto">
+          <Button className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground shadow-md">
             <Plus className="w-4 h-4 mr-2" />
             Add New Product
           </Button>
