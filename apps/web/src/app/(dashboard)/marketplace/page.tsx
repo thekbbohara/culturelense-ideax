@@ -255,7 +255,7 @@ export default function MarketplacePage() {
                 </div>
                 {/* Mobile: Horizontal scroll with individual cards */}
                 <div className="lg:hidden flex gap-4 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-4">
-                  {featuredItems.slice(0, 3).map((item: Product, i: number) => (
+                  {featuredItems.map((item: Product, i: number) => (
                     <motion.div
                       key={item.id}
                       initial={{ opacity: 0, x: 20 }}

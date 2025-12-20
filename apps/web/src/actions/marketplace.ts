@@ -8,6 +8,7 @@ import {
   searchHistory,
   culturalEntities,
   reviews,
+  reviewLikes,
   users,
   eq,
   desc,
@@ -378,13 +379,12 @@ export async function getListingsByEntityId(entityId: string) {
   }
 }
 
-export async function getReviews(listingId: string, page: number = 1, limit: number = 5) {
+export async function getReviews(listingId: string, offset: number = 0, limit: number = 5) {
   try {
-    const offset = (page - 1) * limit;
-
     const items = await db
       .select({
         id: reviews.id,
+        userId: reviews.userId,
         rating: reviews.rating,
         comment: reviews.comment,
         createdAt: reviews.createdAt,
@@ -408,8 +408,6 @@ export async function getReviews(listingId: string, page: number = 1, limit: num
       success: true,
       data: items,
       total,
-      totalPages: Math.ceil(total / limit),
-      currentPage: page,
     };
   } catch (error) {
     console.error('Failed to fetch reviews:', error);
@@ -452,5 +450,105 @@ export async function getVendorByUserId(userId: string) {
   } catch (error) {
     console.error('Failed to fetch vendor by user id:', error);
     return { success: false, error: 'Failed to fetch vendor' };
+  }
+}
+
+export async function deleteReview(reviewId: string, userId: string) {
+  try {
+    // Verify the review belongs to this user
+    const review = await db
+      .select({ id: reviews.id, userId: reviews.userId })
+      .from(reviews)
+      .where(eq(reviews.id, reviewId))
+      .limit(1);
+
+    if (!review || review.length === 0) {
+      return { success: false, error: 'Review not found' };
+    }
+
+    if (review[0].userId !== userId) {
+      return { success: false, error: 'You can only delete your own reviews' };
+    }
+
+    await db.delete(reviews).where(eq(reviews.id, reviewId));
+
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to delete review:', error);
+    return { success: false, error: 'Failed to delete review' };
+  }
+}
+
+export async function toggleReviewLike(reviewId: string, userId: string) {
+  try {
+    // Check if user already liked this review
+    const existingLike = await db
+      .select()
+      .from(reviewLikes)
+      .where(and(eq(reviewLikes.reviewId, reviewId), eq(reviewLikes.userId, userId)))
+      .limit(1);
+
+    if (existingLike.length > 0) {
+      // Unlike - remove the like
+      await db
+        .delete(reviewLikes)
+        .where(and(eq(reviewLikes.reviewId, reviewId), eq(reviewLikes.userId, userId)));
+      return { success: true, liked: false };
+    } else {
+      // Like - add the like
+      await db.insert(reviewLikes).values({
+        reviewId,
+        userId,
+      });
+      return { success: true, liked: true };
+    }
+  } catch (error) {
+    console.error('Failed to toggle review like:', error);
+    return { success: false, error: 'Failed to update like' };
+  }
+}
+
+export async function getReviewLikesCount(reviewIds: string[]) {
+  try {
+    if (reviewIds.length === 0) {
+      return { success: true, data: {} };
+    }
+
+    const likeCounts = await db
+      .select({
+        reviewId: reviewLikes.reviewId,
+        count: sql<number>`count(*)`,
+      })
+      .from(reviewLikes)
+      .where(inArray(reviewLikes.reviewId, reviewIds))
+      .groupBy(reviewLikes.reviewId);
+
+    const countsMap: Record<string, number> = {};
+    likeCounts.forEach((item) => {
+      countsMap[item.reviewId] = Number(item.count);
+    });
+
+    return { success: true, data: countsMap };
+  } catch (error) {
+    console.error('Failed to get review likes count:', error);
+    return { success: false, data: {} };
+  }
+}
+
+export async function getUserLikedReviews(userId: string, reviewIds: string[]) {
+  try {
+    if (reviewIds.length === 0 || !userId) {
+      return { success: true, data: [] };
+    }
+
+    const userLikes = await db
+      .select({ reviewId: reviewLikes.reviewId })
+      .from(reviewLikes)
+      .where(and(eq(reviewLikes.userId, userId), inArray(reviewLikes.reviewId, reviewIds)));
+
+    return { success: true, data: userLikes.map((l) => l.reviewId) };
+  } catch (error) {
+    console.error('Failed to get user liked reviews:', error);
+    return { success: false, data: [] };
   }
 }
