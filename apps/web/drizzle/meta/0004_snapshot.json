@@ -1,7 +1,6 @@
 {
-
-  "id": "7476746b-8cce-46b3-9698-380d81005f8c",
-  "prevId": "25bb4b28-df02-4c1f-939e-af6c684187ce",
+  "id": "216dd8d7-2c71-4989-adb9-fe92c169673b",
+  "prevId": "c7382927-1819-4259-8c3d-493e3022d8b0",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -324,14 +323,20 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "listing_id": {
-          "name": "listing_id",
+        "order_id": {
+          "name": "order_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
         "buyer_id": {
           "name": "buyer_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "vendor_id": {
+          "name": "vendor_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
@@ -350,6 +355,25 @@
           "notNull": true,
           "default": "'held'"
         },
+        "held_at": {
+          "name": "held_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "released_at": {
+          "name": "released_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "refunded_at": {
+          "name": "refunded_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -367,12 +391,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "escrow_transactions_listing_id_listings_id_fk": {
-          "name": "escrow_transactions_listing_id_listings_id_fk",
+        "escrow_transactions_order_id_orders_id_fk": {
+          "name": "escrow_transactions_order_id_orders_id_fk",
           "tableFrom": "escrow_transactions",
-          "tableTo": "listings",
+          "tableTo": "orders",
           "columnsFrom": [
-            "listing_id"
+            "order_id"
           ],
           "columnsTo": [
             "id"
@@ -386,6 +410,19 @@
           "tableTo": "users",
           "columnsFrom": [
             "buyer_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "escrow_transactions_vendor_id_vendors_id_fk": {
+          "name": "escrow_transactions_vendor_id_vendors_id_fk",
+          "tableFrom": "escrow_transactions",
+          "tableTo": "vendors",
+          "columnsFrom": [
+            "vendor_id"
           ],
           "columnsTo": [
             "id"
@@ -667,6 +704,13 @@
           "primaryKey": false,
           "notNull": true
         },
+        "payment_method": {
+          "name": "payment_method",
+          "type": "payment_method",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
         "status": {
           "name": "status",
           "type": "order_status",
@@ -689,7 +733,26 @@
           "primaryKey": false,
           "notNull": false
         },
-
+        "delivery_status": {
+          "name": "delivery_status",
+          "type": "delivery_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'pending'"
+        },
+        "delivery_confirmed_at": {
+          "name": "delivery_confirmed_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "delivery_confirmed_by": {
+          "name": "delivery_confirmed_by",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
         "shipping_address": {
           "name": "shipping_address",
           "type": "text",
@@ -732,6 +795,19 @@
           "tableTo": "listings",
           "columnsFrom": [
             "listing_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "orders_delivery_confirmed_by_users_id_fk": {
+          "name": "orders_delivery_confirmed_by_users_id_fk",
+          "tableFrom": "orders",
+          "tableTo": "users",
+          "columnsFrom": [
+            "delivery_confirmed_by"
           ],
           "columnsTo": [
             "id"
@@ -1636,6 +1712,16 @@
         "deep_mythology"
       ]
     },
+    "public.delivery_status": {
+      "name": "delivery_status",
+      "schema": "public",
+      "values": [
+        "pending",
+        "shipped",
+        "delivered",
+        "failed"
+      ]
+    },
     "public.entity_type": {
       "name": "entity_type",
       "schema": "public",
@@ -1678,12 +1764,21 @@
         "cancelled"
       ]
     },
+    "public.payment_method": {
+      "name": "payment_method",
+      "schema": "public",
+      "values": [
+        "cod",
+        "escrow"
+      ]
+    },
     "public.payment_status": {
       "name": "payment_status",
       "schema": "public",
       "values": [
         "pending",
         "paid",
+        "escrowed",
         "failed",
         "refunded"
       ]

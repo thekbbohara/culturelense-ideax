@@ -35,6 +35,9 @@ export const orderStatusEnum = pgEnum('order_status', [
   'delivered',
   'cancelled',
 ]);
+export const paymentStatusEnum = pgEnum('payment_status', ['pending', 'paid', 'escrowed', 'failed', 'refunded']);
+export const paymentMethodEnum = pgEnum('payment_method', ['cod', 'escrow']);
+export const deliveryStatusEnum = pgEnum('delivery_status', ['pending', 'shipped', 'delivered', 'failed']);
 
 // Users Table
 export const users = pgTable('users', {
@@ -70,6 +73,18 @@ export const vendors = pgTable('vendors', {
   description: text('description'),
   verificationStatus: verificationStatusEnum('verification_status').default('pending').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+// User Balances Table
+export const userBalances = pgTable('user_balances', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: uuid('user_id')
+    .references(() => users.id)
+    .notNull()
+    .unique(),
+  balance: text('balance').default('0').notNull(), // Using text for precision, will parse as decimal
+  currency: text('currency').default('USD').notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
@@ -188,14 +203,20 @@ export const listings = pgTable('listings', {
 
 export const escrowTransactions = pgTable('escrow_transactions', {
   id: uuid('id').defaultRandom().primaryKey(),
-  listingId: uuid('listing_id')
-    .references(() => listings.id)
+  orderId: uuid('order_id')
+    .references(() => orders.id)
     .notNull(),
   buyerId: uuid('buyer_id')
     .references(() => users.id)
     .notNull(),
+  vendorId: uuid('vendor_id')
+    .references(() => vendors.id)
+    .notNull(),
   amount: text('amount').notNull(),
   state: escrowStateEnum('state').default('held').notNull(),
+  heldAt: timestamp('held_at').defaultNow().notNull(),
+  releasedAt: timestamp('released_at'),
+  refundedAt: timestamp('refunded_at'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
@@ -245,10 +266,35 @@ export const orders = pgTable('orders', {
     .notNull(),
   quantity: text('quantity').default('1').notNull(), // text to be safe or integer
   totalAmount: text('total_amount').notNull(),
+  paymentMethod: paymentMethodEnum('payment_method').notNull(),
   status: orderStatusEnum('status').default('pending').notNull(),
+  paymentStatus: paymentStatusEnum('payment_status').default('pending').notNull(),
+  paymentFailureReason: text('payment_failure_reason'),
+  deliveryStatus: deliveryStatusEnum('delivery_status').default('pending').notNull(),
+  deliveryConfirmedAt: timestamp('delivery_confirmed_at'),
+  deliveryConfirmedBy: uuid('delivery_confirmed_by').references(() => users.id),
   shippingAddress: text('shipping_address').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
+// Payment Transactions Table
+export const paymentTransactions = pgTable('payment_transactions', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  orderId: uuid('order_id')
+    .references(() => orders.id)
+    .notNull(),
+  buyerId: uuid('buyer_id')
+    .references(() => users.id)
+    .notNull(),
+  vendorId: uuid('vendor_id')
+    .references(() => vendors.id)
+    .notNull(),
+  amount: text('amount').notNull(), // Using text for precision
+  status: paymentStatusEnum('status').default('pending').notNull(),
+  failureReason: text('failure_reason'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  completedAt: timestamp('completed_at'),
 });
 
 // Reviews/Feedback

@@ -14,7 +14,8 @@ import {
   CheckCircle2,
   ArrowLeft,
   Loader2,
-  Wallet,
+  Banknote,
+  Shield,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
@@ -35,7 +36,7 @@ export default function CheckoutPage() {
     city: '',
     phone: '',
   });
-  const [paymentMethod, setPaymentMethod] = useState<'card' | 'wallet'>('card');
+  const [paymentMethod, setPaymentMethod] = useState<'cod' | 'escrow'>('cod');
 
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -82,6 +83,7 @@ export default function CheckoutPage() {
           quantity: item.quantity,
           price: item.price,
         })),
+        paymentMethod,
         shippingAddress: `${shippingData.fullName}, ${shippingData.address}, ${shippingData.city}. Ph: ${shippingData.phone}`,
       };
 
@@ -343,10 +345,10 @@ export default function CheckoutPage() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
                     <button
-                      onClick={() => setPaymentMethod('card')}
+                      onClick={() => setPaymentMethod('cod')}
                       className={cn(
                         'p-4 rounded-xl border-2 flex flex-col items-center gap-3 transition-all',
-                        paymentMethod === 'card'
+                        paymentMethod === 'cod'
                           ? 'border-primary bg-primary/5 shadow-sm'
                           : 'border-primary/10 hover:border-primary/30',
                       )}
@@ -354,24 +356,24 @@ export default function CheckoutPage() {
                       <div
                         className={cn(
                           'w-12 h-12 rounded-full flex items-center justify-center',
-                          paymentMethod === 'card'
+                          paymentMethod === 'cod'
                             ? 'bg-primary text-white'
                             : 'bg-neutral-white text-neutral-black/40',
                         )}
                       >
-                        <CreditCard className="w-6 h-6" />
+                        <Banknote className="w-6 h-6" />
                       </div>
                       <div>
-                        <p className="font-semibold text-neutral-black">Credit Card</p>
-                        <p className="text-xs text-neutral-black/60">Visa, Mastercard</p>
+                        <p className="font-semibold text-neutral-black">Cash on Delivery</p>
+                        <p className="text-xs text-neutral-black/60">Pay when you receive</p>
                       </div>
                     </button>
 
                     <button
-                      onClick={() => setPaymentMethod('wallet')}
+                      onClick={() => setPaymentMethod('escrow')}
                       className={cn(
                         'p-4 rounded-xl border-2 flex flex-col items-center gap-3 transition-all',
-                        paymentMethod === 'wallet'
+                        paymentMethod === 'escrow'
                           ? 'border-primary bg-primary/5 shadow-sm'
                           : 'border-primary/10 hover:border-primary/30',
                       )}
@@ -379,52 +381,80 @@ export default function CheckoutPage() {
                       <div
                         className={cn(
                           'w-12 h-12 rounded-full flex items-center justify-center',
-                          paymentMethod === 'wallet'
+                          paymentMethod === 'escrow'
                             ? 'bg-primary text-white'
                             : 'bg-neutral-white text-neutral-black/40',
                         )}
                       >
-                        <Wallet className="w-6 h-6" />
+                        <Shield className="w-6 h-6" />
                       </div>
                       <div>
-                        <p className="font-semibold text-neutral-black">Digital Wallet</p>
-                        <p className="text-xs text-neutral-black/60">eSewa, Khalti</p>
+                        <p className="font-semibold text-neutral-black">Secure Escrow</p>
+                        <p className="text-xs text-neutral-black/60">Payment held until delivery</p>
                       </div>
                     </button>
                   </div>
 
-                  {paymentMethod === 'card' ? (
-                    <div className="space-y-4 mb-8 p-6 bg-neutral-white rounded-xl border border-primary/5">
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-neutral-black/70">
-                          Card Number
-                        </label>
-                        <Input placeholder="0000 0000 0000 0000" disabled />
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium text-neutral-black/70">
-                            Expiry Date
-                          </label>
-                          <Input placeholder="MM/YY" disabled />
+                  {paymentMethod === 'escrow' ? (
+                    <div className="space-y-4 mb-8 p-6 bg-blue-50 rounded-xl border border-blue-100">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                          <Shield className="w-5 h-5 text-white" />
                         </div>
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium text-neutral-black/70">CVC</label>
-                          <Input placeholder="123" disabled />
+                        <div>
+                          <h4 className="font-semibold text-blue-900">Secure Escrow Payment</h4>
+                          <p className="text-xs text-blue-700">Your funds are protected</p>
                         </div>
                       </div>
-                      <p className="text-xs text-neutral-black/50 italic">
-                        Note: This is a simulation. Payment details are disabled for development.
+                      <div className="space-y-2 text-sm text-blue-800">
+                        <p className="flex items-start gap-2">
+                          <span className="font-bold">1.</span>
+                          <span>Payment will be held securely in escrow</span>
+                        </p>
+                        <p className="flex items-start gap-2">
+                          <span className="font-bold">2.</span>
+                          <span>Vendor ships your order</span>
+                        </p>
+                        <p className="flex items-start gap-2">
+                          <span className="font-bold">3.</span>
+                          <span>Confirm delivery to release payment to vendor</span>
+                        </p>
+                        <p className="flex items-start gap-2">
+                          <span className="font-bold">4.</span>
+                          <span>Dispute option available if issues arise</span>
+                        </p>
+                      </div>
+                      <p className="text-xs text-blue-600 italic pt-2 border-t border-blue-200">
+                        💡 Buyer protection: Funds only released after you confirm delivery
                       </p>
                     </div>
                   ) : (
-                    <div className="mb-8 p-6 bg-green-50 rounded-xl border border-green-100 flex items-center gap-4">
-                      <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm">
-                        <span className="font-bold text-green-600 text-lg">W</span>
+                    <div className="mb-8 p-6 bg-amber-50 rounded-xl border border-amber-100">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-10 h-10 bg-amber-600 rounded-full flex items-center justify-center">
+                          <Banknote className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-amber-900">Cash on Delivery</h4>
+                          <p className="text-xs text-amber-700">Pay when you receive your order</p>
+                        </div>
                       </div>
-                      <p className="text-sm text-green-800">
-                        You will be redirected to your digital wallet to complete payment after
-                        clicking place order.
+                      <div className="space-y-2 text-sm text-amber-800">
+                        <p className="flex items-start gap-2">
+                          <span className="font-bold">1.</span>
+                          <span>Vendor ships your order</span>
+                        </p>
+                        <p className="flex items-start gap-2">
+                          <span className="font-bold">2.</span>
+                          <span>Receive your order at your doorstep</span>
+                        </p>
+                        <p className="flex items-start gap-2">
+                          <span className="font-bold">3.</span>
+                          <span>Pay cash to the delivery person</span>
+                        </p>
+                      </div>
+                      <p className="text-xs text-amber-600 italic pt-2 border-t border-amber-200">
+                        💡 Simple & convenient: No upfront payment required
                       </p>
                     </div>
                   )}
