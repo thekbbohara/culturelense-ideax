@@ -3,6 +3,8 @@
 import React from 'react';
 import { NavSearch } from '@/components/search/nav-search';
 
+import { LanguageSelector } from '@/components/language-selector';
+
 export function Nav() {
   const [isVisible, setIsVisible] = React.useState(true);
   const [lastScrollY, setLastScrollY] = React.useState(0);
@@ -49,6 +51,7 @@ export function Nav() {
           <div className="w-full max-w-xs lg:w-80 transition-all">
             <NavSearch />
           </div>
+          <LanguageSelector variant="minimal" />
         </div>
       </div>
     </nav>

@@ -10,6 +10,9 @@ export const metadata: Metadata = {
   title: 'CultureLense',
   description: 'Discover cultural entities',
   manifest: '/manifest.json',
+  other: {
+    google: 'translate',
+  },
 };
 
 export const viewport = {
@@ -33,9 +36,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 e.preventDefault();
                 window.pwaEvent = e;
               });
+              
+              function googleTranslateElementInit() {
+                new google.translate.TranslateElement({
+                  pageLanguage: 'en',
+                  layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                  autoDisplay: false
+                }, 'google_translate_element');
+              }
             `,
           }}
         />
+        <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+        <style>{`
+          .goog-te-banner-frame { display: none !important; }
+          body { top: 0px !important; }
+          iframe.goog-te-banner-frame { display: none !important; }
+        `}</style>
       </head>
       <body>
         <QueryProvider>
@@ -46,7 +63,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               enableSystem
               disableTransitionOnChange
             >
-              <div>
+              <div suppressHydrationWarning>
+                <div id="google_translate_element" className="hidden" suppressHydrationWarning></div>
                 {children}
               </div>
               <Toaster position="top-right" richColors />

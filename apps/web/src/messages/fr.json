@@ -1,0 +1,63 @@
+{
+    "nav": {
+        "home": "Accueil",
+        "explore": "Explorer",
+        "scan": "Scanner",
+        "profile": "Profil",
+        "admin": "Administrateur",
+        "logout": "Se déconnecter",
+        "marketplace": "Marché",
+        "vendors": "Vendeurs"
+    },
+    "common": {
+        "loading": "Chargement...",
+        "save": "Enregistrer",
+        "cancel": "Annuler",
+        "delete": "Supprimer",
+        "edit": "Modifier",
+        "search": "Rechercher",
+        "close": "Fermer",
+        "submit": "Soumettre",
+        "select": "Sélectionner"
+    },
+    "profile": {
+        "settings": "Paramètres",
+        "visualMode": "Mode Visuel",
+        "interface": "Interface",
+        "theme": {
+            "light": "Clair",
+            "dark": "Sombre",
+            "auto": "Automatique"
+        },
+        "language": {
+            "label": "Langue",
+            "en": "English (Anglais)",
+            "es": "Español (Espagnol)",
+            "fr": "Français (Par défaut)",
+            "hi": "हिन्दी (Hindi)",
+            "ne": "नेपाली (Népalais)"
+        }
+    },
+    "map": {
+        "searchPlaceholder": "Rechercher des temples...",
+        "markVisited": "Marquer comme Visité",
+        "markUnvisited": "Marquer comme Non Visité",
+        "loadingMap": "Chargement de la carte...",
+        "findLocation": "Trouver ma position",
+        "locationError": "Impossible d'accéder à votre position."
+    },
+    "explore": {
+        "title": "Endroits que vous avez visités:",
+        "noResults": "Aucun temple trouvé"
+    },
+    "errors": {
+        "generic": "Une erreur s'est produite. Veuillez réessayer.",
+        "networkError": "Erreur réseau. Veuillez vérifier votre connexion.",
+        "unauthorized": "Vous n'êtes pas autorisé à effectuer cette action."
+    },
+    "success": {
+        "saved": "Enregistré avec succès!",
+        "updated": "Mis à jour avec succès!",
+        "deleted": "Supprimé avec succès!"
+    }
+}
