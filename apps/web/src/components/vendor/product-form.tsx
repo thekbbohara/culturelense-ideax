@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import { productFormSchema, type ProductFormValues } from '@/lib/validations/product-schema';
 import { uploadProductImage } from '@/lib/supabase/storage';
 import { getEntities } from '@/actions/entities';
+import { getCategories } from '@/actions/categories';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -55,6 +56,7 @@ export function ProductForm({
       quantity: '',
       imageUrl: '',
       entityId: '',
+      categoryId: '',
       status: 'active',
     },
   });
@@ -94,15 +96,23 @@ export function ProductForm({
   };
 
   const [entities, setEntities] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
 
   useEffect(() => {
-    async function fetchEntities() {
-      const result = await getEntities();
-      if (result.success && result.data) {
-        setEntities(result.data);
+    async function fetchData() {
+      const [entitiesResult, categoriesResult] = await Promise.all([
+        getEntities(),
+        getCategories(),
+      ]);
+
+      if (entitiesResult.success && entitiesResult.data) {
+        setEntities(entitiesResult.data);
+      }
+      if (categoriesResult.success && categoriesResult.data) {
+        setCategories(categoriesResult.data);
       }
     }
-    fetchEntities();
+    fetchData();
   }, []);
 
   return (
@@ -209,7 +219,9 @@ export function ProductForm({
               </FormItem>
             )}
           />
+        </div>
 
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <FormField
             control={form.control}
             name="entityId"
@@ -234,6 +246,33 @@ export function ProductForm({
                 <FormDescription>
                   Associate this product with a specific cultural entity
                 </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="categoryId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Category</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
+                  <FormControl>
+                    <SelectTrigger className="focus:ring-primary">
+                      <SelectValue placeholder="Select a category" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent className="max-h-[400px] overflow-y-auto">
+                    <SelectItem value="none">None</SelectItem>
+                    {categories.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormDescription>Select a category for this product</FormDescription>
                 <FormMessage />
               </FormItem>
             )}

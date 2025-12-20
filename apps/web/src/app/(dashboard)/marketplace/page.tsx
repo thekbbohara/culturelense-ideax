@@ -66,7 +66,7 @@ export default function MarketplacePage() {
           </aside>
 
           {/* Main Content */}
-          <main className="flex-1 space-y-12">
+          <main className="flex-1 space-y-16">
             {/* Featured Section */}
             {featuredItems.length > 0 && (
               <section>
@@ -81,7 +81,7 @@ export default function MarketplacePage() {
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ duration: 0.4 }}
-                      className="relative group"
+                      className="relative group md:max-h-[600px] max-h-[800px]"
                     >
                       <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-3xl blur-xl group-hover:blur-2xl transition-all opacity-0 group-hover:opacity-100" />
                       <ProductCard
@@ -91,6 +91,7 @@ export default function MarketplacePage() {
                         price={item.price}
                         imageUrl={item.imageUrl}
                         isNew={item.isNew}
+                        className="h-full w-full"
                       />
                     </motion.div>
                   ))}
@@ -113,6 +114,7 @@ export default function MarketplacePage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: index * 0.05 }}
+                    className="relative group md:max-h-[400px] max-h-[600px]"
                   >
                     <ProductCard
                       id={item.id}
@@ -121,6 +123,7 @@ export default function MarketplacePage() {
                       price={item.price}
                       imageUrl={item.imageUrl}
                       isNew={item.isNew}
+                      className="h-full w-full"
                     />
                   </motion.div>
                 ))}

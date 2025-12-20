@@ -1,16 +1,16 @@
 import React from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
-import { VendorSidebarNav } from '@/components/vendor/vendor-sidebar-nav';
+import { AdminSidebarNav } from '@/components/admin/admin-sidebar-nav';
 
-interface VenderLayoutProps {
+interface AdminLayoutProps {
   children: React.ReactNode;
 }
 
-const VendorLayout: React.FC<VenderLayoutProps> = ({ children }) => {
+const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   return (
     <SidebarProvider className="flex w-full h-screen">
       <div className="min-h-[calc(100vh-5rem)] w-full bg-gradient-to-br from-background via-background to-primary/5 flex">
-        <VendorSidebarNav />
+        <AdminSidebarNav />
         <main className="flex-1 p-8 !pb-28 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
           {children}
         </main>
@@ -19,4 +19,4 @@ const VendorLayout: React.FC<VenderLayoutProps> = ({ children }) => {
   );
 };
 
-export default VendorLayout;
+export default AdminLayout;
