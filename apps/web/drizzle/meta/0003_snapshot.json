@@ -1,5 +1,6 @@
 {
-  "id": "c7382927-1819-4259-8c3d-493e3022d8b0",
+
+  "id": "7476746b-8cce-46b3-9698-380d81005f8c",
   "prevId": "25bb4b28-df02-4c1f-939e-af6c684187ce",
   "version": "7",
   "dialect": "postgresql",
@@ -688,6 +689,7 @@
           "primaryKey": false,
           "notNull": false
         },
+
         "shipping_address": {
           "name": "shipping_address",
           "type": "text",
