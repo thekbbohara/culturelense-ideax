@@ -21,7 +21,9 @@ export async function scanImage(formData: FormData) {
   try {
     /* ---------------- AUTH ---------------- */
     const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) return { success: false, error: 'You must be logged in.' };
 
     const file = formData.get('image') as File;
@@ -32,27 +34,32 @@ export async function scanImage(formData: FormData) {
     const { error } = await supabase.storage.from('scans').upload(filePath, file);
     if (error) throw new Error('Image upload failed');
 
-    const { data: { publicUrl } } = supabase.storage.from('scans').getPublicUrl(filePath);
-
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from('scans').getPublicUrl(filePath);
     /* ---------------- PYTHON AI ---------------- */
-    const pythonForm = new FormData();
-    pythonForm.append('file', file);
-
-    const pythonRes = await axios.post(
-      `${process.env.NEXT_PUBLIC_SPATIAL_URL}/predict`,
-      pythonForm
-    );
-
     let pythonAI: AIResult | null = null;
 
-    if (pythonRes.data?.prediction && pythonRes.data.prediction !== 'unknown') {
-      pythonAI = {
-        source: 'p',
-        isStatue: true,
-        prediction: pythonRes.data.prediction,
-        confidence: pythonRes.data.confidence ?? 0.8,
-        top_3: pythonRes.data.top_3 ?? [],
-      };
+    try {
+      const pythonForm = new FormData();
+      pythonForm.append('file', file);
+
+      const pythonRes = await axios.post(
+        `${process.env.NEXT_PUBLIC_SPATIAL_URL}/predict`,
+        pythonForm,
+      );
+
+      if (pythonRes.data?.prediction) {
+        pythonAI = {
+          source: 'p',
+          isStatue: true,
+          prediction: pythonRes.data.prediction,
+          confidence: pythonRes.data.confidence ?? 0.8,
+          top_3: pythonRes.data.top_3 ?? [],
+        };
+      }
+    } catch (err) {
+      console.warn('Python AI failed, falling back to Gemini');
     }
 
     /* ---------------- GEMINI ---------------- */
@@ -65,11 +72,12 @@ export async function scanImage(formData: FormData) {
 
     const response = await genAI.models.generateContent({
       model: 'gemini-2.5-flash',
-      contents: [{
-        role: 'user',
-        parts: [
-          {
-            text: `
+      contents: [
+        {
+          role: 'user',
+          parts: [
+            {
+              text: `
               You are an expert in Nepali culture, heritage, and religious iconography.
 
               Analyze the provided image and follow the rules EXACTLY.
@@ -131,16 +139,17 @@ export async function scanImage(formData: FormData) {
                 "confidence": 0,
                 "top_3": []
               }
-            `
-          },
-          {
-            inlineData: {
-              mimeType: file.type || 'image/jpeg',
-              data: base64,
+            `,
             },
-          },
-        ],
-      }],
+            {
+              inlineData: {
+                mimeType: file.type || 'image/jpeg',
+                data: base64,
+              },
+            },
+          ],
+        },
+      ],
       config: { responseMimeType: 'application/json' },
     });
 
@@ -194,16 +203,6 @@ export async function scanImage(formData: FormData) {
     });
 
     await saveSearchEntry(entity?.data?.name || '');
-
-    console.log({
-      success: true,
-      data: {
-        entity: entity.data,
-        confidence: finalAI.confidence,
-        top_3: finalAI.top_3,
-        source: finalAI.source,
-      },
-    });
 
     /* ---------------- SUCCESS ---------------- */
     return {
