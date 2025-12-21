@@ -125,8 +125,9 @@ export const FilterSidebar = ({
               min={MIN_PRICE}
               max={maxPrice}
               step={10}
-              className="w-full"
+              className="w-full [&_[role=slider]]:pointer-events-auto [&_[role=slider]]:z-20"
             />
+
 
             {/* Min/Max Labels */}
             <div className="flex justify-between mt-3">

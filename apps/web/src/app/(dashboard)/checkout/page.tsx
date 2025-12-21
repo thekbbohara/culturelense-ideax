@@ -2,10 +2,19 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import {
   ChevronRight,
   MapPin,
@@ -22,24 +31,25 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { clearCart } from '@/store/slices/cartSlice';
 import { createOrders } from '@/actions/checkout';
 import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
 
 type Step = 'address' | 'review' | 'payment' | 'success';
+
+type ShippingFormValues = {
+  fullName: string;
+  phone: string;
+  address: string;
+  city: string;
+};
 
 export default function CheckoutPage() {
   const [step, setStep] = useState<Step>('address');
   const [isLoading, setIsLoading] = useState(false);
-  const [shippingData, setShippingData] = useState({
-    fullName: '',
-    address: '',
-    city: '',
-    phone: '',
-  });
   const [paymentMethod, setPaymentMethod] = useState<'cod' | 'escrow'>('cod');
 
   const dispatch = useAppDispatch();
-  const router = useRouter();
   const { userId } = useAppSelector((state) => state.auth);
   const effectiveUserId = userId || 'guest';
 
@@ -48,6 +58,15 @@ export default function CheckoutPage() {
 
   const shipping = subtotal > 5000 || subtotal === 0 ? 0 : 50;
   const total = subtotal + shipping;
+
+  const form = useForm<ShippingFormValues>({
+    defaultValues: {
+      fullName: '',
+      phone: '',
+      address: '',
+      city: '',
+    },
+  });
 
   if (cartItems.length === 0 && step !== 'success') {
     return (
@@ -66,13 +85,13 @@ export default function CheckoutPage() {
     );
   }
 
-  const handleStepChange = (nextStep: Step) => {
-    if (
-      nextStep === 'review' &&
-      (!shippingData.fullName || !shippingData.address || !shippingData.city || !shippingData.phone)
-    ) {
-      toast.error('Please fill in all shipping details');
-      return;
+  const handleStepChange = async (nextStep: Step) => {
+    if (nextStep === 'review') {
+      const isValid = await form.trigger();
+      if (!isValid) {
+        toast.error('Please fill in all shipping details correctly');
+        return;
+      }
     }
     setStep(nextStep);
   };
@@ -80,6 +99,7 @@ export default function CheckoutPage() {
   const handlePlaceOrder = async () => {
     setIsLoading(true);
     try {
+      const values = form.getValues();
       const orderData = {
         items: cartItems.map((item) => ({
           listingId: item.id,
@@ -87,7 +107,7 @@ export default function CheckoutPage() {
           price: item.price,
         })),
         paymentMethod,
-        shippingAddress: `${shippingData.fullName}, ${shippingData.address}, ${shippingData.city}. Ph: ${shippingData.phone}`,
+        shippingAddress: `${values.fullName}, ${values.address}, ${values.city}. Ph: ${values.phone}`,
       };
 
       const result = await createOrders(orderData);
@@ -106,8 +126,10 @@ export default function CheckoutPage() {
     }
   };
 
+  const formValues = form.watch();
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-neutral-white via-neutral-white to-primary/5 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-neutral-white via-neutral-white to-primary/5 pt-14 pb-40 sm:pb-24 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         {/* Progress Header */}
         <div className="mb-12">
@@ -193,56 +215,79 @@ export default function CheckoutPage() {
                     <MapPin className="w-5 h-5 text-primary" />
                     Shipping Information
                   </h2>
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-neutral-black/70">
-                          Full Name
-                        </label>
-                        <Input
-                          placeholder="John Doe"
-                          value={shippingData.fullName}
-                          onChange={(e) =>
-                            setShippingData({ ...shippingData, fullName: e.target.value })
-                          }
+                  <Form {...form}>
+                    <form className="space-y-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="fullName"
+                          rules={{ required: 'Full Name is required', minLength: { value: 2, message: 'Name must be at least 2 characters' } }}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Full Name</FormLabel>
+                              <FormControl>
+                                <Input placeholder="John Doe" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="phone"
+                          rules={{
+                            required: 'Phone number is required',
+                            validate: (value) => !value || isValidPhoneNumber(value) || 'Invalid phone number for selected country'
+                          }}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Phone Number</FormLabel>
+                              <FormControl>
+                                <div className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                                  <PhoneInput
+                                    placeholder="Enter phone number"
+                                    defaultCountry="NP"
+                                    value={field.value}
+                                    onChange={field.onChange}
+                                    className="flex-1 bg-transparent border-none outline-none"
+                                  />
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
                         />
                       </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium text-neutral-black/70">
-                          Phone Number
-                        </label>
-                        <Input
-                          placeholder="+977-9800000000"
-                          value={shippingData.phone}
-                          onChange={(e) =>
-                            setShippingData({ ...shippingData, phone: e.target.value })
-                          }
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-neutral-black/70">
-                        Street Address
-                      </label>
-                      <Input
-                        placeholder="House No., Street Name"
-                        value={shippingData.address}
-                        onChange={(e) =>
-                          setShippingData({ ...shippingData, address: e.target.value })
-                        }
+                      <FormField
+                        control={form.control}
+                        name="address"
+                        rules={{ required: 'Address is required', minLength: { value: 5, message: 'Address must be at least 5 characters' } }}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Street Address</FormLabel>
+                            <FormControl>
+                              <Input placeholder="House No., Street Name" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-neutral-black/70">
-                        City / District
-                      </label>
-                      <Input
-                        placeholder="Kathmandu"
-                        value={shippingData.city}
-                        onChange={(e) => setShippingData({ ...shippingData, city: e.target.value })}
+                      <FormField
+                        control={form.control}
+                        name="city"
+                        rules={{ required: 'City is required', minLength: { value: 2, message: 'City must be at least 2 characters' } }}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>City / District</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Kathmandu" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
-                    </div>
-                  </div>
+                    </form>
+                  </Form>
                   <div className="mt-8 flex justify-end">
                     <Button
                       onClick={() => handleStepChange('review')}
@@ -314,11 +359,13 @@ export default function CheckoutPage() {
                         <MapPin className="w-4 h-4 text-primary" />
                         Shipping To
                       </h4>
-                      <p className="text-sm text-neutral-black/70">{shippingData.fullName}</p>
+                      <p className="text-sm text-neutral-black/70">{formValues.fullName}</p>
                       <p className="text-sm text-neutral-black/70">
-                        {shippingData.address}, {shippingData.city}
+                        {formValues.address}, {formValues.city}
                       </p>
-                      <p className="text-sm text-neutral-black/70">Ph: {shippingData.phone}</p>
+                      <p className="text-sm text-neutral-black/70">
+                        Ph: {formValues.phone}
+                      </p>
                     </div>
                   </div>
 
@@ -462,18 +509,27 @@ export default function CheckoutPage() {
                     </div>
                   )}
 
-                  <div className="flex justify-between items-center">
+                  <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-between sm:items-center">
                     <Button
                       variant="ghost"
                       onClick={() => setStep('review')}
-                      className="text-primary"
+                      className="text-primary w-full sm:w-auto justify-center sm:justify-start"
                     >
-                      <ArrowLeft className="mr-2 w-4 h-4" /> Back to Review
+                      <ArrowLeft className="mr-2 w-4 h-4" />
+                      Back to Review
                     </Button>
+
                     <Button
                       onClick={handlePlaceOrder}
                       disabled={isLoading}
-                      className="px-10 bg-primary hover:bg-primary/90 text-white rounded-xl h-12 text-lg font-bold min-w-[200px]"
+                      className="
+                        w-full sm:w-fit
+                        bg-primary hover:bg-primary/90
+                        text-white rounded-xl
+                        h-10 sm:h-6
+                        text-sm font-bold
+                        sm:min-w-[200px]
+                      "
                     >
                       {isLoading ? (
                         <>
@@ -485,6 +541,7 @@ export default function CheckoutPage() {
                       )}
                     </Button>
                   </div>
+
                 </motion.div>
               )}
 
